@@ -51,6 +51,37 @@ const (
 	Nnew // push(nil);
 )
 
+func (op Op) GoString() string {
+	switch op {
+	case Inew:
+		return "Inew"
+	case Iinc:
+		return "Iinc"
+	case Ishl:
+		return "Ishl"
+	case Iadd:
+		return "Iadd"
+	case Snew:
+		return "Snew"
+	case Sadd:
+		return "Sadd"
+	case Onew:
+		return "Onew"
+	case Oadd:
+		return "Oadd"
+	case Bnew:
+		return "Bnew"
+	case Bneg:
+		return "Bneg"
+	case Nnew:
+		return "Nnew"
+	default:
+		panic(fmt.Errorf("invalid opcode: %d", op))
+	}
+}
+
+var _ fmt.GoStringer = Op(0)
+
 // Kind is a type of Value.
 type Kind int
 
