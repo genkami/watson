@@ -562,6 +562,58 @@ func TestFeedBnewPushesFalse(t *testing.T) {
 	}
 }
 
+func TestFeedBnegNegatesTheTop(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushBool(true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Bneg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewBoolValue(false)
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedBnegFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Bneg)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedBnegFailsWhenArg1IsNotBool(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Bneg)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedNnewPushesNil(t *testing.T) {
 	var err error
 	vm := NewVM()

@@ -42,6 +42,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedOadd()
 	case Bnew:
 		return vm.feedBnew()
+	case Bneg:
+		return vm.feedBneg()
 	case Nnew:
 		return vm.feedNnew()
 	default:
@@ -134,6 +136,14 @@ func (vm *VM) feedBnew() error {
 	return vm.pushBool(false)
 }
 
+func (vm *VM) feedBneg() error {
+	v, err := vm.popBool()
+	if err != nil {
+		return err
+	}
+	return vm.pushBool(!v)
+}
+
 func (vm *VM) feedNnew() error {
 	return vm.pushNil()
 }
@@ -212,4 +222,15 @@ func (vm *VM) popObject() (Object, error) {
 		return nil, ErrTypeMismatch
 	}
 	return v.Object, nil
+}
+
+func (vm *VM) popBool() (bool, error) {
+	v, err := vm.pop()
+	if err != nil {
+		return false, err
+	}
+	if v.Kind != KBool {
+		return false, ErrTypeMismatch
+	}
+	return v.Bool, nil
 }

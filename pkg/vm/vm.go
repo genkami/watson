@@ -45,6 +45,7 @@ const (
 
 	// Bool Operations
 	Bnew // push(false);
+	Bneg // b: bool = pop(); push(!b);
 
 	// Nil Operations
 	Nnew // push(nil);
