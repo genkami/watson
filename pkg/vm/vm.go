@@ -49,6 +49,7 @@ type Kind int
 const (
 	KInt    Kind = iota // 64-bit signed integer
 	KString             // string (represented as a byte array)
+	KObject             // object (set of key-value pairs)
 	KNil                // nil
 )
 
@@ -57,7 +58,10 @@ type Value struct {
 	Kind   Kind
 	Int    int64
 	String []byte
+	Object Object
 }
+
+type Object map[string]*Value
 
 // NewIntValue creates a new Value that contains an integer.
 func NewIntValue(val int64) *Value {
@@ -67,6 +71,11 @@ func NewIntValue(val int64) *Value {
 // NewStringValue creates a new Value that contains a string.
 func NewStringValue(val []byte) *Value {
 	return &Value{Kind: KString, String: val}
+}
+
+// NewObjectValue creates a new Value that contains an object.
+func NewObjectValue(val Object) *Value {
+	return &Value{Kind: KObject, Object: val}
 }
 
 // NewNilValue creates a new Value that contains nil.
@@ -82,6 +91,11 @@ func (v *Value) DeepCopy() *Value {
 	case KString:
 		clone.String = make([]byte, len(v.String))
 		copy(clone.String, v.String)
+	case KObject:
+		clone.Object = map[string]*Value{}
+		for k, v := range v.Object {
+			clone.Object[k] = v.DeepCopy()
+		}
 	case KNil:
 		// nop
 	default:

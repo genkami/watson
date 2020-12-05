@@ -421,6 +421,31 @@ func TestDeepCopyString(t *testing.T) {
 	}
 }
 
+func TestDeepCopyWithObject(t *testing.T) {
+	orig := NewObjectValue(map[string]*Value{
+		"hello": NewStringValue([]byte("world")),
+	})
+	clone := orig.DeepCopy()
+	if diff := cmp.Diff(orig, clone); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+
+	clone.Object["hello"].String[0] = 0x61 // 'a'
+	if diff := cmp.Diff(orig, clone); diff == "" {
+		t.Errorf("clone shares the same reference with its origin")
+	}
+
+	clone.Object["hoge"] = NewStringValue([]byte("fuga"))
+	if diff := cmp.Diff(orig, clone); diff == "" {
+		t.Errorf("clone shares the same reference with its origin")
+	}
+
+	clone.Object = map[string]*Value{}
+	if diff := cmp.Diff(orig, clone); diff == "" {
+		t.Errorf("DeepCopy returned receiver itself")
+	}
+}
+
 func TestDeepCopyWithNil(t *testing.T) {
 	orig := NewNilValue()
 	clone := orig.DeepCopy()
