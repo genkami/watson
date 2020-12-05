@@ -185,3 +185,29 @@ func TestFeedMultiExecutesOpsSequentially(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestDeepCopyWithInt(t *testing.T) {
+	orig := NewIntValue(123)
+	clone := orig.DeepCopy()
+	if diff := cmp.Diff(orig, clone); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+
+	clone.Int = 456
+	if orig.Int == clone.Int {
+		t.Errorf("DeepCopy returned receiver itself")
+	}
+}
+
+func TestDeepCopyWithNil(t *testing.T) {
+	orig := NewNilValue()
+	clone := orig.DeepCopy()
+	if diff := cmp.Diff(orig, clone); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+
+	clone.Kind = KInt
+	if orig.Kind == clone.Kind {
+		t.Errorf("DeepCopy returned receiver itself")
+	}
+}

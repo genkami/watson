@@ -1,6 +1,10 @@
 // Package vm contains a stack-based virtual machine that interprets Watson.
 package vm
 
+import (
+	"fmt"
+)
+
 const (
 	DefaultStackSize = 1024 // the default size of the stack
 )
@@ -33,6 +37,14 @@ const (
 	Nnew           // push(nil);
 )
 
+// Kind is a type of Value.
+type Kind int
+
+const (
+	KInt Kind = iota // 64-bit signed integer
+	KNil             // nil
+)
+
 // Value is an element of the stack.
 type Value struct {
 	Kind Kind
@@ -49,10 +61,15 @@ func NewNilValue() *Value {
 	return &Value{Kind: KNil}
 }
 
-// Kind is a type of Value.
-type Kind int
-
-const (
-	KInt Kind = iota // 64-bit signed integer
-	KNil             // nil
-)
+func (v *Value) DeepCopy() *Value {
+	clone := &Value{Kind: v.Kind}
+	switch v.Kind {
+	case KInt:
+		clone.Int = v.Int
+	case KNil:
+		// nop
+	default:
+		panic(fmt.Errorf("unknown kind: %d", v.Kind))
+	}
+	return clone
+}
