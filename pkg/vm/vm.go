@@ -54,6 +54,7 @@ const (
 	KInt    Kind = iota // 64-bit signed integer
 	KString             // string (represented as a byte array)
 	KObject             // object (set of key-value pairs)
+	KBool               // bool
 	KNil                // nil
 )
 
@@ -63,6 +64,7 @@ type Value struct {
 	Int    int64
 	String []byte
 	Object Object
+	Bool   bool
 }
 
 // Object is a set of key-value pairs.
@@ -83,6 +85,11 @@ func NewObjectValue(val Object) *Value {
 	return &Value{Kind: KObject, Object: val}
 }
 
+// NewBoolValue creates a new Value that contains a bool.
+func NewBoolValue(val bool) *Value {
+	return &Value{Kind: KBool, Bool: val}
+}
+
 // NewNilValue creates a new Value that contains nil.
 func NewNilValue() *Value {
 	return &Value{Kind: KNil}
@@ -101,6 +108,8 @@ func (v *Value) DeepCopy() *Value {
 		for k, v := range v.Object {
 			clone.Object[k] = v.DeepCopy()
 		}
+	case KBool:
+		clone.Bool = v.Bool
 	case KNil:
 		// nop
 	default:

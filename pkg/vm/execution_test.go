@@ -650,6 +650,19 @@ func TestDeepCopyWithObject(t *testing.T) {
 	}
 }
 
+func TestDeepCopyWithBool(t *testing.T) {
+	orig := NewBoolValue(true)
+	clone := orig.DeepCopy()
+	if diff := cmp.Diff(orig, clone); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+
+	clone.Bool = false
+	if orig.Bool == clone.Bool {
+		t.Errorf("DeepCopy returned receiver itself")
+	}
+}
+
 func TestDeepCopyWithNil(t *testing.T) {
 	orig := NewNilValue()
 	clone := orig.DeepCopy()
