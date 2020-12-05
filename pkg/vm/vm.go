@@ -39,6 +39,9 @@ const (
 	Snew // push("");
 	Sadd // n: int = pop(); s: str = pop(); c = n && 0xff; push(s + c);
 
+	// Object Operations
+	Onew // push({});
+
 	// Nil Operations
 	Nnew // push(nil);
 )

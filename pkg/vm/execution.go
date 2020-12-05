@@ -36,6 +36,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedSnew()
 	case Sadd:
 		return vm.feedSadd()
+	case Onew:
+		return vm.feedOnew()
 	case Nnew:
 		return vm.feedNnew()
 	default:
@@ -103,6 +105,10 @@ func (vm *VM) feedSadd() error {
 	return vm.pushString(t)
 }
 
+func (vm *VM) feedOnew() error {
+	return vm.pushObject(map[string]*Value{})
+}
+
 func (vm *VM) feedNnew() error {
 	return vm.pushNil()
 }
@@ -126,6 +132,10 @@ func (vm *VM) pushInt(val int64) error {
 
 func (vm *VM) pushString(val []byte) error {
 	return vm.push(NewStringValue(val))
+}
+
+func (vm *VM) pushObject(val Object) error {
+	return vm.push(NewObjectValue(val))
 }
 
 func (vm *VM) pushNil() error {
