@@ -9,7 +9,7 @@ import (
 )
 
 func TestNextReturnsTheFirstOp(t *testing.T) {
-	op, err := readOne("Y")
+	op, err := readOne("B")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -19,7 +19,7 @@ func TestNextReturnsTheFirstOp(t *testing.T) {
 }
 
 func TestNextReturnsOpsSequentially(t *testing.T) {
-	buf := bytes.NewReader([]byte("Yummy"))
+	buf := bytes.NewReader([]byte("Bubba"))
 	l := NewLexer(buf)
 	expectedOps := []vm.Op{vm.Inew, vm.Iinc, vm.Ishl, vm.Ishl, vm.Iadd}
 	for _, expected := range expectedOps {
@@ -38,7 +38,7 @@ func TestNextReturnsOpsSequentially(t *testing.T) {
 }
 
 func TestNextSkipsMeaninglessBytes(t *testing.T) {
-	op, err := readOne("ZZZZZY")
+	op, err := readOne("ZZZZZB")
 	if err != nil {
 		t.Fatal(err)
 	}

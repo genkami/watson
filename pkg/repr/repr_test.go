@@ -7,10 +7,10 @@ import (
 )
 
 var table = map[string]vm.Op{
-	"Y": vm.Inew,
+	"B": vm.Inew,
 	"u": vm.Iinc,
-	"m": vm.Ishl,
-	"y": vm.Iadd,
+	"b": vm.Ishl,
+	"a": vm.Iadd,
 	"?": vm.Snew,
 	"!": vm.Sadd,
 	"~": vm.Onew,

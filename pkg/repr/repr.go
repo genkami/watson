@@ -8,10 +8,10 @@ import (
 )
 
 var opTable = map[byte]vm.Op{
-	0x59: vm.Inew, // 'Y'
+	0x42: vm.Inew, // 'B'
 	0x75: vm.Iinc, // 'u'
-	0x6d: vm.Ishl, // 'm'
-	0x79: vm.Iadd, // 'y'
+	0x62: vm.Ishl, // 'b'
+	0x61: vm.Iadd, // 'a'
 	0x3f: vm.Snew, // '?'
 	0x21: vm.Sadd, // '!'
 	0x7e: vm.Onew, // '~'
