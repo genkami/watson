@@ -43,19 +43,26 @@ const (
 type Kind int
 
 const (
-	KInt Kind = iota // 64-bit signed integer
-	KNil             // nil
+	KInt    Kind = iota // 64-bit signed integer
+	KString             // string (represented as a byte array)
+	KNil                // nil
 )
 
 // Value is an element of the stack.
 type Value struct {
-	Kind Kind
-	Int  int64
+	Kind   Kind
+	Int    int64
+	String []byte
 }
 
 // NewIntValue creates a new Value that contains an integer.
 func NewIntValue(val int64) *Value {
 	return &Value{Kind: KInt, Int: val}
+}
+
+// NewStringValue creates a new Value that contains a string.
+func NewStringValue(val []byte) *Value {
+	return &Value{Kind: KString, String: val}
 }
 
 // NewNilValue creates a new Value that contains nil.
@@ -68,6 +75,9 @@ func (v *Value) DeepCopy() *Value {
 	switch v.Kind {
 	case KInt:
 		clone.Int = v.Int
+	case KString:
+		clone.String = make([]byte, len(v.String))
+		copy(clone.String, v.String)
 	case KNil:
 		// nop
 	default:
