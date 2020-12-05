@@ -25,6 +25,8 @@ func (vm *VM) Feed(op Op) error {
 	switch op {
 	case Inew:
 		return vm.feedInew()
+	case Iinc:
+		return vm.feedIinc()
 	default:
 		panic(fmt.Errorf("invalid opcode: %d", op))
 	}
@@ -32,6 +34,14 @@ func (vm *VM) Feed(op Op) error {
 
 func (vm *VM) feedInew() error {
 	return vm.pushInt(0)
+}
+
+func (vm *VM) feedIinc() error {
+	v, err := vm.pop()
+	if err != nil {
+		return err
+	}
+	return vm.pushInt(v.Int + 1)
 }
 
 // Miscellaneous functions
