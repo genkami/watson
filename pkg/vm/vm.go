@@ -31,12 +31,13 @@ type Op int
 const (
 	// Integer Operations
 	Inew Op = iota // push(0);
-	Iinc           // v = pop(); push(v + 1);
-	Iadd           // b = pop(); a = pop(); push(a + b);
-	Ishl           // v = pop(); push(v << 1);
+	Iinc           // v: int = pop(); push(v + 1);
+	Iadd           // b: int = pop(); a: int = pop(); push(a + b);
+	Ishl           // v: int = pop(); push(v << 1);
 
 	// String Operations
 	Snew // push("");
+	Sadd // n: int = pop(); s: str = pop(); c = n && 0xff; push(s + c);
 
 	// Nil Operations
 	Nnew // push(nil);

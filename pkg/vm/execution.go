@@ -34,6 +34,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedIadd()
 	case Snew:
 		return vm.feedSnew()
+	case Sadd:
+		return vm.feedSadd()
 	case Nnew:
 		return vm.feedNnew()
 	default:
@@ -88,6 +90,19 @@ func (vm *VM) feedSnew() error {
 	return vm.pushString([]byte{})
 }
 
+func (vm *VM) feedSadd() error {
+	n, err := vm.popInt()
+	if err != nil {
+		return err
+	}
+	s, err := vm.popString()
+	if err != nil {
+		return err
+	}
+	t := append(s, byte(n))
+	return vm.pushString(t)
+}
+
 func (vm *VM) feedNnew() error {
 	return vm.pushNil()
 }
@@ -136,4 +151,15 @@ func (vm *VM) popInt() (int64, error) {
 		return 0, ErrTypeMismatch
 	}
 	return v.Int, nil
+}
+
+func (vm *VM) popString() ([]byte, error) {
+	v, err := vm.pop()
+	if err != nil {
+		return nil, err
+	}
+	if v.Kind != KString {
+		return nil, ErrTypeMismatch
+	}
+	return v.String, nil
 }

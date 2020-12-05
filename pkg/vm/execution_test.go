@@ -246,6 +246,96 @@ func TestFeedSnewPushesEmptyString(t *testing.T) {
 	}
 }
 
+func TestFeedSaddAddsACharToString(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushString([]byte("hello"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushInt(0x21) // '!'
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Sadd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewStringValue([]byte("hello!"))
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedSaddFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+	err = vm.Feed(Sadd)
+	if err != ErrStackEmpty {
+		t.Fatalf("expected ErrStackEmpty but got %v", err)
+	}
+}
+
+func TestFeedSaddFailsWhenStackIsInsufficiient(t *testing.T) {
+	var err error
+	vm := NewVM()
+	err = vm.pushInt(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Sadd)
+	if err != ErrStackEmpty {
+		t.Fatalf("expected ErrStackEmpty but got %v", err)
+	}
+}
+
+func TestFeedSaddFailsWhenArg1IsNotInteger(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushString([]byte("hello"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Sadd)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedSaddFailsWhenArg2IsNotString(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushInt(0x21) // '!'
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Sadd)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedNnewPushesNil(t *testing.T) {
 	var err error
 	vm := NewVM()
