@@ -27,8 +27,9 @@ type Op int
 const (
 	// Every op
 	Inew Op = iota // push(0);
-	Iinc           // v = pop(); push(v+1);
+	Iinc           // v = pop(); push(v + 1);
 	Iadd           // b = pop(); a = pop(); push(a + b);
+	Ishl           // v = pop(); push(v << 1);
 	Nnew           // push(nil);
 )
 

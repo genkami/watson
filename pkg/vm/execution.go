@@ -28,6 +28,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedInew()
 	case Iinc:
 		return vm.feedIinc()
+	case Ishl:
+		return vm.feedIshl()
 	case Nnew:
 		return vm.feedNnew()
 	default:
@@ -56,6 +58,14 @@ func (vm *VM) feedIinc() error {
 		return err
 	}
 	return vm.pushInt(v + 1)
+}
+
+func (vm *VM) feedIshl() error {
+	v, err := vm.popInt()
+	if err != nil {
+		return err
+	}
+	return vm.pushInt(v << 1)
 }
 
 func (vm *VM) feedNnew() error {

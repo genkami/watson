@@ -78,6 +78,60 @@ func TestFeedIincFailsIfStackIsEmpty(t *testing.T) {
 	}
 }
 
+func TestFeedIshlShiftsTheTopBy1(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	var before int64 = 123
+
+	err = vm.pushInt(before)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Ishl)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewIntValue(before * 2)
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedIshlFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Ishl)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedIshlFailsWhenTypeMismatch(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Ishl)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedNnewPushesNil(t *testing.T) {
 	var err error
 	vm := NewVM()
