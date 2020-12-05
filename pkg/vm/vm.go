@@ -43,6 +43,9 @@ const (
 	Onew // push({});
 	Oadd // v: any = pop(); k: str = pop(); o: obj = pop(); o[k] = v; push(o);
 
+	// Bool Operations
+	Bnew // push(false);
+
 	// Nil Operations
 	Nnew // push(nil);
 )
