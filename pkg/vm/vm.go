@@ -37,6 +37,11 @@ type Value struct {
 	Int  int64
 }
 
+// NewIntValue creates a new Value that contains an integer.
+func NewIntValue(val int64) *Value {
+	return &Value{Kind: KInt, Int: val}
+}
+
 // Kind is a type of Value.
 type Kind int
 
