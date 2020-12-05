@@ -8,6 +8,7 @@ import (
 var (
 	ErrStackEmpty               = errors.New("stack is empty")
 	ErrMaximumStackSizeExceeded = errors.New("maximum stack size exceeded")
+	ErrTypeMismatch             = errors.New("type mismatch")
 )
 
 // Top returns a value in the top of the stack.
@@ -39,28 +40,20 @@ func (vm *VM) feedInew() error {
 }
 
 func (vm *VM) feedIinc() error {
-	v, err := vm.pop()
+	v, err := vm.popInt()
 	if err != nil {
 		return err
 	}
-	return vm.pushInt(v.Int + 1)
+	return vm.pushInt(v + 1)
 }
 
 func (vm *VM) feedNnew() error {
 	return vm.pushNil()
 }
 
+//
 // Miscellaneous functions
-
-func (vm *VM) pop() (*Value, error) {
-	if vm.sp < 0 {
-		return nil, ErrStackEmpty
-	}
-	top := vm.stack[vm.sp]
-	vm.stack[vm.sp] = nil
-	vm.sp--
-	return top, nil
-}
+//
 
 func (vm *VM) push(v *Value) error {
 	if len(vm.stack)-1 <= vm.sp {
@@ -77,4 +70,25 @@ func (vm *VM) pushInt(val int64) error {
 
 func (vm *VM) pushNil() error {
 	return vm.push(NewNilValue())
+}
+
+func (vm *VM) pop() (*Value, error) {
+	if vm.sp < 0 {
+		return nil, ErrStackEmpty
+	}
+	top := vm.stack[vm.sp]
+	vm.stack[vm.sp] = nil
+	vm.sp--
+	return top, nil
+}
+
+func (vm *VM) popInt() (int64, error) {
+	v, err := vm.pop()
+	if err != nil {
+		return 0, err
+	}
+	if v.Kind != KInt {
+		return 0, ErrTypeMismatch
+	}
+	return v.Int, nil
 }

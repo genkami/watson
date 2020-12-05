@@ -56,6 +56,19 @@ func TestFeedIincIncrementsTheValue(t *testing.T) {
 	}
 }
 
+func TestFeedIincFailsWhenTypeMismatch(t *testing.T) {
+	var err error
+	vm := NewVM()
+	err = vm.Feed(Nnew)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Iinc)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedIincFailsIfStackIsEmpty(t *testing.T) {
 	var err error
 	vm := NewVM()
