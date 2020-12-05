@@ -35,6 +35,17 @@ func (vm *VM) Feed(op Op) error {
 	}
 }
 
+// FeedMulti takes a series of Ops and execute them sequentially.
+// If one of them fails, it stops execution and returns an error.
+func (vm *VM) FeedMulti(ops []Op) error {
+	for _, op := range ops {
+		if err := vm.Feed(op); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (vm *VM) feedInew() error {
 	return vm.pushInt(0)
 }

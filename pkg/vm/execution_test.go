@@ -100,3 +100,34 @@ func TestFeedNnewPushesNil(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestFeedMultiDoNothingWhenOpsIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+	err = vm.FeedMulti([]Op{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if vm.sp != -1 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", -1, vm.sp)
+	}
+}
+
+func TestFeedMultiExecutesOpsSequentially(t *testing.T) {
+	var err error
+	vm := NewVM()
+	err = vm.FeedMulti([]Op{Inew, Iinc, Iinc, Iinc})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	want := NewIntValue(3)
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
