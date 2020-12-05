@@ -44,7 +44,7 @@ func toDumpable(val *vm.Value) interface{} {
 	case vm.KInt:
 		return val.Int
 	case vm.KString:
-		return val.String
+		return string(val.String)
 	case vm.KObject:
 		obj := map[string]interface{}{}
 		for k, v := range val.Object {
