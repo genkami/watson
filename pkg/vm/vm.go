@@ -29,6 +29,7 @@ const (
 	Inew Op = iota // push(0);
 	Iinc           // v = pop(); push(v+1);
 	Iadd           // b = pop(); a = pop(); push(a + b);
+	Nnew           // push(nil);
 )
 
 // Value is an element of the stack.
@@ -42,9 +43,15 @@ func NewIntValue(val int64) *Value {
 	return &Value{Kind: KInt, Int: val}
 }
 
+// NewNilValue creates a new Value that contains nil.
+func NewNilValue() *Value {
+	return &Value{Kind: KNil}
+}
+
 // Kind is a type of Value.
 type Kind int
 
 const (
 	KInt Kind = iota // 64-bit signed integer
+	KNil             // nil
 )
