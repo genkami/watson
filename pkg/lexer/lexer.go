@@ -18,7 +18,17 @@ func NewLexer(r io.Reader) *Lexer {
 }
 
 var opTable = map[byte]vm.Op{
-	0x79: vm.Inew, // 'y'
+	0x59: vm.Inew, // 'Y'
+	0x75: vm.Iinc, // 'u'
+	0x6d: vm.Ishl, // 'm'
+	0x79: vm.Iadd, // 'y'
+	0x3f: vm.Snew, // '?'
+	0x21: vm.Sadd, // '!'
+	0x7e: vm.Onew, // '~'
+	0x4d: vm.Oadd, // 'M'
+	0x7a: vm.Bnew, // 'z'
+	0x6f: vm.Bneg, // 'o'
+	0x2e: vm.Nnew, // '.'
 }
 
 // Returns the next Op.

@@ -7,14 +7,28 @@ import (
 	"github.com/genkami/watson/pkg/vm"
 )
 
-func TestNextWithInew(t *testing.T) {
-	expected := vm.Inew
-	actual, err := readOne("y")
-	if err != nil {
-		t.Fatal(err)
+func TestOpTable(t *testing.T) {
+	table := map[string]vm.Op{
+		"Y": vm.Inew,
+		"u": vm.Iinc,
+		"m": vm.Ishl,
+		"y": vm.Iadd,
+		"?": vm.Snew,
+		"!": vm.Sadd,
+		"~": vm.Onew,
+		"M": vm.Oadd,
+		"z": vm.Bnew,
+		"o": vm.Bneg,
+		".": vm.Nnew,
 	}
-	if expected != actual {
-		t.Errorf("expected %#v but got %#v", expected, actual)
+	for s, expected := range table {
+		actual, err := readOne(s)
+		if err != nil {
+			t.Fatalf("error on testing %s (%#v): %#v", s, expected, err)
+		}
+		if expected != actual {
+			t.Errorf("expected %#v but got %#v", expected, actual)
+		}
 	}
 }
 

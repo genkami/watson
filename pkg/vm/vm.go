@@ -32,8 +32,8 @@ const (
 	// Integer Operations
 	Inew Op = iota // push(0);
 	Iinc           // v: int = pop(); push(v + 1);
-	Iadd           // b: int = pop(); a: int = pop(); push(a + b);
 	Ishl           // v: int = pop(); push(v << 1);
+	Iadd           // b: int = pop(); a: int = pop(); push(a + b);
 
 	// String Operations
 	Snew // push("");
