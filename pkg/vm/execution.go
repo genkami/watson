@@ -32,6 +32,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedIshl()
 	case Iadd:
 		return vm.feedIadd()
+	case Snew:
+		return vm.feedSnew()
 	case Nnew:
 		return vm.feedNnew()
 	default:
@@ -82,6 +84,10 @@ func (vm *VM) feedIadd() error {
 	return vm.pushInt(a + b)
 }
 
+func (vm *VM) feedSnew() error {
+	return vm.pushString([]byte{})
+}
+
 func (vm *VM) feedNnew() error {
 	return vm.pushNil()
 }
@@ -101,6 +107,10 @@ func (vm *VM) push(v *Value) error {
 
 func (vm *VM) pushInt(val int64) error {
 	return vm.push(NewIntValue(val))
+}
+
+func (vm *VM) pushString(val []byte) error {
+	return vm.push(NewStringValue(val))
 }
 
 func (vm *VM) pushNil() error {

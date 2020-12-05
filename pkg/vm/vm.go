@@ -35,6 +35,9 @@ const (
 	Iadd           // b = pop(); a = pop(); push(a + b);
 	Ishl           // v = pop(); push(v << 1);
 
+	// String Operations
+	Snew // push("");
+
 	// Nil Operations
 	Nnew // push(nil);
 )
