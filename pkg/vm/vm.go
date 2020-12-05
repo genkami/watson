@@ -41,6 +41,7 @@ const (
 
 	// Object Operations
 	Onew // push({});
+	Oadd // v: any = pop(); k: str = pop(); o: obj = pop(); o[k] = v; push(o);
 
 	// Nil Operations
 	Nnew // push(nil);
@@ -64,6 +65,7 @@ type Value struct {
 	Object Object
 }
 
+// Object is a set of key-value pairs.
 type Object map[string]*Value
 
 // NewIntValue creates a new Value that contains an integer.

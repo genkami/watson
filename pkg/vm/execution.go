@@ -38,6 +38,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedSadd()
 	case Onew:
 		return vm.feedOnew()
+	case Oadd:
+		return vm.feedOadd()
 	case Nnew:
 		return vm.feedNnew()
 	default:
@@ -109,6 +111,23 @@ func (vm *VM) feedOnew() error {
 	return vm.pushObject(map[string]*Value{})
 }
 
+func (vm *VM) feedOadd() error {
+	v, err := vm.pop()
+	if err != nil {
+		return err
+	}
+	k, err := vm.popString()
+	if err != nil {
+		return err
+	}
+	o, err := vm.popObject()
+	if err != nil {
+		return err
+	}
+	o[string(k)] = v.DeepCopy()
+	return vm.pushObject(o)
+}
+
 func (vm *VM) feedNnew() error {
 	return vm.pushNil()
 }
@@ -172,4 +191,15 @@ func (vm *VM) popString() ([]byte, error) {
 		return nil, ErrTypeMismatch
 	}
 	return v.String, nil
+}
+
+func (vm *VM) popObject() (Object, error) {
+	v, err := vm.pop()
+	if err != nil {
+		return nil, err
+	}
+	if v.Kind != KObject {
+		return nil, ErrTypeMismatch
+	}
+	return v.Object, nil
 }
