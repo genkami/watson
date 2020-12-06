@@ -4,11 +4,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/genkami/watson/pkg/decoder/util"
+	"github.com/genkami/watson/pkg/decoder/yaml"
 	"github.com/genkami/watson/pkg/lexer"
 	"github.com/genkami/watson/pkg/vm"
-
-	"gopkg.in/yaml.v2"
 )
 
 func main() {
@@ -30,10 +28,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	obj := util.ToObject(v)
-	enc := yaml.NewEncoder(os.Stdout)
-	defer enc.Close()
-	err = enc.Encode(obj)
+	err = yaml.Decode(os.Stdout, v)
 	if err != nil {
 		panic(err)
 	}
