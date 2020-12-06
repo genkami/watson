@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"io"
 	"os"
 
+	"github.com/genkami/watson/pkg/decoder/util"
 	"github.com/genkami/watson/pkg/lexer"
 	"github.com/genkami/watson/pkg/vm"
 
@@ -30,32 +30,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	obj := toDumpable(v)
+	obj := util.ToObject(v)
 	enc := yaml.NewEncoder(os.Stdout)
 	defer enc.Close()
 	err = enc.Encode(obj)
 	if err != nil {
 		panic(err)
-	}
-}
-
-func toDumpable(val *vm.Value) interface{} {
-	switch val.Kind {
-	case vm.KInt:
-		return val.Int
-	case vm.KString:
-		return string(val.String)
-	case vm.KObject:
-		obj := map[string]interface{}{}
-		for k, v := range val.Object {
-			obj[k] = toDumpable(v)
-		}
-		return obj
-	case vm.KBool:
-		return val.Bool
-	case vm.KNil:
-		return nil
-	default:
-		panic(fmt.Errorf("invalid kind: %d", val.Kind))
 	}
 }
