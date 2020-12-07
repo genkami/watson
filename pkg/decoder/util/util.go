@@ -17,6 +17,8 @@ func ToObject(val *vm.Value) interface{} {
 	switch val.Kind {
 	case vm.KInt:
 		return val.Int
+	case vm.KFloat:
+		return val.Float
 	case vm.KString:
 		return string(val.String)
 	case vm.KObject:

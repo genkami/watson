@@ -87,6 +87,7 @@ type Kind int
 
 const (
 	KInt    Kind = iota // 64-bit signed integer
+	KFloat              // IEEE-754 64-bit floating-point number
 	KString             // string (represented as a byte array)
 	KObject             // object (set of key-value pairs)
 	KBool               // bool
@@ -97,6 +98,7 @@ const (
 type Value struct {
 	Kind   Kind
 	Int    int64
+	Float  float64
 	String []byte
 	Object Object
 	Bool   bool
@@ -108,6 +110,11 @@ type Object map[string]*Value
 // NewIntValue creates a new Value that contains an integer.
 func NewIntValue(val int64) *Value {
 	return &Value{Kind: KInt, Int: val}
+}
+
+// NewFloatValue creates a new Value that contains a floating point number.
+func NewFloatValue(val float64) *Value {
+	return &Value{Kind: KFloat, Float: val}
 }
 
 // NewStringValue creates a new Value that contains a string.
@@ -135,6 +142,8 @@ func (v *Value) DeepCopy() *Value {
 	switch v.Kind {
 	case KInt:
 		clone.Int = v.Int
+	case KFloat:
+		clone.Float = v.Float
 	case KString:
 		clone.String = make([]byte, len(v.String))
 		copy(clone.String, v.String)

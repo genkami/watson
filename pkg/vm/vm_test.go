@@ -20,6 +20,19 @@ func TestDeepCopyWithInt(t *testing.T) {
 	}
 }
 
+func TestDeepCopyWithFloat(t *testing.T) {
+	orig := NewFloatValue(1.23)
+	clone := orig.DeepCopy()
+	if diff := cmp.Diff(orig, clone); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+
+	clone.Float = 4.56
+	if orig.Float == clone.Float {
+		t.Errorf("DeepCopy returned receiver itself")
+	}
+}
+
 func TestDeepCopyString(t *testing.T) {
 	orig := NewStringValue([]byte("hello"))
 	clone := orig.DeepCopy()

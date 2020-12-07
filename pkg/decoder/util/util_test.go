@@ -17,6 +17,15 @@ func TestToObjectConvertsInt(t *testing.T) {
 	}
 }
 
+func TestToObjectConvertsFloat(t *testing.T) {
+	val := vm.NewFloatValue(1.23)
+	var want interface{} = float64(1.23)
+	got := ToObject(val)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToObjectConvertsString(t *testing.T) {
 	val := vm.NewStringValue([]byte("hey"))
 	var want interface{} = "hey"
