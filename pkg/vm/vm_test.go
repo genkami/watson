@@ -101,3 +101,9 @@ func TestDeepCopyWithNil(t *testing.T) {
 		t.Errorf("DeepCopy returned receiver itself")
 	}
 }
+
+func TestGoStringIsDefinedForAllOps(t *testing.T) {
+	for _, op := range AllOps() {
+		op.GoString()
+	}
+}

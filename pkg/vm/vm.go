@@ -49,7 +49,19 @@ const (
 
 	// Nil Operations
 	Nnew // push(nil);
+
+	// This can only be used to iterate over all defined Ops.
+	numOps
 )
+
+// Returns all defined Ops.
+func AllOps() []Op {
+	ops := make([]Op, 0, numOps)
+	for op := Op(0); op < numOps; op++ {
+		ops = append(ops, op)
+	}
+	return ops
+}
 
 func (op Op) GoString() string {
 	switch op {
