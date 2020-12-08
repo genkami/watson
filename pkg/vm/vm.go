@@ -111,13 +111,10 @@ type Value struct {
 	Int    int64
 	Float  float64
 	String []byte
-	Object Object
+	Object map[string]*Value
 	Array  []*Value
 	Bool   bool
 }
-
-// Object is a set of key-value pairs.
-type Object map[string]*Value
 
 // NewIntValue creates a new Value that contains an integer.
 func NewIntValue(val int64) *Value {
@@ -135,7 +132,7 @@ func NewStringValue(val []byte) *Value {
 }
 
 // NewObjectValue creates a new Value that contains an object.
-func NewObjectValue(val Object) *Value {
+func NewObjectValue(val map[string]*Value) *Value {
 	return &Value{Kind: KObject, Object: val}
 }
 

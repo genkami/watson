@@ -413,10 +413,10 @@ func TestFeedOaddAddsACopyOfAValue(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	addedVal := Object(map[string]*Value{
+	addedVal := map[string]*Value{
 		"name": NewStringValue([]byte("taro")),
 		"age":  NewIntValue(20),
-	})
+	}
 	err = vm.pushObject(addedVal)
 	if err != nil {
 		t.Fatal(err)

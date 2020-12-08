@@ -169,7 +169,7 @@ func (vm *VM) pushString(val []byte) error {
 	return vm.push(NewStringValue(val))
 }
 
-func (vm *VM) pushObject(val Object) error {
+func (vm *VM) pushObject(val map[string]*Value) error {
 	return vm.push(NewObjectValue(val))
 }
 
@@ -213,7 +213,7 @@ func (vm *VM) popString() ([]byte, error) {
 	return v.String, nil
 }
 
-func (vm *VM) popObject() (Object, error) {
+func (vm *VM) popObject() (map[string]*Value, error) {
 	v, err := vm.pop()
 	if err != nil {
 		return nil, err
