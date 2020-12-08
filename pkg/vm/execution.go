@@ -20,7 +20,7 @@ func (vm *VM) Top() (*Value, error) {
 	return vm.stack[vm.sp], nil
 }
 
-// Feed takes a op and executed corresponding operation.
+// Feed takes a op and executes corresponding operation.
 // This can fail in various ways; e.g. type mismatch, stack overflow, etc.
 func (vm *VM) Feed(op Op) error {
 	switch op {

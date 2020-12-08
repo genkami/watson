@@ -10,8 +10,6 @@ const (
 )
 
 // VM is a virtual machine that consists of a stack of values and a pointer to the top of the stack.
-//
-// In this document, we call the N-th element of the stack s[N] (counting from the top).
 type VM struct {
 	stack []*Value
 	sp    int
