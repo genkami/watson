@@ -32,6 +32,19 @@ func TestReadOp(t *testing.T) {
 	}
 }
 
+func TestOpTableIsSurjective(t *testing.T) {
+	ops := map[vm.Op]bool{}
+	for _, op := range vm.AllOps() {
+		ops[op] = true
+	}
+	for _, op := range opTable {
+		delete(ops, op)
+	}
+	for op := range ops {
+		t.Errorf("%#v is not in opTable", op)
+	}
+}
+
 func TestShowOp(t *testing.T) {
 	for s, op := range table {
 		expected := []byte(s)[0]
@@ -39,5 +52,11 @@ func TestShowOp(t *testing.T) {
 		if expected != actual {
 			t.Errorf("expected %#v but got %#v", expected, actual)
 		}
+	}
+}
+
+func TestShowOpIsDefinedForAllOps(t *testing.T) {
+	for _, op := range vm.AllOps() {
+		ShowOp(op)
 	}
 }
