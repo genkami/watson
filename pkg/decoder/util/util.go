@@ -27,6 +27,12 @@ func ToObject(val *vm.Value) interface{} {
 			obj[k] = ToObject(v)
 		}
 		return obj
+	case vm.KArray:
+		arr := make([]interface{}, 0, len(val.Array))
+		for _, v := range val.Array {
+			arr = append(arr, ToObject(v))
+		}
+		return arr
 	case vm.KBool:
 		return val.Bool
 	case vm.KNil:

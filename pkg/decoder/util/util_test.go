@@ -50,6 +50,18 @@ func TestToObjectConvertsObject(t *testing.T) {
 	}
 }
 
+func TestToObjectConvertsArray(t *testing.T) {
+	val := vm.NewArrayValue([]*vm.Value{
+		vm.NewStringValue([]byte("Yo")),
+		vm.NewIntValue(123),
+	})
+	var want interface{} = []interface{}{"Yo", int64(123)}
+	got := ToObject(val)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToObjectConvertsBool(t *testing.T) {
 	val := vm.NewBoolValue(true)
 	var want interface{} = true

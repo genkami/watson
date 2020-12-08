@@ -100,6 +100,7 @@ const (
 	KFloat              // IEEE-754 64-bit floating-point number
 	KString             // string (represented as a byte array)
 	KObject             // object (set of key-value pairs)
+	KArray              // array
 	KBool               // bool
 	KNil                // nil
 )
@@ -111,6 +112,7 @@ type Value struct {
 	Float  float64
 	String []byte
 	Object Object
+	Array  []*Value
 	Bool   bool
 }
 
@@ -137,6 +139,11 @@ func NewObjectValue(val Object) *Value {
 	return &Value{Kind: KObject, Object: val}
 }
 
+// NewArrayValue creates a new value that contains an array.
+func NewArrayValue(val []*Value) *Value {
+	return &Value{Kind: KArray, Array: val}
+}
+
 // NewBoolValue creates a new Value that contains a bool.
 func NewBoolValue(val bool) *Value {
 	return &Value{Kind: KBool, Bool: val}
@@ -161,6 +168,11 @@ func (v *Value) DeepCopy() *Value {
 		clone.Object = map[string]*Value{}
 		for k, v := range v.Object {
 			clone.Object[k] = v.DeepCopy()
+		}
+	case KArray:
+		clone.Array = make([]*Value, 0, len(v.Array))
+		for _, v := range v.Array {
+			clone.Array = append(clone.Array, v.DeepCopy())
 		}
 	case KBool:
 		clone.Bool = v.Bool
