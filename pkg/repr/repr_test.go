@@ -6,33 +6,6 @@ import (
 	"github.com/genkami/watson/pkg/vm"
 )
 
-var table = map[string]vm.Op{
-	"B": vm.Inew,
-	"u": vm.Iinc,
-	"b": vm.Ishl,
-	"a": vm.Iadd,
-	"A": vm.Ineg,
-	"?": vm.Snew,
-	"!": vm.Sadd,
-	"~": vm.Onew,
-	"M": vm.Oadd,
-	"z": vm.Bnew,
-	"o": vm.Bneg,
-	".": vm.Nnew,
-}
-
-func TestReadOp(t *testing.T) {
-	for s, expected := range table {
-		actual, ok := ReadOp([]byte(s)[0])
-		if !ok {
-			t.Fatalf("op not found for %s", s)
-		}
-		if expected != actual {
-			t.Errorf("expected %#v but got %#v", expected, actual)
-		}
-	}
-}
-
 func TestOpTableIsSurjective(t *testing.T) {
 	ops := map[vm.Op]bool{}
 	for _, op := range vm.AllOps() {
@@ -43,16 +16,6 @@ func TestOpTableIsSurjective(t *testing.T) {
 	}
 	for op := range ops {
 		t.Errorf("%#v is not in opTable", op)
-	}
-}
-
-func TestShowOp(t *testing.T) {
-	for s, op := range table {
-		expected := []byte(s)[0]
-		actual := ShowOp(op)
-		if expected != actual {
-			t.Errorf("expected %#v but got %#v", expected, actual)
-		}
 	}
 }
 
