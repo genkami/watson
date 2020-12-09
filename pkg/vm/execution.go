@@ -32,6 +32,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedIshl()
 	case Iadd:
 		return vm.feedIadd()
+	case Ineg:
+		return vm.feedIneg()
 	case Snew:
 		return vm.feedSnew()
 	case Sadd:
@@ -92,6 +94,14 @@ func (vm *VM) feedIadd() error {
 		return err
 	}
 	return vm.pushInt(a + b)
+}
+
+func (vm *VM) feedIneg() error {
+	v, err := vm.popInt()
+	if err != nil {
+		return err
+	}
+	return vm.pushInt(-v)
 }
 
 func (vm *VM) feedSnew() error {

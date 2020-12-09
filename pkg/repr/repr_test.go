@@ -11,6 +11,7 @@ var table = map[string]vm.Op{
 	"u": vm.Iinc,
 	"b": vm.Ishl,
 	"a": vm.Iadd,
+	"A": vm.Ineg,
 	"?": vm.Snew,
 	"!": vm.Sadd,
 	"~": vm.Onew,

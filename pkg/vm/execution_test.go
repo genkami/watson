@@ -222,6 +222,58 @@ func TestFeedIaddFailsWhenArg2IsNotInteger(t *testing.T) {
 	}
 }
 
+func TestFeedInegNegatesTheTop(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Ineg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewIntValue(-1)
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedInegFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Ineg)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedInegFailsWhenArg1IsNotInteger(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Ineg)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedSnewPushesEmptyString(t *testing.T) {
 	var err error
 	vm := NewVM()
