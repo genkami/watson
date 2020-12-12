@@ -13,6 +13,7 @@ var opTable = map[byte]vm.Op{
 	0x62: vm.Ishl, // 'b'
 	0x61: vm.Iadd, // 'a'
 	0x41: vm.Ineg, // 'A'
+	0x65: vm.Isht, // 'e'
 	0x3f: vm.Snew, // '?'
 	0x21: vm.Sadd, // '!'
 	0x7e: vm.Onew, // '~'

@@ -33,6 +33,7 @@ const (
 	Ishl           // v: int = pop(); push(v << 1);
 	Iadd           // b: int = pop(); a: int = pop(); push(a + b);
 	Ineg           // v: int = pop(); push(-n);
+	Isht           // b: int = pop(); a: int = pop(); push(a << b);
 
 	// String Operations
 	Snew // push("");
@@ -74,6 +75,8 @@ func (op Op) GoString() string {
 		return "Iadd"
 	case Ineg:
 		return "Ineg"
+	case Isht:
+		return "Isht"
 	case Snew:
 		return "Snew"
 	case Sadd:

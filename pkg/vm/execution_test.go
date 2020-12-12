@@ -274,6 +274,129 @@ func TestFeedInegFailsWhenArg1IsNotInteger(t *testing.T) {
 	}
 }
 
+func TestFeedIshtShiftsArg2ToLeftByArg1WhenArg1IsPositive(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(0xabcd0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushInt(4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Isht)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewIntValue(0xabcd00)
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedIshtShiftsArg2ToRightByArg1WhenArg1IsNegative(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(0xabcd0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushInt(-4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Isht)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewIntValue(0xabcd)
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedIshtFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+	err = vm.Feed(Isht)
+	if err != ErrStackEmpty {
+		t.Fatalf("expected ErrStackEmpty but got %v", err)
+	}
+}
+
+func TestFeedIshtFailsWhenStackIsInsufficient(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Isht)
+	if err != ErrStackEmpty {
+		t.Fatalf("expected ErrStackEmpty but got %v", err)
+	}
+}
+
+func TestFeedIshtFailsWhenArg1IsNotInteger(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(0xabcd0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Isht)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedIshtFailsWhenArg2IsNotInteger(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushInt(4)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Isht)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedSnewPushesEmptyString(t *testing.T) {
 	var err error
 	vm := NewVM()
