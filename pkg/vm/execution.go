@@ -39,6 +39,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedIsht()
 	case Itof:
 		return vm.feedItof()
+	case Finf:
+		return vm.feedFinf()
 	case Snew:
 		return vm.feedSnew()
 	case Sadd:
@@ -131,6 +133,10 @@ func (vm *VM) feedItof() error {
 		return err
 	}
 	return vm.pushFloat(math.Float64frombits(uint64(n)))
+}
+
+func (vm *VM) feedFinf() error {
+	return vm.pushFloat(math.Inf(1))
 }
 
 func (vm *VM) feedSnew() error {

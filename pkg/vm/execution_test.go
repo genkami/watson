@@ -450,6 +450,30 @@ func TestFeedItofFailsWhenArg1IsNotInteger(t *testing.T) {
 	}
 }
 
+func TestFeedFinfPushesPositiveInf(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Finf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewFloatValue(math.Inf(1))
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestFeedSnewPushesEmptyString(t *testing.T) {
 	var err error
 	vm := NewVM()
