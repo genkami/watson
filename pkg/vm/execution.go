@@ -41,6 +41,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedItof()
 	case Finf:
 		return vm.feedFinf()
+	case Fneg:
+		return vm.feedFneg()
 	case Snew:
 		return vm.feedSnew()
 	case Sadd:
@@ -137,6 +139,14 @@ func (vm *VM) feedItof() error {
 
 func (vm *VM) feedFinf() error {
 	return vm.pushFloat(math.Inf(1))
+}
+
+func (vm *VM) feedFneg() error {
+	x, err := vm.popFloat()
+	if err != nil {
+		return err
+	}
+	return vm.pushFloat(-x)
 }
 
 func (vm *VM) feedSnew() error {
@@ -249,6 +259,17 @@ func (vm *VM) popInt() (int64, error) {
 		return 0, ErrTypeMismatch
 	}
 	return v.Int, nil
+}
+
+func (vm *VM) popFloat() (float64, error) {
+	v, err := vm.pop()
+	if err != nil {
+		return 0, err
+	}
+	if v.Kind != KFloat {
+		return 0, ErrTypeMismatch
+	}
+	return v.Float, nil
 }
 
 func (vm *VM) popString() ([]byte, error) {

@@ -38,6 +38,7 @@ const (
 
 	// Float Operations
 	Finf // push(Inf);
+	Fneg // x: float = pop(); push(-x);
 
 	// String Operations
 	Snew // push("");
@@ -85,6 +86,8 @@ func (op Op) GoString() string {
 		return "Itof"
 	case Finf:
 		return "Finf"
+	case Fneg:
+		return "Fneg"
 	case Snew:
 		return "Snew"
 	case Sadd:

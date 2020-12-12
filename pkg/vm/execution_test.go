@@ -474,6 +474,86 @@ func TestFeedFinfPushesPositiveInf(t *testing.T) {
 	}
 }
 
+func TestFeedFnegNegatesArg1(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushFloat(9.87456e78)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Fneg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewFloatValue(-9.87456e78)
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedFnegCanNegateInf(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushFloat(math.Inf(1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Fneg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewFloatValue(math.Inf(-1))
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedFnegFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Fneg)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedFnegFailsWhenArg1IsNotFloat(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Fneg)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedSnewPushesEmptyString(t *testing.T) {
 	var err error
 	vm := NewVM()
