@@ -8,19 +8,19 @@ import (
 )
 
 var opTable = map[byte]vm.Op{
-	0x42: vm.Inew, // 'B'
-	0x75: vm.Iinc, // 'u'
-	0x62: vm.Ishl, // 'b'
-	0x61: vm.Iadd, // 'a'
-	0x41: vm.Ineg, // 'A'
-	0x65: vm.Isht, // 'e'
-	0x3f: vm.Snew, // '?'
-	0x21: vm.Sadd, // '!'
-	0x7e: vm.Onew, // '~'
-	0x4d: vm.Oadd, // 'M'
-	0x7a: vm.Bnew, // 'z'
-	0x6f: vm.Bneg, // 'o'
-	0x2e: vm.Nnew, // '.'
+	char("B"): vm.Inew,
+	char("u"): vm.Iinc,
+	char("b"): vm.Ishl,
+	char("a"): vm.Iadd,
+	char("A"): vm.Ineg,
+	char("e"): vm.Isht,
+	char("?"): vm.Snew,
+	char("!"): vm.Sadd,
+	char("~"): vm.Onew,
+	char("M"): vm.Oadd,
+	char("z"): vm.Bnew,
+	char("o"): vm.Bneg,
+	char("."): vm.Nnew,
 }
 
 var reversedTable map[vm.Op]byte
@@ -45,4 +45,8 @@ func ShowOp(op vm.Op) byte {
 		return b
 	}
 	panic(fmt.Errorf("unknown Op: %#v\n", op))
+}
+
+func char(s string) byte {
+	return []byte(s)[0]
 }
