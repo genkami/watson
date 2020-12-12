@@ -53,6 +53,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedOnew()
 	case Oadd:
 		return vm.feedOadd()
+	case Anew:
+		return vm.feedAnew()
 	case Bnew:
 		return vm.feedBnew()
 	case Bneg:
@@ -193,6 +195,10 @@ func (vm *VM) feedOadd() error {
 	return vm.pushObject(o)
 }
 
+func (vm *VM) feedAnew() error {
+	return vm.pushArray([]*Value{})
+}
+
 func (vm *VM) feedBnew() error {
 	return vm.pushBool(false)
 }
@@ -236,6 +242,10 @@ func (vm *VM) pushString(val []byte) error {
 
 func (vm *VM) pushObject(val map[string]*Value) error {
 	return vm.push(NewObjectValue(val))
+}
+
+func (vm *VM) pushArray(val []*Value) error {
+	return vm.push(NewArrayValue(val))
 }
 
 func (vm *VM) pushBool(val bool) error {

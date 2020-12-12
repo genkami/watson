@@ -50,6 +50,9 @@ const (
 	Onew // push({});
 	Oadd // v: any = pop(); k: str = pop(); o: obj = pop(); o[k] = v; push(o);
 
+	// Array Operations
+	Anew // push([]);
+
 	// Bool Operations
 	Bnew // push(false);
 	Bneg // b: bool = pop(); push(!b);
@@ -100,6 +103,8 @@ func (op Op) GoString() string {
 		return "Onew"
 	case Oadd:
 		return "Oadd"
+	case Anew:
+		return "Anew"
 	case Bnew:
 		return "Bnew"
 	case Bneg:
