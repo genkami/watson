@@ -41,6 +41,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedItof()
 	case Finf:
 		return vm.feedFinf()
+	case Fnan:
+		return vm.feedFnan()
 	case Fneg:
 		return vm.feedFneg()
 	case Snew:
@@ -139,6 +141,10 @@ func (vm *VM) feedItof() error {
 
 func (vm *VM) feedFinf() error {
 	return vm.pushFloat(math.Inf(1))
+}
+
+func (vm *VM) feedFnan() error {
+	return vm.pushFloat(math.NaN())
 }
 
 func (vm *VM) feedFneg() error {

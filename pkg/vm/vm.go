@@ -3,6 +3,7 @@ package vm
 
 import (
 	"fmt"
+	"math"
 )
 
 const (
@@ -38,6 +39,7 @@ const (
 
 	// Float Operations
 	Finf // push(Inf);
+	Fnan // push(NaN);
 	Fneg // x: float = pop(); push(-x);
 
 	// String Operations
@@ -86,6 +88,8 @@ func (op Op) GoString() string {
 		return "Itof"
 	case Finf:
 		return "Finf"
+	case Fnan:
+		return "Fnan"
 	case Fneg:
 		return "Fneg"
 	case Snew:
@@ -166,6 +170,11 @@ func NewBoolValue(val bool) *Value {
 // NewNilValue creates a new Value that contains nil.
 func NewNilValue() *Value {
 	return &Value{Kind: KNil}
+}
+
+// IsNaN returns true if v is a NaN; otherwise it returns false.
+func (v *Value) IsNaN() bool {
+	return v.Kind == KFloat && math.IsNaN(v.Float)
 }
 
 func (v *Value) DeepCopy() *Value {

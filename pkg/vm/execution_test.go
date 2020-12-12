@@ -474,6 +474,29 @@ func TestFeedFinfPushesPositiveInf(t *testing.T) {
 	}
 }
 
+func TestFeedFinfPushesNaN(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Fnan)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !got.IsNaN() {
+		t.Errorf("expected NaN but got %+v", got)
+	}
+}
+
 func TestFeedFnegNegatesArg1(t *testing.T) {
 	var err error
 	vm := NewVM()
