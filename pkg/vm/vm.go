@@ -52,6 +52,7 @@ const (
 
 	// Array Operations
 	Anew // push([]);
+	Aadd // x: any = pop(); a: array = pop(); a.append(x); push(a);
 
 	// Bool Operations
 	Bnew // push(false);
@@ -105,6 +106,8 @@ func (op Op) GoString() string {
 		return "Oadd"
 	case Anew:
 		return "Anew"
+	case Aadd:
+		return "Aadd"
 	case Bnew:
 		return "Bnew"
 	case Bneg:

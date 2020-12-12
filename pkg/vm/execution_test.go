@@ -917,6 +917,130 @@ func TestFeedAnewPushesEmptyArray(t *testing.T) {
 	}
 }
 
+func TestFeedAaddAppendsArg1ToArg2(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushArray([]*Value{NewIntValue(123)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushFloat(4.56)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Aadd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewArrayValue([]*Value{
+		NewIntValue(123),
+		NewFloatValue(4.56),
+	})
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedAaddAppendsACopyOfAValue(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushArray([]*Value{NewStringValue([]byte("hello"))})
+	if err != nil {
+		t.Fatal(err)
+	}
+	addedVal := map[string]*Value{
+		"name": NewStringValue([]byte("taro")),
+		"age":  NewIntValue(20),
+	}
+	err = vm.pushObject(addedVal)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Aadd)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewArrayValue([]*Value{
+		NewStringValue([]byte("hello")),
+		NewObjectValue(map[string]*Value{
+			"name": NewStringValue([]byte("taro")),
+			"age":  NewIntValue(20),
+		}),
+	})
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+
+	got.Array[1].Object["name"] = NewStringValue([]byte("jiro"))
+	if diff := cmp.Diff(addedVal, got.Array[1].Object); diff == "" {
+		t.Errorf("the added value does not seem to be a clone of the value on the stack")
+	}
+}
+
+func TestFeedAaddFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Aadd)
+	if err != ErrStackEmpty {
+		t.Fatalf("expected ErrStackEmpty but got %v", err)
+	}
+}
+
+func TestFeedAaddFailsWhenStackIsInsufficient(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Aadd)
+	if err != ErrStackEmpty {
+		t.Fatalf("expected ErrStackEmpty but got %v", err)
+	}
+}
+
+func TestFeedAaddFailsIfArg2IsNotArray(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushInt(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Aadd)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedBnewPushesFalse(t *testing.T) {
 	var err error
 	vm := NewVM()

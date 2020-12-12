@@ -55,6 +55,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedOadd()
 	case Anew:
 		return vm.feedAnew()
+	case Aadd:
+		return vm.feedAadd()
 	case Bnew:
 		return vm.feedBnew()
 	case Bneg:
@@ -199,6 +201,19 @@ func (vm *VM) feedAnew() error {
 	return vm.pushArray([]*Value{})
 }
 
+func (vm *VM) feedAadd() error {
+	x, err := vm.pop()
+	if err != nil {
+		return err
+	}
+	a, err := vm.popArray()
+	if err != nil {
+		return err
+	}
+	a = append(a, x.DeepCopy())
+	return vm.pushArray(a)
+}
+
 func (vm *VM) feedBnew() error {
 	return vm.pushBool(false)
 }
@@ -308,6 +323,17 @@ func (vm *VM) popObject() (map[string]*Value, error) {
 		return nil, ErrTypeMismatch
 	}
 	return v.Object, nil
+}
+
+func (vm *VM) popArray() ([]*Value, error) {
+	v, err := vm.pop()
+	if err != nil {
+		return nil, err
+	}
+	if v.Kind != KArray {
+		return nil, ErrTypeMismatch
+	}
+	return v.Array, nil
 }
 
 func (vm *VM) popBool() (bool, error) {
