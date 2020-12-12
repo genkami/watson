@@ -1,6 +1,7 @@
 package vm
 
 import (
+	"math"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -392,6 +393,58 @@ func TestFeedIshtFailsWhenArg2IsNotInteger(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = vm.Feed(Isht)
+	if err != ErrTypeMismatch {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedItofConvertsArg1ToFloat(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(int64(math.Float64bits(1.234e-56)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Itof)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewFloatValue(1.234e-56)
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedItofFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Itof)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedItofFailsWhenArg1IsNotInteger(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushNil()
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Itof)
 	if err != ErrTypeMismatch {
 		t.Fatal(err)
 	}

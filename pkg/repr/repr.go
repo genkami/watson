@@ -14,6 +14,7 @@ var opTable = map[byte]vm.Op{
 	char("a"): vm.Iadd,
 	char("A"): vm.Ineg,
 	char("e"): vm.Isht,
+	char("i"): vm.Itof,
 	char("?"): vm.Snew,
 	char("!"): vm.Sadd,
 	char("~"): vm.Onew,

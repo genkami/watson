@@ -34,6 +34,7 @@ const (
 	Iadd           // b: int = pop(); a: int = pop(); push(a + b);
 	Ineg           // v: int = pop(); push(-n);
 	Isht           // b: int = pop(); a: int = pop(); push(a << b);
+	Itof           // n: int = pop(); push(n interpreted as an IEEE-754 64-bit floating-point number)
 
 	// String Operations
 	Snew // push("");
@@ -77,6 +78,8 @@ func (op Op) GoString() string {
 		return "Ineg"
 	case Isht:
 		return "Isht"
+	case Itof:
+		return "Itof"
 	case Snew:
 		return "Snew"
 	case Sadd:

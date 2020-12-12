@@ -3,6 +3,7 @@ package vm
 import (
 	"errors"
 	"fmt"
+	"math"
 )
 
 var (
@@ -36,6 +37,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedIneg()
 	case Isht:
 		return vm.feedIsht()
+	case Itof:
+		return vm.feedItof()
 	case Snew:
 		return vm.feedSnew()
 	case Sadd:
@@ -122,6 +125,14 @@ func (vm *VM) feedIsht() error {
 	}
 }
 
+func (vm *VM) feedItof() error {
+	n, err := vm.popInt()
+	if err != nil {
+		return err
+	}
+	return vm.pushFloat(math.Float64frombits(uint64(n)))
+}
+
 func (vm *VM) feedSnew() error {
 	return vm.pushString([]byte{})
 }
@@ -191,6 +202,10 @@ func (vm *VM) push(v *Value) error {
 
 func (vm *VM) pushInt(val int64) error {
 	return vm.push(NewIntValue(val))
+}
+
+func (vm *VM) pushFloat(val float64) error {
+	return vm.push(NewFloatValue(val))
 }
 
 func (vm *VM) pushString(val []byte) error {
