@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/genkami/watson/pkg/vm"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestOpTableIsSurjectiveWhenModeIsA(t *testing.T) {
@@ -87,8 +89,47 @@ func TestNextReturnsEOFWhenReachingEndOfFile(t *testing.T) {
 	}
 }
 
+func TestNextChangesItsStateFromAToCWhenReachingSnew(t *testing.T) {
+	got, err := readAll("b?b")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []vm.Op{vm.Ishl, vm.Snew, vm.Fnan}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Fatalf("expected %#v but got %#v", want, got)
+	}
+}
+
+func TestNextChangesItsStateFromCToAWhenTheNextTimeItReachesSnew(t *testing.T) {
+	got, err := readAll("b?b$b")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []vm.Op{vm.Ishl, vm.Snew, vm.Fnan, vm.Snew, vm.Ishl}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Fatalf("expected %#v but got %#v", want, got)
+	}
+}
+
 func readOne(s string) (vm.Op, error) {
 	buf := bytes.NewReader([]byte(s))
 	l := NewLexer(buf)
 	return l.Next()
+}
+
+func readAll(s string) ([]vm.Op, error) {
+	buf := bytes.NewReader([]byte(s))
+	l := NewLexer(buf)
+	out := make([]vm.Op, 0, 10) // a random number that is sufficient to run the test
+	for {
+		op, err := l.Next()
+		if err != nil {
+			if err == io.EOF {
+				return out, nil
+			} else {
+				return nil, err
+			}
+		}
+		out = append(out, op)
+	}
 }

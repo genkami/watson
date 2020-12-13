@@ -137,7 +137,16 @@ func init() {
 }
 
 func readOp(m Mode, b byte) (op vm.Op, ok bool) {
-	op, ok = opTableA[b]
+	var table map[byte]vm.Op
+	switch m {
+	case A:
+		table = opTableA
+	case S:
+		table = opTableS
+	default:
+		panic(fmt.Errorf("unknown mode: %d", m))
+	}
+	op, ok = table[b]
 	return
 }
 
@@ -164,13 +173,14 @@ func char(s string) byte {
 // Then it hits '?', which is now interpreted as `Snew`, yields `Snew`, and changes its current mode to A.
 // In the end, it hits 'q' and yields `Finf`, and it stops its lexing procedure.
 type Lexer struct {
-	r   io.Reader
-	buf [1]byte
+	r    io.Reader
+	mode Mode
+	buf  [1]byte
 }
 
 // Creates a new Lexer that reads Watson Representation from r.
 func NewLexer(r io.Reader) *Lexer {
-	return &Lexer{r: r}
+	return &Lexer{r: r, mode: A}
 }
 
 // Returns the next Op.
@@ -182,8 +192,30 @@ func (l *Lexer) Next() (vm.Op, error) {
 			// Note that it returns io.EOF if the underlying Reader returns io.EOF.
 			return 0, err
 		}
-		if op, ok := readOp(A, l.buf[0]); ok {
+		if op, ok := readOp(l.mode, l.buf[0]); ok {
+			l.mode = nextMode(l.mode, op)
 			return op, nil
 		}
 	}
+}
+
+func nextMode(mode Mode, op vm.Op) Mode {
+	var next Mode
+	switch mode {
+	case A:
+		if op == vm.Snew {
+			next = S
+		} else {
+			next = A
+		}
+	case S:
+		if op == vm.Snew {
+			next = A
+		} else {
+			next = S
+		}
+	default:
+		panic(fmt.Errorf("unknown mode: %d", mode))
+	}
+	return next
 }
