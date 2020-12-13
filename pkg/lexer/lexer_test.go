@@ -10,6 +10,27 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func TestNewLexer(t *testing.T) {
+	lex := NewLexer(bytes.NewReader(nil))
+	if lex.Mode() != A {
+		t.Fatalf("expected %#v but got %#v", A, lex.Mode())
+	}
+}
+
+func TestNewLexerWithInitialModeSetToA(t *testing.T) {
+	lex := NewLexer(bytes.NewReader(nil), WithInitialMode(A))
+	if lex.Mode() != A {
+		t.Fatalf("expected %#v but got %#v", A, lex.Mode())
+	}
+}
+
+func TestNewLexerWithInitialModeSetToS(t *testing.T) {
+	lex := NewLexer(bytes.NewReader(nil), WithInitialMode(S))
+	if lex.Mode() != S {
+		t.Fatalf("expected %#v but got %#v", S, lex.Mode())
+	}
+}
+
 func TestOpTableIsSurjectiveWhenModeIsA(t *testing.T) {
 	ops := map[vm.Op]bool{}
 	for _, op := range vm.AllOps() {

@@ -163,6 +163,23 @@ func char(s string) byte {
 	return []byte(s)[0]
 }
 
+// LexerOption configures a Lexer.
+type LexerOption interface {
+	apply(*Lexer)
+}
+
+type lexerOption func(*Lexer)
+
+func (opt lexerOption) apply(l *Lexer) {
+	opt(l)
+}
+
+func WithInitialMode(mode Mode) LexerOption {
+	return lexerOption(func(l *Lexer) {
+		l.mode = mode
+	})
+}
+
 // Lexer converts a Watson Representation into a sequence of `vm.Op`s.
 // Each lexer has its state called mode. Its default mode is A, and whenever it yields the `Snew` instruction, it flips its mode.
 //
@@ -181,8 +198,12 @@ type Lexer struct {
 }
 
 // Creates a new Lexer that reads Watson Representation from r.
-func NewLexer(r io.Reader) *Lexer {
-	return &Lexer{r: r, mode: A}
+func NewLexer(r io.Reader, opts ...LexerOption) *Lexer {
+	l := &Lexer{r: r, mode: A}
+	for _, opt := range opts {
+		opt.apply(l)
+	}
+	return l
 }
 
 // Returns its current mode.
