@@ -73,6 +73,91 @@ const (
 	S
 )
 
+// LexerOption configures a Lexer.
+type LexerOption interface {
+	apply(*Lexer)
+}
+
+type lexerOption func(*Lexer)
+
+func (opt lexerOption) apply(l *Lexer) {
+	opt(l)
+}
+
+func WithInitialMode(mode Mode) LexerOption {
+	return lexerOption(func(l *Lexer) {
+		l.mode = mode
+	})
+}
+
+// Lexer converts a Watson Representation into a sequence of `vm.Op`s.
+// Each lexer has its state called mode. Its default mode is A, and whenever it yields the `Snew` instruction, it flips its mode.
+//
+// Example:
+// Consider the situation where the lexer tries to read the following string:
+//   b?b$q
+// As described above, the lexer's initial mode is A. The lexer first hits 'b' and regards it as `Ishl`.
+// Then it hits the character '?', where it changes its mode from A to S. More specifically, the lexer reads a character '?' and yields `Snew` since its current state is A. Then it changes its current state to S.
+// After that, it hits 'b' again, but in this time the 'b' is interpreted differently from the previous lexing step. Since the current mode of the lexer is S, it regards 'b' as `Fnan` instead of `Ishl`.
+// Then it hits '?', which is now interpreted as `Snew`, yields `Snew`, and changes its current mode to A.
+// In the end, it hits 'q' and yields `Finf`, and it stops its lexing procedure.
+type Lexer struct {
+	r    io.Reader
+	mode Mode
+	buf  [1]byte
+}
+
+// Creates a new Lexer that reads Watson Representation from r.
+func NewLexer(r io.Reader, opts ...LexerOption) *Lexer {
+	l := &Lexer{r: r, mode: A}
+	for _, opt := range opts {
+		opt.apply(l)
+	}
+	return l
+}
+
+// Returns its current mode.
+func (l *Lexer) Mode() Mode {
+	return l.mode
+}
+
+// Returns the next Op.
+// This returns io.EOF if it hits on the end of the input.
+func (l *Lexer) Next() (vm.Op, error) {
+	for {
+		_, err := l.r.Read(l.buf[:])
+		if err != nil {
+			// Note that it returns io.EOF if the underlying Reader returns io.EOF.
+			return 0, err
+		}
+		if op, ok := readOp(l.mode, l.buf[0]); ok {
+			l.mode = nextMode(l.mode, op)
+			return op, nil
+		}
+	}
+}
+
+func nextMode(mode Mode, op vm.Op) Mode {
+	var next Mode
+	switch mode {
+	case A:
+		if op == vm.Snew {
+			next = S
+		} else {
+			next = A
+		}
+	case S:
+		if op == vm.Snew {
+			next = A
+		} else {
+			next = S
+		}
+	default:
+		panic(fmt.Errorf("unknown mode: %d", mode))
+	}
+	return next
+}
+
 var opTableA = map[byte]vm.Op{
 	char("B"): vm.Inew,
 	char("u"): vm.Iinc,
@@ -161,89 +246,4 @@ func showOp(m Mode, op vm.Op) byte {
 
 func char(s string) byte {
 	return []byte(s)[0]
-}
-
-// LexerOption configures a Lexer.
-type LexerOption interface {
-	apply(*Lexer)
-}
-
-type lexerOption func(*Lexer)
-
-func (opt lexerOption) apply(l *Lexer) {
-	opt(l)
-}
-
-func WithInitialMode(mode Mode) LexerOption {
-	return lexerOption(func(l *Lexer) {
-		l.mode = mode
-	})
-}
-
-// Lexer converts a Watson Representation into a sequence of `vm.Op`s.
-// Each lexer has its state called mode. Its default mode is A, and whenever it yields the `Snew` instruction, it flips its mode.
-//
-// Example:
-// Consider the situation where the lexer tries to read the following string:
-//   b?b$q
-// As described above, the lexer's initial mode is A. The lexer first hits 'b' and regards it as `Ishl`.
-// Then it hits the character '?', where it changes its mode from A to S. More specifically, the lexer reads a character '?' and yields `Snew` since its current state is A. Then it changes its current state to S.
-// After that, it hits 'b' again, but in this time the 'b' is interpreted differently from the previous lexing step. Since the current mode of the lexer is S, it regards 'b' as `Fnan` instead of `Ishl`.
-// Then it hits '?', which is now interpreted as `Snew`, yields `Snew`, and changes its current mode to A.
-// In the end, it hits 'q' and yields `Finf`, and it stops its lexing procedure.
-type Lexer struct {
-	r    io.Reader
-	mode Mode
-	buf  [1]byte
-}
-
-// Creates a new Lexer that reads Watson Representation from r.
-func NewLexer(r io.Reader, opts ...LexerOption) *Lexer {
-	l := &Lexer{r: r, mode: A}
-	for _, opt := range opts {
-		opt.apply(l)
-	}
-	return l
-}
-
-// Returns its current mode.
-func (l *Lexer) Mode() Mode {
-	return l.mode
-}
-
-// Returns the next Op.
-// This returns io.EOF if it hits on the end of the input.
-func (l *Lexer) Next() (vm.Op, error) {
-	for {
-		_, err := l.r.Read(l.buf[:])
-		if err != nil {
-			// Note that it returns io.EOF if the underlying Reader returns io.EOF.
-			return 0, err
-		}
-		if op, ok := readOp(l.mode, l.buf[0]); ok {
-			l.mode = nextMode(l.mode, op)
-			return op, nil
-		}
-	}
-}
-
-func nextMode(mode Mode, op vm.Op) Mode {
-	var next Mode
-	switch mode {
-	case A:
-		if op == vm.Snew {
-			next = S
-		} else {
-			next = A
-		}
-	case S:
-		if op == vm.Snew {
-			next = A
-		} else {
-			next = S
-		}
-	default:
-		panic(fmt.Errorf("unknown mode: %d", mode))
-	}
-	return next
 }
