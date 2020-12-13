@@ -1,20 +1,15 @@
-// Package lexer provides a way to convert a byte sequence into a sequence of Watson's instructions and vice versa.
-package lexer
-
-import (
-	"fmt"
-	"io"
-
-	"github.com/genkami/watson/pkg/vm"
-)
-
-// Mode is an important concept that is unique to Watson.
-// It determines the correspondence between Vm's instructions and their ASCII representation.
-// The complete conversion table between instructions and their ASCII representations are as follows:
+// Package lexer provides a way to convert a Watson Representation into a sequence of Watson's instructions and vice versa.
+// (where Watson Representation is a sequence of character that represents Watson's instructions).
+//
+// The correspondence between characters and instructions depends on the lexer's mode.
+// Each lexer has its own mode. The mode of a lexer is either `A` or `S`. The initial mode of a lexer is A unless otherwise specified.
+//
+// The complete conversion table between instructions and their Watson Representations are as follows:
 //
 //   +-----------+--------------+--------------+
-//   |Instruction|Representation|Representation|
-//   |           |(A)           |(S)           |
+//   |Instruction|Watson        |Watson        |
+//   |           |Representation|Representation|
+//   |           |(mode = A)    |(mode = S)    |
 //   +-----------+--------------+--------------+
 //   |Inew       |B             |S             |
 //   +-----------+--------------+--------------+
@@ -58,10 +53,21 @@ import (
 //   +-----------+--------------+--------------+
 //   |Gswp       |%             |:             |
 //   +-----------+--------------+--------------+
+package lexer
+
+import (
+	"fmt"
+	"io"
+
+	"github.com/genkami/watson/pkg/vm"
+)
+
+// Mode is an important concept that is unique to Watson.
+// It determines the correspondence between Vm's instructions and their ASCII representation.
 type Mode int
 
 const (
-	A Mode = iota // A, S are modes of the lexer. See the specification for more details.
+	A Mode = iota // A, S are the modes of the lexer. See the overview for more details.
 	S
 )
 
@@ -146,17 +152,17 @@ func char(s string) byte {
 	return []byte(s)[0]
 }
 
-// Lexer is responsible for converting a Watson Representation into a sequence of vm.Ops.
-// Its default mode is A, and whenever it yields the Snew instruction, it flips its mode.
+// Lexer converts a Watson Representation into a sequence of `vm.Op`s.
+// Each lexer has its state called mode. Its default mode is A, and whenever it yields the `Snew` instruction, it flips its mode.
 //
 // Example:
 // Consider the situation where the lexer tries to read the following string:
 //   b?b$q
-// As described above, the lexer's initial mode is A. The lexer first hits 'b' and consider it as vm.Ishl.
-// Then it hits the character '?', where it changes its mode from A to S. More specifically, the lexer reads a character '?' and yields vm.Snew since its current state is A. Then it changes its current state to S.
-// After that, it hits 'b' again, but in this time the 'b' is interpreted differently from the previous lexing step. Since the current mode of the lexer is S, it regards 'b' as vm.Fnan instead of vm.Ishl.
-// Then it hits '?', which is now interpreted as vm.Snew, yields vm.Snew, and changes its current mode to A.
-// In the end, it hits 'q' and yields vm.Finf, and it stops its lexing procedure.
+// As described above, the lexer's initial mode is A. The lexer first hits 'b' and regards it as `Ishl`.
+// Then it hits the character '?', where it changes its mode from A to S. More specifically, the lexer reads a character '?' and yields `Snew` since its current state is A. Then it changes its current state to S.
+// After that, it hits 'b' again, but in this time the 'b' is interpreted differently from the previous lexing step. Since the current mode of the lexer is S, it regards 'b' as `Fnan` instead of `Ishl`.
+// Then it hits '?', which is now interpreted as `Snew`, yields `Snew`, and changes its current mode to A.
+// In the end, it hits 'q' and yields `Finf`, and it stops its lexing procedure.
 type Lexer struct {
 	r   io.Reader
 	buf [1]byte
