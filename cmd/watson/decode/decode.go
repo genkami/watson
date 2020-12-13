@@ -13,13 +13,13 @@ func Main(args []string) {
 	m := vm.NewVM()
 	lexer := lexer.NewLexer(os.Stdin)
 	for {
-		op, err := lexer.Next()
+		tok, err := lexer.Next()
 		if err == io.EOF {
 			break
 		} else if err != nil {
 			panic(err)
 		}
-		err = m.Feed(op)
+		err = m.Feed(tok.Op)
 		if err != nil {
 			panic(err)
 		}

@@ -72,10 +72,11 @@ func TestNextReturnsOpsSequentially(t *testing.T) {
 	l := NewLexer(buf)
 	expectedOps := []vm.Op{vm.Inew, vm.Iinc, vm.Ishl, vm.Ishl, vm.Iadd}
 	for _, expected := range expectedOps {
-		actual, err := l.Next()
+		tok, err := l.Next()
 		if err != nil {
 			t.Fatal(err)
 		}
+		actual := tok.Op
 		if expected != actual {
 			t.Errorf("expected %#v but got %#v", expected, actual)
 		}
@@ -135,7 +136,11 @@ func TestNextChangesItsStateFromCToAWhenTheNextTimeItReachesSnew(t *testing.T) {
 func readOne(s string) (vm.Op, error) {
 	buf := bytes.NewReader([]byte(s))
 	l := NewLexer(buf)
-	return l.Next()
+	tok, err := l.Next()
+	if err != nil {
+		return 0, err
+	}
+	return tok.Op, nil
 }
 
 func readAll(s string) ([]vm.Op, error) {
@@ -143,7 +148,7 @@ func readAll(s string) ([]vm.Op, error) {
 	l := NewLexer(buf)
 	out := make([]vm.Op, 0, 10) // a random number that is sufficient to run the test
 	for {
-		op, err := l.Next()
+		tok, err := l.Next()
 		if err != nil {
 			if err == io.EOF {
 				return out, nil
@@ -151,6 +156,6 @@ func readAll(s string) ([]vm.Op, error) {
 				return nil, err
 			}
 		}
-		out = append(out, op)
+		out = append(out, tok.Op)
 	}
 }

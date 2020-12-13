@@ -73,6 +73,11 @@ const (
 	S
 )
 
+// Token is a token yielded by Lexer.
+type Token struct {
+	Op vm.Op
+}
+
 // LexerOption configures a Lexer.
 type LexerOption interface {
 	apply(*Lexer)
@@ -123,16 +128,16 @@ func (l *Lexer) Mode() Mode {
 
 // Returns the next Op.
 // This returns io.EOF if it hits on the end of the input.
-func (l *Lexer) Next() (vm.Op, error) {
+func (l *Lexer) Next() (*Token, error) {
 	for {
 		_, err := l.r.Read(l.buf[:])
 		if err != nil {
 			// Note that it returns io.EOF if the underlying Reader returns io.EOF.
-			return 0, err
+			return nil, err
 		}
 		if op, ok := readOp(l.mode, l.buf[0]); ok {
 			l.mode = nextMode(l.mode, op)
-			return op, nil
+			return &Token{Op: op}, nil
 		}
 	}
 }
