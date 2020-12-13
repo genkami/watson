@@ -27,6 +27,7 @@ var opTable = map[byte]vm.Op{
 	char("z"): vm.Bnew,
 	char("o"): vm.Bneg,
 	char("."): vm.Nnew,
+	char("*"): vm.Gdup,
 }
 
 var reversedTable map[vm.Op]byte

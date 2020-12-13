@@ -1139,6 +1139,93 @@ func TestFeedNnewPushesNil(t *testing.T) {
 	}
 }
 
+func TestGdupDuplicatesArg1(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(123)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Gdup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 1 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewIntValue(123)
+	clone, err := vm.pop()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, clone); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+	orig, err := vm.pop()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, orig); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestGdupPushesACopy(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushObject(map[string]*Value{
+		"hello": NewStringValue([]byte("world")),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Gdup)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 1 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewObjectValue(map[string]*Value{
+		"hello": NewStringValue([]byte("world")),
+	})
+	clone, err := vm.pop()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, clone); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+	orig, err := vm.pop()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, orig); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+
+	clone.Object["ebi"] = NewStringValue([]byte("shrimp"))
+	if diff := cmp.Diff(clone, orig); diff == "" {
+		t.Errorf("Gdup does not seem to copy arg1")
+	}
+}
+
+func TestFeedGdupFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Gdup)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedMultiDoNothingWhenOpsIsEmpty(t *testing.T) {
 	var err error
 	vm := NewVM()

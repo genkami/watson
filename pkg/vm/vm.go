@@ -61,6 +61,9 @@ const (
 	// Nil Operations
 	Nnew // push(nil);
 
+	// Generic Operations
+	Gdup // x: any = pop(); push(x); push(x);
+
 	// This can only be used to iterate over all defined Ops.
 	numOps
 )
@@ -114,6 +117,8 @@ func (op Op) GoString() string {
 		return "Bneg"
 	case Nnew:
 		return "Nnew"
+	case Gdup:
+		return "Gdup"
 	default:
 		panic(fmt.Errorf("invalid opcode: %d", op))
 	}
