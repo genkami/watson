@@ -143,7 +143,33 @@ const (
 	KArray              // array
 	KBool               // bool
 	KNil                // nil
+
+	// This can only be used to iterate over all defined Kinds.
+	numKinds
 )
+
+func (k Kind) GoString() string {
+	switch k {
+	case KInt:
+		return "Int"
+	case KFloat:
+		return "Float"
+	case KString:
+		return "String"
+	case KObject:
+		return "Object"
+	case KArray:
+		return "Array"
+	case KBool:
+		return "Bool"
+	case KNil:
+		return "Nil"
+	default:
+		panic(fmt.Errorf("invalid kind: %d", k))
+	}
+}
+
+var _ fmt.GoStringer = Kind(0)
 
 // Value is an element of the stack.
 type Value struct {
@@ -225,3 +251,30 @@ func (v *Value) DeepCopy() *Value {
 	}
 	return clone
 }
+
+func (v *Value) GoString() string {
+	return fmt.Sprintf("{Kind: %#v, Value: %s}", v.Kind, v.goStringValue())
+}
+
+func (v *Value) goStringValue() string {
+	switch v.Kind {
+	case KInt:
+		return fmt.Sprintf("%d", v.Int)
+	case KFloat:
+		return fmt.Sprintf("%f", v.Float)
+	case KString:
+		return fmt.Sprintf("%#v", v.String)
+	case KObject:
+		return fmt.Sprintf("%#v", v.Object)
+	case KArray:
+		return fmt.Sprintf("%#v", v.Array)
+	case KBool:
+		return fmt.Sprintf("%t", v.Bool)
+	case KNil:
+		return "nil"
+	default:
+		panic(fmt.Errorf("invalid kind: %d", v.Kind))
+	}
+}
+
+var _ fmt.GoStringer = &Value{}
