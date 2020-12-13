@@ -21,12 +21,6 @@ func TestOpTableIsSurjectiveWhenModeIsA(t *testing.T) {
 	}
 }
 
-func TestShowOpIsDefinedForAllOpsWhenModeIsA(t *testing.T) {
-	for _, op := range vm.AllOps() {
-		ShowOp(A, op)
-	}
-}
-
 func TestNextReturnsTheFirstOp(t *testing.T) {
 	op, err := readOne("B")
 	if err != nil {

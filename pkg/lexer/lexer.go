@@ -50,15 +50,12 @@ func init() {
 	}
 }
 
-// Returns a Op that corresponds to the given byte.
-// This returns false if and only if b is not in the byte-to-op map.
-func ReadOp(m Mode, b byte) (op vm.Op, ok bool) {
+func readOp(m Mode, b byte) (op vm.Op, ok bool) {
 	op, ok = opTableA[b]
 	return
 }
 
-// Returns a ascii representation of the given Op.
-func ShowOp(m Mode, op vm.Op) byte {
+func showOp(m Mode, op vm.Op) byte {
 	if b, ok := reversedTableA[op]; ok {
 		return b
 	}
@@ -89,7 +86,7 @@ func (l *Lexer) Next() (vm.Op, error) {
 			// Note that it returns io.EOF if the underlying Reader returns io.EOF.
 			return 0, err
 		}
-		if op, ok := ReadOp(A, l.buf[0]); ok {
+		if op, ok := readOp(A, l.buf[0]); ok {
 			return op, nil
 		}
 	}
