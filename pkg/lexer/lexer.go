@@ -169,6 +169,27 @@ func (l *Lexer) Next() (*Token, error) {
 	}
 }
 
+// Unlexer converts a sequence of `vm.Op`s into a sequence of characters.
+type Unlexer struct {
+	w    io.Writer
+	mode Mode
+}
+
+func NewUnlexer(w io.Writer) *Unlexer {
+	return &Unlexer{
+		w:    w,
+		mode: A,
+	}
+}
+
+func (u *Unlexer) Write(op vm.Op) error {
+	b := make([]byte, 1)
+	b[0] = showOp(u.mode, op)
+	u.mode = nextMode(u.mode, op)
+	_, err := u.w.Write(b)
+	return err
+}
+
 func nextMode(mode Mode, op vm.Op) Mode {
 	var next Mode
 	switch mode {
@@ -270,7 +291,16 @@ func readOp(m Mode, b byte) (op vm.Op, ok bool) {
 }
 
 func showOp(m Mode, op vm.Op) byte {
-	if b, ok := reversedTableA[op]; ok {
+	var table map[vm.Op]byte
+	switch m {
+	case A:
+		table = reversedTableA
+	case S:
+		table = reversedTableS
+	default:
+		panic(fmt.Errorf("unknown mode: %d", m))
+	}
+	if b, ok := table[op]; ok {
 		return b
 	}
 	panic(fmt.Errorf("unknown Op: %#v\n", op))

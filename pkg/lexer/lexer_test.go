@@ -163,6 +163,39 @@ func TestNextChangesItsStateFromCToAWhenTheNextTimeItReachesSnew(t *testing.T) {
 	}
 }
 
+func TestWriteWritesAnOp(t *testing.T) {
+	buf := bytes.NewBuffer(nil)
+	u := NewUnlexer(buf)
+	err := u.Write(vm.Inew)
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := []byte("B")
+	got := buf.Bytes()
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Fatalf("expected %#v but got %#v", want, got)
+	}
+}
+
+func TestWriteChangesItsModeWhenHittingSnew(t *testing.T) {
+	buf := bytes.NewBuffer(nil)
+	u := NewUnlexer(buf)
+	ops := []vm.Op{vm.Ishl, vm.Snew, vm.Fnan, vm.Snew, vm.Finf}
+	want := []byte("b?b$q")
+
+	for _, op := range ops {
+		err := u.Write(op)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	got := buf.Bytes()
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Fatalf("expected %#v but got %#v", want, got)
+	}
+}
+
 func readOne(s string) (vm.Op, error) {
 	buf := bytes.NewReader([]byte(s))
 	l := NewLexer(buf)
