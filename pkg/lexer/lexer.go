@@ -13,7 +13,8 @@ import (
 type Mode int
 
 const (
-	A Mode = iota // A is the initial mode of the lexer. See the specification for more details.
+	A Mode = iota // A, S are modes of the lexer. See the specification for more details.
+	S
 )
 
 var opTableA = map[byte]vm.Op{
@@ -43,10 +44,41 @@ var opTableA = map[byte]vm.Op{
 
 var reversedTableA map[vm.Op]byte
 
+var opTableS = map[byte]vm.Op{
+	char("S"): vm.Inew,
+	char("h"): vm.Iinc,
+	char("a"): vm.Ishl,
+	char("k"): vm.Iadd,
+	char("r"): vm.Ineg,
+	char("A"): vm.Isht,
+	char("z"): vm.Itof,
+	char("p"): vm.Finf,
+	char("b"): vm.Fnan,
+	char("u"): vm.Fneg,
+	char("$"): vm.Snew,
+	char("-"): vm.Sadd,
+	char("+"): vm.Onew,
+	char("g"): vm.Oadd,
+	char("v"): vm.Anew,
+	char("?"): vm.Aadd,
+	char("^"): vm.Bnew,
+	char("!"): vm.Bneg,
+	char("y"): vm.Nnew,
+	char("/"): vm.Gdup,
+	char("c"): vm.Gpop,
+	char(":"): vm.Gswp,
+}
+
+var reversedTableS map[vm.Op]byte
+
 func init() {
 	reversedTableA = make(map[vm.Op]byte)
 	for k, v := range opTableA {
 		reversedTableA[v] = k
+	}
+	reversedTableS = make(map[vm.Op]byte)
+	for k, v := range opTableS {
+		reversedTableS[v] = k
 	}
 }
 
