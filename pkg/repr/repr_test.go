@@ -6,12 +6,12 @@ import (
 	"github.com/genkami/watson/pkg/vm"
 )
 
-func TestOpTableIsSurjective(t *testing.T) {
+func TestOpTableIsSurjectiveWhenModeIsA(t *testing.T) {
 	ops := map[vm.Op]bool{}
 	for _, op := range vm.AllOps() {
 		ops[op] = true
 	}
-	for _, op := range opTable {
+	for _, op := range opTableA {
 		delete(ops, op)
 	}
 	for op := range ops {
@@ -19,8 +19,8 @@ func TestOpTableIsSurjective(t *testing.T) {
 	}
 }
 
-func TestShowOpIsDefinedForAllOps(t *testing.T) {
+func TestShowOpIsDefinedForAllOpsWhenModeIsA(t *testing.T) {
 	for _, op := range vm.AllOps() {
-		ShowOp(op)
+		ShowOp(A, op)
 	}
 }

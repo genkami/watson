@@ -7,7 +7,15 @@ import (
 	"github.com/genkami/watson/pkg/vm"
 )
 
-var opTable = map[byte]vm.Op{
+// Mode is an important concept that is unique to Watson.
+// It determines the correspondence between Vm's instructions and their representation.
+type Mode int
+
+const (
+	A Mode = iota // A is the initial mode of the lexer. See the specification for more details.
+)
+
+var opTableA = map[byte]vm.Op{
 	char("B"): vm.Inew,
 	char("u"): vm.Iinc,
 	char("b"): vm.Ishl,
@@ -32,25 +40,25 @@ var opTable = map[byte]vm.Op{
 	char("%"): vm.Gswp,
 }
 
-var reversedTable map[vm.Op]byte
+var reversedTableA map[vm.Op]byte
 
 func init() {
-	reversedTable = make(map[vm.Op]byte)
-	for k, v := range opTable {
-		reversedTable[v] = k
+	reversedTableA = make(map[vm.Op]byte)
+	for k, v := range opTableA {
+		reversedTableA[v] = k
 	}
 }
 
 // Returns a Op that corresponds to the given byte.
 // This returns false if and only if b is not in the byte-to-op map.
-func ReadOp(b byte) (op vm.Op, ok bool) {
-	op, ok = opTable[b]
+func ReadOp(m Mode, b byte) (op vm.Op, ok bool) {
+	op, ok = opTableA[b]
 	return
 }
 
 // Returns a ascii representation of the given Op.
-func ShowOp(op vm.Op) byte {
-	if b, ok := reversedTable[op]; ok {
+func ShowOp(m Mode, op vm.Op) byte {
+	if b, ok := reversedTableA[op]; ok {
 		return b
 	}
 	panic(fmt.Errorf("unknown Op: %#v\n", op))

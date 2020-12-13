@@ -27,7 +27,7 @@ func (l *Lexer) Next() (vm.Op, error) {
 			// Note that it returns io.EOF if the underlying Reader returns io.EOF.
 			return 0, err
 		}
-		if op, ok := repr.ReadOp(l.buf[0]); ok {
+		if op, ok := repr.ReadOp(repr.A, l.buf[0]); ok {
 			return op, nil
 		}
 	}
