@@ -17,16 +17,24 @@ type VM struct {
 }
 
 // VMOption provides the way to build VMs with custom configurations.
-type VMOption func(*VM)
+type VMOption interface {
+	apply(*VM)
+}
+
+type vmOption func(*VM)
+
+func (opt vmOption) apply(vm *VM) {
+	opt(vm)
+}
 
 // WithStackSize sets the stack size of a VM to the given value.
 // If given size is less than or equal to zero, DefaultStackSize will be used.
 func WithStackSize(size int) VMOption {
-	return func(v *VM) {
+	return vmOption(func(v *VM) {
 		if size > 0 {
 			v.stack = make([]*Value, size)
 		}
-	}
+	})
 }
 
 // Returns a new VM with its stack allocated.
@@ -34,7 +42,7 @@ func WithStackSize(size int) VMOption {
 func NewVM(opts ...VMOption) *VM {
 	vm := &VM{sp: -1}
 	for _, opt := range opts {
-		opt(vm)
+		opt.apply(vm)
 	}
 	if len(vm.stack) == 0 {
 		vm.stack = make([]*Value, DefaultStackSize)
