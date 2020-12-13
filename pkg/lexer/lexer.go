@@ -185,6 +185,11 @@ func NewLexer(r io.Reader) *Lexer {
 	return &Lexer{r: r, mode: A}
 }
 
+// Returns its current mode.
+func (l *Lexer) Mode() Mode {
+	return l.mode
+}
+
 // Returns the next Op.
 // This returns io.EOF if it hits on the end of the input.
 func (l *Lexer) Next() (vm.Op, error) {
