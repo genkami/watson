@@ -1268,6 +1268,70 @@ func TestFeedGpopFailsWhenStackIsEmpty(t *testing.T) {
 	}
 }
 
+func TestGswpSwapsArgs(t *testing.T) {
+	var err error
+	vm := NewVM()
+	a := NewIntValue(1)
+	b := NewStringValue([]byte("2"))
+
+	err = vm.push(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.push(a)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Gswp)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	b1, err := vm.pop()
+	if err != nil {
+		t.Fatal(err)
+	}
+	a1, err := vm.pop()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != -1 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", -1, vm.sp)
+	}
+
+	if diff := cmp.Diff(a, a1); diff != "" {
+		t.Errorf("comparing arg1: mismatch (-want +got):\n%s", diff)
+	}
+	if diff := cmp.Diff(b, b1); diff != "" {
+		t.Errorf("comparing arg2: mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedGswpFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Gswp)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
+func TestFeedGswpFailsWhenStackIsInsufficient(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushInt(1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Gswp)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedMultiDoNothingWhenOpsIsEmpty(t *testing.T) {
 	var err error
 	vm := NewVM()
