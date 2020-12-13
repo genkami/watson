@@ -1226,6 +1226,48 @@ func TestFeedGdupFailsWhenStackIsEmpty(t *testing.T) {
 	}
 }
 
+func TestFeedGpopPopsOnce(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.pushString([]byte("first"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.pushString([]byte("second"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = vm.Feed(Gpop)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if vm.sp != 0 {
+		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
+	}
+
+	want := NewStringValue([]byte("first"))
+	got, err := vm.Top()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestFeedGpopFailsWhenStackIsEmpty(t *testing.T) {
+	var err error
+	vm := NewVM()
+
+	err = vm.Feed(Gpop)
+	if err != ErrStackEmpty {
+		t.Fatal(err)
+	}
+}
+
 func TestFeedMultiDoNothingWhenOpsIsEmpty(t *testing.T) {
 	var err error
 	vm := NewVM()

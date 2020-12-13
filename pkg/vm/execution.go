@@ -65,6 +65,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedNnew()
 	case Gdup:
 		return vm.feedGdup()
+	case Gpop:
+		return vm.feedGpop()
 	default:
 		panic(fmt.Errorf("invalid opcode: %d", op))
 	}
@@ -242,6 +244,11 @@ func (vm *VM) feedGdup() error {
 		return err
 	}
 	return vm.push(v.DeepCopy())
+}
+
+func (vm *VM) feedGpop() error {
+	_, err := vm.pop()
+	return err
 }
 
 //

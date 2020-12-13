@@ -63,6 +63,7 @@ const (
 
 	// Generic Operations
 	Gdup // x: any = pop(); push(x); push(x);
+	Gpop // pop();
 
 	// This can only be used to iterate over all defined Ops.
 	numOps
@@ -119,6 +120,8 @@ func (op Op) GoString() string {
 		return "Nnew"
 	case Gdup:
 		return "Gdup"
+	case Gpop:
+		return "Gpop"
 	default:
 		panic(fmt.Errorf("invalid opcode: %d", op))
 	}
