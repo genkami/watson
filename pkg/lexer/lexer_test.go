@@ -31,6 +31,14 @@ func TestNewLexerWithInitialModeSetToS(t *testing.T) {
 	}
 }
 
+func TestNewLexerWithFileNameSetsFileName(t *testing.T) {
+	name := "hoge.txt"
+	lex := NewLexer(bytes.NewReader(nil), WithFileName(name))
+	if lex.fileName != name {
+		t.Fatalf("expected %#v but got %#v", name, lex.fileName)
+	}
+}
+
 func TestOpTableIsSurjectiveWhenModeIsA(t *testing.T) {
 	ops := map[vm.Op]bool{}
 	for _, op := range vm.AllOps() {
@@ -64,6 +72,28 @@ func TestNextReturnsTheFirstOp(t *testing.T) {
 	}
 	if op != vm.Inew {
 		t.Errorf("expected %#v but got %#v", vm.Inew, op)
+	}
+}
+
+func TestNextReturnsFileNameAndPosition(t *testing.T) {
+	name := "hoge.watson"
+	buf := bytes.NewReader([]byte("Bub\nba"))
+	l := NewLexer(buf, WithFileName(name))
+	expectedTokens := []*Token{
+		&Token{Op: vm.Inew, FileName: name, Line: 0, Column: 0},
+		&Token{Op: vm.Iinc, FileName: name, Line: 0, Column: 1},
+		&Token{Op: vm.Ishl, FileName: name, Line: 0, Column: 2},
+		&Token{Op: vm.Ishl, FileName: name, Line: 1, Column: 0},
+		&Token{Op: vm.Iadd, FileName: name, Line: 1, Column: 1},
+	}
+	for _, expected := range expectedTokens {
+		actual, err := l.Next()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff := cmp.Diff(expected, actual); diff != "" {
+			t.Errorf("lexing %#v: mismatch (-want +got):\n%s", expected.Op, diff)
+		}
 	}
 }
 

@@ -75,8 +75,13 @@ const (
 
 // Token is a token yielded by Lexer.
 type Token struct {
-	Op vm.Op
+	Op       vm.Op
+	FileName string
+	Line     int
+	Column   int
 }
+
+var newline = char("\n")
 
 // LexerOption configures a Lexer.
 type LexerOption interface {
@@ -95,6 +100,12 @@ func WithInitialMode(mode Mode) LexerOption {
 	})
 }
 
+func WithFileName(name string) LexerOption {
+	return lexerOption(func(l *Lexer) {
+		l.fileName = name
+	})
+}
+
 // Lexer converts a Watson Representation into a sequence of `vm.Op`s.
 // Each lexer has its state called mode. Its default mode is A, and whenever it yields the `Snew` instruction, it flips its mode.
 //
@@ -107,9 +118,12 @@ func WithInitialMode(mode Mode) LexerOption {
 // Then it hits '?', which is now interpreted as `Snew`, yields `Snew`, and changes its current mode to A.
 // In the end, it hits 'q' and yields `Finf`, and it stops its lexing procedure.
 type Lexer struct {
-	r    io.Reader
-	mode Mode
-	buf  [1]byte
+	r        io.Reader
+	mode     Mode
+	buf      [1]byte
+	fileName string
+	line     int
+	column   int
 }
 
 // Creates a new Lexer that reads Watson Representation from r.
@@ -135,9 +149,22 @@ func (l *Lexer) Next() (*Token, error) {
 			// Note that it returns io.EOF if the underlying Reader returns io.EOF.
 			return nil, err
 		}
+		line := l.line
+		col := l.column
+		if l.buf[0] == newline {
+			l.line++
+			l.column = 0
+		} else {
+			l.column++
+		}
 		if op, ok := readOp(l.mode, l.buf[0]); ok {
 			l.mode = nextMode(l.mode, op)
-			return &Token{Op: op}, nil
+			return &Token{
+				Op:       op,
+				FileName: l.fileName,
+				Line:     line,
+				Column:   col,
+			}, nil
 		}
 	}
 }
