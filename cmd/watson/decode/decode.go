@@ -1,6 +1,7 @@
 package decode
 
 import (
+	"fmt"
 	"io"
 	"os"
 
@@ -11,17 +12,17 @@ import (
 
 func Main(args []string) {
 	m := vm.NewVM()
-	lexer := lexer.NewLexer(os.Stdin)
+	lexer := lexer.NewLexer(os.Stdin, lexer.WithFileName("<stdin>"))
 	for {
 		tok, err := lexer.Next()
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			panic(err)
+			showErrAndExit(tok, err)
 		}
 		err = m.Feed(tok.Op)
 		if err != nil {
-			panic(err)
+			showErrAndExit(tok, err)
 		}
 	}
 	v, err := m.Top()
@@ -30,6 +31,13 @@ func Main(args []string) {
 	}
 	err = yaml.Decode(os.Stdout, v)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "output is empty")
+		os.Exit(1)
 	}
+}
+
+func showErrAndExit(tok *lexer.Token, err error) {
+	fmt.Fprintf(os.Stderr, "error %+v\n at %#v line %d, column %d\n",
+		err, tok.FileName, tok.Line+1, tok.Column+1)
+	os.Exit(1)
 }
