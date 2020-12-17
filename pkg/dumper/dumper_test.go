@@ -1,6 +1,8 @@
 package dumper
 
 import (
+	"fmt"
+	"math"
 	"testing"
 
 	"github.com/genkami/watson/pkg/vm"
@@ -61,4 +63,48 @@ func TestDumpInt(t *testing.T) {
 	test(0x1234abcd)
 	test(0x12345678abcdef0)
 	test(-1)
+}
+
+func TestDumpFloat(t *testing.T) {
+	test := func(n float64) {
+		orig := vm.NewFloatValue(n)
+		w := NewSliceWriter()
+		d := NewDumper(w)
+		err := d.Dump(orig)
+		if err != nil {
+			t.Fatal(err)
+		}
+		dumped := w.Ops()
+		v := vm.NewVM()
+		for _, op := range dumped {
+			err = v.Feed(op)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		converted, err := v.Top()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if orig.IsNaN() {
+			fmt.Printf("yey")
+			if !converted.IsNaN() {
+				t.Errorf("expected NaN but got %#v", converted)
+			}
+			return
+		}
+		if diff := cmp.Diff(orig, converted); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	}
+	test(0)
+	test(1)
+	test(2)
+	test(1.2345e67)
+	test(1.2345e-67)
+	test(-1.2345e67)
+	test(-1.2345e-67)
+	test(math.NaN())
+	test(math.Inf(1))
+	test(math.Inf(-1))
 }

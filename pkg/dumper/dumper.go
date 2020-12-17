@@ -3,6 +3,7 @@ package dumper
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/genkami/watson/pkg/vm"
 )
@@ -50,6 +51,8 @@ func (d *Dumper) Dump(v *vm.Value) error {
 	switch v.Kind {
 	case vm.KInt:
 		return d.dumpInt(uint64(v.Int))
+	case vm.KFloat:
+		return d.dumpFloat(v.Float)
 	default:
 		panic(fmt.Errorf("unknown kind: %d", v.Kind))
 	}
@@ -85,6 +88,33 @@ func (d *Dumper) dumpInt(n uint64) error {
 		}
 		n = n >> 1
 		shift++
+	}
+	return nil
+}
+
+func (d *Dumper) dumpFloat(x float64) error {
+	var err error
+	if math.IsNaN(x) {
+		return d.w.Write(vm.Fnan)
+	} else if math.IsInf(x, 1) {
+		return d.w.Write(vm.Finf)
+	} else if math.IsInf(x, -1) {
+		err = d.w.Write(vm.Finf)
+		if err != nil {
+			return err
+		}
+		err = d.w.Write(vm.Fneg)
+		if err != nil {
+			return err
+		}
+	}
+	err = d.dumpInt(math.Float64bits(x))
+	if err != nil {
+		return err
+	}
+	err = d.w.Write(vm.Itof)
+	if err != nil {
+		return err
 	}
 	return nil
 }
