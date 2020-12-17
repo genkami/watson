@@ -151,6 +151,17 @@ func TestDumpBool(t *testing.T) {
 	test(false)
 }
 
+func TestDumpNil(t *testing.T) {
+	orig := vm.NewNilValue()
+	converted, err := encodeThenExecute(orig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(orig, converted); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func encodeThenExecute(val *vm.Value) (*vm.Value, error) {
 	w := NewSliceWriter()
 	d := NewDumper(w)
