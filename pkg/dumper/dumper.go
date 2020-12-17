@@ -53,6 +53,8 @@ func (d *Dumper) Dump(v *vm.Value) error {
 		return d.dumpInt(uint64(v.Int))
 	case vm.KFloat:
 		return d.dumpFloat(v.Float)
+	case vm.KString:
+		return d.dumpString(v.String)
 	default:
 		panic(fmt.Errorf("unknown kind: %d", v.Kind))
 	}
@@ -115,6 +117,25 @@ func (d *Dumper) dumpFloat(x float64) error {
 	err = d.w.Write(vm.Itof)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (d *Dumper) dumpString(s []byte) error {
+	var err error
+	err = d.w.Write(vm.Snew)
+	if err != nil {
+		return err
+	}
+	for _, c := range s {
+		err = d.dumpInt(uint64(c))
+		if err != nil {
+			return err
+		}
+		err = d.w.Write(vm.Sadd)
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

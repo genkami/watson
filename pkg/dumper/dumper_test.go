@@ -81,6 +81,22 @@ func TestDumpFloat(t *testing.T) {
 	test(math.Inf(-1))
 }
 
+func TestDumpString(t *testing.T) {
+	test := func(s string) {
+		orig := vm.NewStringValue([]byte(s))
+		converted, err := encodeThenExecute(orig)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff := cmp.Diff(orig, converted); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	}
+	test("")
+	test("a")
+	test("shrimp")
+}
+
 func encodeThenExecute(val *vm.Value) (*vm.Value, error) {
 	w := NewSliceWriter()
 	d := NewDumper(w)
