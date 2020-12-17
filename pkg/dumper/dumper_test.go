@@ -35,21 +35,7 @@ func TestSliceWriterReturnsAllOpsThatAreWritten(t *testing.T) {
 func TestDumpInt(t *testing.T) {
 	test := func(n int64) {
 		orig := vm.NewIntValue(n)
-		w := NewSliceWriter()
-		d := NewDumper(w)
-		err := d.Dump(orig)
-		if err != nil {
-			t.Fatal(err)
-		}
-		dumped := w.Ops()
-		v := vm.NewVM()
-		for _, op := range dumped {
-			err = v.Feed(op)
-			if err != nil {
-				t.Fatal(err)
-			}
-		}
-		converted, err := v.Top()
+		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -68,21 +54,7 @@ func TestDumpInt(t *testing.T) {
 func TestDumpFloat(t *testing.T) {
 	test := func(n float64) {
 		orig := vm.NewFloatValue(n)
-		w := NewSliceWriter()
-		d := NewDumper(w)
-		err := d.Dump(orig)
-		if err != nil {
-			t.Fatal(err)
-		}
-		dumped := w.Ops()
-		v := vm.NewVM()
-		for _, op := range dumped {
-			err = v.Feed(op)
-			if err != nil {
-				t.Fatal(err)
-			}
-		}
-		converted, err := v.Top()
+		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -107,4 +79,22 @@ func TestDumpFloat(t *testing.T) {
 	test(math.NaN())
 	test(math.Inf(1))
 	test(math.Inf(-1))
+}
+
+func encodeThenExecute(val *vm.Value) (*vm.Value, error) {
+	w := NewSliceWriter()
+	d := NewDumper(w)
+	err := d.Dump(val)
+	if err != nil {
+		return nil, err
+	}
+	dumped := w.Ops()
+	v := vm.NewVM()
+	for _, op := range dumped {
+		err = v.Feed(op)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return v.Top()
 }
