@@ -120,6 +120,22 @@ func TestDumpObject(t *testing.T) {
 	})
 }
 
+func TestDumpArray(t *testing.T) {
+	test := func(arr []*vm.Value) {
+		orig := vm.NewArrayValue(arr)
+		converted, err := encodeThenExecute(orig)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff := cmp.Diff(orig, converted); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	}
+	test([]*vm.Value{})
+	test([]*vm.Value{vm.NewIntValue(1)})
+	test([]*vm.Value{vm.NewIntValue(1), vm.NewStringValue([]byte("hoge"))})
+}
+
 func encodeThenExecute(val *vm.Value) (*vm.Value, error) {
 	w := NewSliceWriter()
 	d := NewDumper(w)
