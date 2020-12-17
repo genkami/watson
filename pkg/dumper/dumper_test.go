@@ -136,6 +136,21 @@ func TestDumpArray(t *testing.T) {
 	test([]*vm.Value{vm.NewIntValue(1), vm.NewStringValue([]byte("hoge"))})
 }
 
+func TestDumpBool(t *testing.T) {
+	test := func(b bool) {
+		orig := vm.NewBoolValue(b)
+		converted, err := encodeThenExecute(orig)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff := cmp.Diff(orig, converted); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	}
+	test(true)
+	test(false)
+}
+
 func encodeThenExecute(val *vm.Value) (*vm.Value, error) {
 	w := NewSliceWriter()
 	d := NewDumper(w)

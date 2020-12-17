@@ -59,6 +59,8 @@ func (d *Dumper) Dump(v *vm.Value) error {
 		return d.dumpObject(v.Object)
 	case vm.KArray:
 		return d.dumpArray(v.Array)
+	case vm.KBool:
+		return d.dumpBool(v.Bool)
 	default:
 		panic(fmt.Errorf("unknown kind: %d", v.Kind))
 	}
@@ -179,6 +181,21 @@ func (d *Dumper) dumpArray(arr []*vm.Value) error {
 			return err
 		}
 		err = d.w.Write(vm.Aadd)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (d *Dumper) dumpBool(b bool) error {
+	var err error
+	err = d.w.Write(vm.Bnew)
+	if err != nil {
+		return err
+	}
+	if b {
+		err = d.w.Write(vm.Bneg)
 		if err != nil {
 			return err
 		}
