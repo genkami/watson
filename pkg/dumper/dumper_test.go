@@ -97,6 +97,29 @@ func TestDumpString(t *testing.T) {
 	test("shrimp")
 }
 
+func TestDumpObject(t *testing.T) {
+	test := func(v map[string]*vm.Value) {
+		orig := vm.NewObjectValue(v)
+		converted, err := encodeThenExecute(orig)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff := cmp.Diff(orig, converted); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	}
+	test(map[string]*vm.Value{})
+	test(map[string]*vm.Value{
+		"hoge": vm.NewStringValue([]byte("fuga")),
+	})
+	test(map[string]*vm.Value{
+		"hoge": vm.NewStringValue([]byte("fuga")),
+		"fuga": vm.NewObjectValue(map[string]*vm.Value{
+			"foo": vm.NewIntValue(0xdeadbeef),
+		}),
+	})
+}
+
 func encodeThenExecute(val *vm.Value) (*vm.Value, error) {
 	w := NewSliceWriter()
 	d := NewDumper(w)
