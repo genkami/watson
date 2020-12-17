@@ -5,16 +5,11 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/genkami/watson/pkg/lexer"
 	"github.com/genkami/watson/pkg/vm"
 )
 
-// OpWriter is an underlying writer that is used by Dumper.
-// In most cases it would be `lexer.Unlexer`.
-type OpWriter interface {
-	Write(vm.Op) error
-}
-
-// SliceWriter is a simple `OpWriter` that just holds `vm.Op`s written as a slice of `vm.Op`s.
+// SliceWriter is a simple `lexer.OpWriter` that just holds `vm.Op`s written as a slice of `vm.Op`s.
 type SliceWriter struct {
 	ops []vm.Op
 }
@@ -38,15 +33,15 @@ func (s *SliceWriter) Write(op vm.Op) error {
 
 // Dumper dumps `vm.Value` as a sequence of `vm.Op`s.
 type Dumper struct {
-	w OpWriter
+	w lexer.OpWriter
 }
 
 // NewDumper creates a new Dumper.
-func NewDumper(w OpWriter) *Dumper {
+func NewDumper(w lexer.OpWriter) *Dumper {
 	return &Dumper{w: w}
 }
 
-// Dump converts v into a sequence of `vm.Op`s and writes it to the underlying writer `OpWriter`.
+// Dump converts v into a sequence of `vm.Op`s and writes it to the underlying writer `lexer.OpWriter`.
 func (d *Dumper) Dump(v *vm.Value) error {
 	switch v.Kind {
 	case vm.KInt:

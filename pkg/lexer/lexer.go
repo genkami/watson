@@ -169,6 +169,11 @@ func (l *Lexer) Next() (*Token, error) {
 	}
 }
 
+// OpWriter is an abstract interface that defined what the Unlexer does.
+type OpWriter interface {
+	Write(vm.Op) error
+}
+
 // Unlexer converts a sequence of `vm.Op`s into a sequence of characters.
 type Unlexer struct {
 	w    io.Writer
