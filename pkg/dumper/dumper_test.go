@@ -29,3 +29,36 @@ func TestSliceWriterReturnsAllOpsThatAreWritten(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestDumpInt(t *testing.T) {
+	test := func(n int64) {
+		orig := vm.NewIntValue(n)
+		w := NewSliceWriter()
+		d := NewDumper(w)
+		err := d.Dump(orig)
+		if err != nil {
+			t.Fatal(err)
+		}
+		dumped := w.Ops()
+		v := vm.NewVM()
+		for _, op := range dumped {
+			err = v.Feed(op)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		converted, err := v.Top()
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff := cmp.Diff(orig, converted); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	}
+	test(0)
+	test(1)
+	test(2)
+	test(0x1234abcd)
+	test(0x12345678abcdef0)
+	test(-1)
+}

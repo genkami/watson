@@ -2,6 +2,8 @@
 package dumper
 
 import (
+	"fmt"
+
 	"github.com/genkami/watson/pkg/vm"
 )
 
@@ -45,5 +47,44 @@ func NewDumper(w OpWriter) *Dumper {
 
 // Dump converts v into a sequence of `vm.Op`s and writes it to the underlying writer `OpWriter`.
 func (d *Dumper) Dump(v *vm.Value) error {
+	switch v.Kind {
+	case vm.KInt:
+		return d.dumpInt(uint64(v.Int))
+	default:
+		panic(fmt.Errorf("unknown kind: %d", v.Kind))
+	}
+}
+
+func (d *Dumper) dumpInt(n uint64) error {
+	var err error
+	err = d.w.Write(vm.Inew)
+	if err != nil {
+		return err
+	}
+	shift := 0
+	for n != 0 {
+		if n%2 == 1 {
+			err = d.w.Write(vm.Inew)
+			if err != nil {
+				return err
+			}
+			err = d.w.Write(vm.Iinc)
+			if err != nil {
+				return err
+			}
+			for i := 0; i < shift; i++ {
+				err = d.w.Write(vm.Ishl)
+				if err != nil {
+					return err
+				}
+			}
+			err = d.w.Write(vm.Iadd)
+			if err != nil {
+				return err
+			}
+		}
+		n = n >> 1
+		shift++
+	}
 	return nil
 }
