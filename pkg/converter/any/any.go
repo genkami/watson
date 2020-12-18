@@ -52,6 +52,16 @@ func ToValue(v interface{}) *vm.Value {
 	switch v := v.(type) {
 	case bool:
 		return vm.NewBoolValue(v)
+	case int:
+		return vm.NewIntValue(int64(v))
+	case int8:
+		return vm.NewIntValue(int64(v))
+	case int16:
+		return vm.NewIntValue(int64(v))
+	case int32:
+		return vm.NewIntValue(int64(v))
+	case int64:
+		return vm.NewIntValue(v)
 	}
 	panic(fmt.Errorf("can't convert %#v (%T) to *vm.Value", v, v))
 }
