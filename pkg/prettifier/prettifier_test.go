@@ -12,7 +12,7 @@ import (
 )
 
 func TestPrettifierDoesNotChangeSemantics(t *testing.T) {
-	test := func(src string) {
+	test := func(src string, expected string) {
 		orig, err := lex(src)
 		if err != nil {
 			t.Fatal(err)
@@ -32,10 +32,17 @@ func TestPrettifierDoesNotChangeSemantics(t *testing.T) {
 		if diff := cmp.Diff(origResult, prettifiedResult); diff != "" {
 			t.Errorf("mismatch (-want +got):\n%s", diff)
 		}
+		actual, err := unlex(prettified)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if expected != actual {
+			t.Errorf("expected %#v but got %#v", expected, actual)
+		}
 	}
-	test("B")
-	test("?SShak")
-	test("?SShaShaAk")
+	test("B", "B")
+	test("?SShak", "?SSharrk")
+	test("?SShaShaAk", "?SShaShaArrk")
 }
 
 func lex(src string) ([]vm.Op, error) {
@@ -73,4 +80,16 @@ func execute(ops []vm.Op) (*vm.Value, error) {
 		}
 	}
 	return v.Top()
+}
+
+func unlex(ops []vm.Op) (string, error) {
+	buf := bytes.NewBuffer(nil)
+	ul := lexer.NewUnlexer(buf)
+	for _, op := range ops {
+		err := ul.Write(op)
+		if err != nil {
+			return "", err
+		}
+	}
+	return buf.String(), nil
 }
