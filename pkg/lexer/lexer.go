@@ -172,6 +172,38 @@ func (l *Lexer) Next() (*Token, error) {
 // OpWriter is an abstract interface that defined what the Unlexer does.
 type OpWriter interface {
 	Write(vm.Op) error
+	Mode() Mode
+}
+
+// SliceWriter is a simple `lexer.OpWriter` that just holds `vm.Op`s written as a slice of `vm.Op`s.
+type SliceWriter struct {
+	ops  []vm.Op
+	mode Mode
+}
+
+// NewSliceWriter creates a new `SliceWriter`.
+func NewSliceWriter() *SliceWriter {
+	return &SliceWriter{
+		ops:  make([]vm.Op, 0, 50),
+		mode: A,
+	}
+}
+
+func (s *SliceWriter) Mode() Mode {
+	return s.mode
+}
+
+// Returns the `vm.Op`s that was written by previous `Write`s.
+func (s *SliceWriter) Ops() []vm.Op {
+	ops := make([]vm.Op, len(s.ops))
+	copy(ops, s.ops)
+	return ops
+}
+
+func (s *SliceWriter) Write(op vm.Op) error {
+	s.ops = append(s.ops, op)
+	s.mode = nextMode(s.mode, op)
+	return nil
 }
 
 // Unlexer converts a sequence of `vm.Op`s into a sequence of characters.

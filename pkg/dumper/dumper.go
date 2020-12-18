@@ -9,28 +9,6 @@ import (
 	"github.com/genkami/watson/pkg/vm"
 )
 
-// SliceWriter is a simple `lexer.OpWriter` that just holds `vm.Op`s written as a slice of `vm.Op`s.
-type SliceWriter struct {
-	ops []vm.Op
-}
-
-// NewSliceWriter creates a new `SliceWriter`.
-func NewSliceWriter() *SliceWriter {
-	return &SliceWriter{ops: make([]vm.Op, 0, 50)}
-}
-
-// Returns the `vm.Op`s that was written by previous `Write`s.
-func (s *SliceWriter) Ops() []vm.Op {
-	ops := make([]vm.Op, len(s.ops))
-	copy(ops, s.ops)
-	return ops
-}
-
-func (s *SliceWriter) Write(op vm.Op) error {
-	s.ops = append(s.ops, op)
-	return nil
-}
-
 // Dumper dumps `vm.Value` as a sequence of `vm.Op`s.
 type Dumper struct {
 	w lexer.OpWriter
