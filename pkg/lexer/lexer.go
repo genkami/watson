@@ -227,6 +227,10 @@ func (u *Unlexer) Write(op vm.Op) error {
 	return err
 }
 
+func (u *Unlexer) Mode() Mode {
+	return u.mode
+}
+
 func nextMode(mode Mode, op vm.Op) Mode {
 	var next Mode
 	switch mode {

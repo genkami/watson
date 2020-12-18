@@ -186,6 +186,13 @@ func TestSliceWriterReturnsAllOpsThatAreWritten(t *testing.T) {
 	}
 }
 
+func TestNewUnlexerReturnsUnlexerWithItsModeSetToDefault(t *testing.T) {
+	u := NewUnlexer(bytes.NewBuffer(nil))
+	if u.Mode() != A {
+		t.Fatalf("expected %#v but got %#v", A, u.Mode())
+	}
+}
+
 func TestWriteWritesAnOp(t *testing.T) {
 	buf := bytes.NewBuffer(nil)
 	u := NewUnlexer(buf)
