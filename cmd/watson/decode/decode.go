@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/genkami/watson/pkg/decoder/yaml"
+	"github.com/genkami/watson/pkg/converter/yaml"
 	"github.com/genkami/watson/pkg/lexer"
 	"github.com/genkami/watson/pkg/vm"
 )

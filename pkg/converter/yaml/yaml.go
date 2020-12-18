@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/genkami/watson/pkg/decoder/util"
+	"github.com/genkami/watson/pkg/converter/util"
 	"github.com/genkami/watson/pkg/vm"
 )
 
