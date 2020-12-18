@@ -72,6 +72,12 @@ func ToValue(v interface{}) *vm.Value {
 		return vm.NewUintValue(uint64(v))
 	case uint64:
 		return vm.NewUintValue(uint64(v))
+	case []byte:
+		w := make([]byte, len(v))
+		copy(w, v)
+		return vm.NewStringValue(w)
+	case string:
+		return vm.NewStringValue([]byte(v))
 	}
 	panic(fmt.Errorf("can't convert %#v (%T) to *vm.Value", v, v))
 }

@@ -183,3 +183,19 @@ func TestToValueConvertsUint64(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestToValueConvertsByteSlice(t *testing.T) {
+	want := vm.NewStringValue([]byte("hogefuga"))
+	got := ToValue([]byte("hogefuga"))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsString(t *testing.T) {
+	want := vm.NewStringValue([]byte("hogefuga"))
+	got := ToValue("hogefuga")
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
