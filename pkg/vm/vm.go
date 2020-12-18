@@ -62,6 +62,7 @@ const (
 	Ineg           // v: int = pop(); push(-n);
 	Isht           // b: int = pop(); a: int = pop(); push(a << b);
 	Itof           // n: int = pop(); push(n interpreted as an IEEE-754 64-bit floating-point number)
+	Itou           // n: int = pop(); push(n interpreted as 64-bit unsigned integer)
 
 	// Float Operations
 	Finf // push(Inf);
@@ -121,6 +122,8 @@ func (op Op) GoString() string {
 		return "Isht"
 	case Itof:
 		return "Itof"
+	case Itou:
+		return "Itou"
 	case Finf:
 		return "Finf"
 	case Fnan:

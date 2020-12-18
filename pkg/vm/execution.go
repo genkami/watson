@@ -39,6 +39,8 @@ func (vm *VM) Feed(op Op) error {
 		return vm.feedIsht()
 	case Itof:
 		return vm.feedItof()
+	case Itou:
+		return vm.feedItou()
 	case Finf:
 		return vm.feedFinf()
 	case Fnan:
@@ -147,6 +149,14 @@ func (vm *VM) feedItof() error {
 		return err
 	}
 	return vm.pushFloat(math.Float64frombits(uint64(n)))
+}
+
+func (vm *VM) feedItou() error {
+	n, err := vm.popInt()
+	if err != nil {
+		return err
+	}
+	return vm.pushUint(uint64(n))
 }
 
 func (vm *VM) feedFinf() error {
@@ -284,6 +294,10 @@ func (vm *VM) push(v *Value) error {
 
 func (vm *VM) pushInt(val int64) error {
 	return vm.push(NewIntValue(val))
+}
+
+func (vm *VM) pushUint(val uint64) error {
+	return vm.push(NewUintValue(val))
 }
 
 func (vm *VM) pushFloat(val float64) error {

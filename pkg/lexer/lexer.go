@@ -25,6 +25,8 @@
 //   +-----------+--------------+--------------+
 //   |Itof       |i             |z             |
 //   +-----------+--------------+--------------+
+//   |Itou       |'             |i             |
+//   +-----------+--------------+--------------+
 //   |Finf       |q             |m             |
 //   +-----------+--------------+--------------+
 //   |Fnan       |t             |b             |
@@ -281,6 +283,7 @@ var opTableA = map[byte]vm.Op{
 	char("A"): vm.Ineg,
 	char("e"): vm.Isht,
 	char("i"): vm.Itof,
+	char("'"): vm.Itou,
 	char("q"): vm.Finf,
 	char("t"): vm.Fnan,
 	char("p"): vm.Fneg,
@@ -308,6 +311,7 @@ var opTableS = map[byte]vm.Op{
 	char("r"): vm.Ineg,
 	char("A"): vm.Isht,
 	char("z"): vm.Itof,
+	char("i"): vm.Itou,
 	char("m"): vm.Finf,
 	char("b"): vm.Fnan,
 	char("u"): vm.Fneg,
