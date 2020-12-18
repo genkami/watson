@@ -30,6 +30,25 @@ func TestDumpInt(t *testing.T) {
 	test(-1)
 }
 
+func TestDumpUint(t *testing.T) {
+	test := func(n uint64) {
+		orig := vm.NewUintValue(n)
+		converted, err := encodeThenExecute(orig)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if diff := cmp.Diff(orig, converted); diff != "" {
+			t.Errorf("mismatch (-want +got):\n%s", diff)
+		}
+	}
+	test(0)
+	test(1)
+	test(2)
+	test(0x1234abcd)
+	test(0x12345678abcdef01)
+	test(0xffffffffffffffff)
+}
+
 func TestDumpFloat(t *testing.T) {
 	test := func(n float64) {
 		orig := vm.NewFloatValue(n)

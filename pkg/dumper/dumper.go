@@ -24,6 +24,8 @@ func (d *Dumper) Dump(v *vm.Value) error {
 	switch v.Kind {
 	case vm.KInt:
 		return d.dumpInt(uint64(v.Int))
+	case vm.KUint:
+		return d.dumpUint(v.Uint)
 	case vm.KFloat:
 		return d.dumpFloat(v.Float)
 	case vm.KString:
@@ -71,6 +73,19 @@ func (d *Dumper) dumpInt(n uint64) error {
 		}
 		n = n >> 1
 		shift++
+	}
+	return nil
+}
+
+func (d *Dumper) dumpUint(n uint64) error {
+	var err error
+	err = d.dumpInt(n)
+	if err != nil {
+		return err
+	}
+	err = d.w.Write(vm.Itou)
+	if err != nil {
+		return err
 	}
 	return nil
 }
