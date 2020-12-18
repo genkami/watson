@@ -163,6 +163,7 @@ type Kind int
 
 const (
 	KInt    Kind = iota // 64-bit signed integer
+	KUint               // 64-bit unsigned integer
 	KFloat              // IEEE-754 64-bit floating-point number
 	KString             // string (represented as a byte array)
 	KObject             // object (set of key-value pairs)
@@ -178,6 +179,8 @@ func (k Kind) GoString() string {
 	switch k {
 	case KInt:
 		return "Int"
+	case KUint:
+		return "Uint"
 	case KFloat:
 		return "Float"
 	case KString:
@@ -201,6 +204,7 @@ var _ fmt.GoStringer = Kind(0)
 type Value struct {
 	Kind   Kind
 	Int    int64
+	Uint   uint64
 	Float  float64
 	String []byte
 	Object map[string]*Value
@@ -211,6 +215,11 @@ type Value struct {
 // NewIntValue creates a new Value that contains an integer.
 func NewIntValue(val int64) *Value {
 	return &Value{Kind: KInt, Int: val}
+}
+
+// NewUintValue creates a new Value that contains an unsigned integer.
+func NewUintValue(val uint64) *Value {
+	return &Value{Kind: KUint, Uint: val}
 }
 
 // NewFloatValue creates a new Value that contains a floating point number.
@@ -253,6 +262,8 @@ func (v *Value) DeepCopy() *Value {
 	switch v.Kind {
 	case KInt:
 		clone.Int = v.Int
+	case KUint:
+		clone.Uint = v.Uint
 	case KFloat:
 		clone.Float = v.Float
 	case KString:
@@ -286,6 +297,8 @@ func (v *Value) goStringValue() string {
 	switch v.Kind {
 	case KInt:
 		return fmt.Sprintf("%d", v.Int)
+	case KUint:
+		return fmt.Sprintf("%d", v.Uint)
 	case KFloat:
 		return fmt.Sprintf("%f", v.Float)
 	case KString:

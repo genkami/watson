@@ -9,6 +9,7 @@ import (
 
 // ToObject converts vm.Value into one of the following type:
 // * int64
+// * uint64
 // * string
 // * bool
 // * (interface{})(nil)
@@ -17,6 +18,8 @@ func ToObject(val *vm.Value) interface{} {
 	switch val.Kind {
 	case vm.KInt:
 		return val.Int
+	case vm.KUint:
+		return val.Uint
 	case vm.KFloat:
 		return val.Float
 	case vm.KString:
