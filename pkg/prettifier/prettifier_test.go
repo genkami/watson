@@ -34,6 +34,8 @@ func TestPrettifierDoesNotChangeSemantics(t *testing.T) {
 		}
 	}
 	test("B")
+	test("?SShak")
+	test("?SShaShaAk")
 }
 
 func lex(src string) ([]vm.Op, error) {

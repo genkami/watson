@@ -50,7 +50,23 @@ func (p *Prettifier) writeWithDecorationA(op vm.Op, last vm.Op) error {
 }
 
 func (p *Prettifier) writeWithDecorationS(op vm.Op, last vm.Op) error {
-	return p.w.Write(op)
+	if last == vm.Ishl && op == vm.Iadd { // Sharrk
+		return p.writeMulti(vm.Ineg, vm.Ineg, vm.Iadd)
+	} else if last == vm.Isht && op == vm.Iadd { // ShaArrk
+		return p.writeMulti(vm.Ineg, vm.Ineg, vm.Iadd)
+	} else {
+		return p.w.Write(op)
+	}
+}
+
+func (p *Prettifier) writeMulti(ops ...vm.Op) error {
+	for _, op := range ops {
+		err := p.w.Write(op)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (p *Prettifier) Mode() lexer.Mode {
