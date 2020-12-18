@@ -17,15 +17,15 @@ func TestNewLexer(t *testing.T) {
 	}
 }
 
-func TestNewLexerWithInitialModeSetToA(t *testing.T) {
-	lex := NewLexer(bytes.NewReader(nil), WithInitialMode(A))
+func TestNewLexerWithInitialLexerModeSetToA(t *testing.T) {
+	lex := NewLexer(bytes.NewReader(nil), WithInitialLexerMode(A))
 	if lex.Mode() != A {
 		t.Fatalf("expected %#v but got %#v", A, lex.Mode())
 	}
 }
 
-func TestNewLexerWithInitialModeSetToS(t *testing.T) {
-	lex := NewLexer(bytes.NewReader(nil), WithInitialMode(S))
+func TestNewLexerWithInitialLexerModeSetToS(t *testing.T) {
+	lex := NewLexer(bytes.NewReader(nil), WithInitialLexerMode(S))
 	if lex.Mode() != S {
 		t.Fatalf("expected %#v but got %#v", S, lex.Mode())
 	}
@@ -190,6 +190,20 @@ func TestNewUnlexerReturnsUnlexerWithItsModeSetToDefault(t *testing.T) {
 	u := NewUnlexer(bytes.NewBuffer(nil))
 	if u.Mode() != A {
 		t.Fatalf("expected %#v but got %#v", A, u.Mode())
+	}
+}
+
+func TestWithInitialUnlexerModeWithASetsAToTheModeOfTheUnlexer(t *testing.T) {
+	u := NewUnlexer(bytes.NewBuffer(nil), WithInitialUnlexerMode(A))
+	if u.Mode() != A {
+		t.Fatalf("expected %#v but got %#v", A, u.Mode())
+	}
+}
+
+func TestWithInitialUnlexerModeWithSSetsSToTheModeOfTheUnlexer(t *testing.T) {
+	u := NewUnlexer(bytes.NewBuffer(nil), WithInitialUnlexerMode(S))
+	if u.Mode() != S {
+		t.Fatalf("expected %#v but got %#v", S, u.Mode())
 	}
 }
 

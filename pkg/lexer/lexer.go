@@ -94,7 +94,7 @@ func (opt lexerOption) apply(l *Lexer) {
 	opt(l)
 }
 
-func WithInitialMode(mode Mode) LexerOption {
+func WithInitialLexerMode(mode Mode) LexerOption {
 	return lexerOption(func(l *Lexer) {
 		l.mode = mode
 	})
@@ -206,17 +206,38 @@ func (s *SliceWriter) Write(op vm.Op) error {
 	return nil
 }
 
+// UnlexerOption configures the Unlexer.
+type UnlexerOption interface {
+	apply(*Unlexer)
+}
+
+type unlexerOption func(*Unlexer)
+
+func (opt unlexerOption) apply(u *Unlexer) {
+	opt(u)
+}
+
+func WithInitialUnlexerMode(m Mode) UnlexerOption {
+	return unlexerOption(func(u *Unlexer) {
+		u.mode = m
+	})
+}
+
 // Unlexer converts a sequence of `vm.Op`s into a sequence of characters.
 type Unlexer struct {
 	w    io.Writer
 	mode Mode
 }
 
-func NewUnlexer(w io.Writer) *Unlexer {
-	return &Unlexer{
+func NewUnlexer(w io.Writer, opts ...UnlexerOption) *Unlexer {
+	u := &Unlexer{
 		w:    w,
 		mode: A,
 	}
+	for _, opt := range opts {
+		opt.apply(u)
+	}
+	return u
 }
 
 func (u *Unlexer) Write(op vm.Op) error {
