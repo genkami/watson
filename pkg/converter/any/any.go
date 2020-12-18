@@ -93,6 +93,8 @@ func reflectValueToValue(v reflect.Value) *vm.Value {
 		return reflectIntToValue(v)
 	} else if isUintFamily(v) {
 		return reflectUintToValue(v)
+	} else if isFloatFamily(v) {
+		return reflectFloatToValue(v)
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
 	}
@@ -106,6 +108,10 @@ func reflectIntToValue(v reflect.Value) *vm.Value {
 
 func reflectUintToValue(v reflect.Value) *vm.Value {
 	return vm.NewUintValue(v.Uint())
+}
+
+func reflectFloatToValue(v reflect.Value) *vm.Value {
+	return vm.NewFloatValue(v.Float())
 }
 
 func reflectMapToValue(v reflect.Value) *vm.Value {
@@ -131,6 +137,15 @@ func isIntFamily(v reflect.Value) bool {
 func isUintFamily(v reflect.Value) bool {
 	switch v.Type().Kind() {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return true
+	default:
+		return false
+	}
+}
+
+func isFloatFamily(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Float32, reflect.Float64:
 		return true
 	default:
 		return false

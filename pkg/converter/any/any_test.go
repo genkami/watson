@@ -207,7 +207,7 @@ func TestToValueConvertsFloat32(t *testing.T) {
 	if got.Kind != vm.KFloat {
 		t.Fatalf("expected Float but got %#v", got)
 	}
-	if math.Abs(want.Float-got.Float)/math.Abs(want.Float) > 1e-3 {
+	if !closeEnough(want.Float, got.Float) {
 		t.Fatalf("expected %#v but got %#v", want, got)
 	}
 }
@@ -338,4 +338,42 @@ func TestToValueConvertsUint64Map(t *testing.T) {
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
+}
+
+func TestToValueConvertsFloat32Map(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewFloatValue(1.23e-4),
+	})
+	got := ToValue(map[string]float32{
+		"value": 1.23e-4,
+	})
+	if got.Kind != vm.KObject {
+		t.Fatalf("expected Object but got %#v", got)
+	}
+	gotValue, ok := got.Object["value"]
+	if !ok {
+		t.Fatalf("missing key: %#v", got)
+	}
+	if gotValue.Kind != vm.KFloat {
+		t.Fatalf("expected float but got: %#v", gotValue)
+	}
+	if !closeEnough(want.Object["value"].Float, gotValue.Float) {
+		t.Errorf("expected %#v but got %#v", want, got)
+	}
+}
+
+func TestToValueConvertsFloat64Map(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewFloatValue(1.23e-4),
+	})
+	got := ToValue(map[string]float64{
+		"value": 1.23e-4,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func closeEnough(x, y float64) bool {
+	return math.Abs(x-y)/math.Abs(x) < 1e-3
 }
