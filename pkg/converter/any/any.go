@@ -3,6 +3,7 @@ package any
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/genkami/watson/pkg/vm"
 )
@@ -83,5 +84,45 @@ func ToValue(v interface{}) *vm.Value {
 	case float64:
 		return vm.NewFloatValue(v)
 	}
-	panic(fmt.Errorf("can't convert %#v (%T) to *vm.Value", v, v))
+	vv := reflect.ValueOf(v)
+	return reflectValueToValue(vv)
+}
+
+func reflectValueToValue(v reflect.Value) *vm.Value {
+	if isIntFamily(v) {
+		return reflectIntToValue(v)
+	} else if isMapConvertibleToValue(v) {
+		return reflectMapToValue(v)
+	}
+
+	panic(fmt.Errorf("can't convert %s to *vm.Value", v.Type().String()))
+}
+
+func reflectIntToValue(v reflect.Value) *vm.Value {
+	return vm.NewIntValue(v.Int())
+}
+
+func reflectMapToValue(v reflect.Value) *vm.Value {
+	obj := map[string]*vm.Value{}
+	iter := v.MapRange()
+	for iter.Next() {
+		k := iter.Key().String()
+		v := iter.Value()
+		obj[k] = reflectValueToValue(v)
+	}
+	return vm.NewObjectValue(obj)
+}
+
+func isIntFamily(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	default:
+		return false
+	}
+}
+
+func isMapConvertibleToValue(v reflect.Value) bool {
+	t := v.Type()
+	return t.Kind() == reflect.Map && t.Key().Kind() == reflect.String
 }

@@ -219,3 +219,63 @@ func TestToValueConvertsFloat64(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestToValueConvertsIntMap(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewIntValue(1),
+	})
+	got := ToValue(map[string]int{
+		"value": 1,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsInt8Map(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewIntValue(1),
+	})
+	got := ToValue(map[string]int8{
+		"value": 1,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsInt16Map(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewIntValue(1),
+	})
+	got := ToValue(map[string]int16{
+		"value": 1,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsInt32Map(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewIntValue(1),
+	})
+	got := ToValue(map[string]int32{
+		"value": 1,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsInt64Map(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewIntValue(1),
+	})
+	got := ToValue(map[string]int64{
+		"value": 1,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
