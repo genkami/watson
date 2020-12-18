@@ -143,3 +143,43 @@ func TestToValueConvertsInt64(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestToValueConvertsUint(t *testing.T) {
+	want := vm.NewUintValue(12345)
+	got := ToValue(uint(12345))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUint8(t *testing.T) {
+	want := vm.NewUintValue(255)
+	got := ToValue(uint8(255))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUint16(t *testing.T) {
+	want := vm.NewUintValue(12345)
+	got := ToValue(uint16(12345))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUint32(t *testing.T) {
+	want := vm.NewUintValue(12345)
+	got := ToValue(uint32(12345))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUint64(t *testing.T) {
+	want := vm.NewUintValue(12345)
+	got := ToValue(uint64(12345))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
