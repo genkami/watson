@@ -44,6 +44,12 @@ func TestPrettifierDoesNotChangeSemantics(t *testing.T) {
 	test("?SShak", "?SSharrk")
 	test("?SShaShaAk", "?SShaShaArrk")
 	test("?+", "?Samee+")
+	test("~?$#zM", "~?$#zooM")
+	test("~?$#BM", "~?$#BAAME#")
+	test("~?$#BuM", "~?$#BuAAME#")
+	test("~?$#BBaM", "~?$#BBaAAME#")
+	test("~?$#BAM", "~?$#BAAAME#")
+	test("~?$#BBeM", "~?$#BBeAAME#")
 }
 
 func lex(src string) ([]vm.Op, error) {

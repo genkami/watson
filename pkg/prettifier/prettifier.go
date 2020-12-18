@@ -46,7 +46,13 @@ func (p *Prettifier) writeWithDecoration(op vm.Op, last vm.Op) error {
 }
 
 func (p *Prettifier) writeWithDecorationA(op vm.Op, last vm.Op) error {
-	return p.w.Write(op)
+	if last == vm.Bnew && op == vm.Oadd {
+		return p.writeMulti(vm.Bneg, vm.Bneg, vm.Oadd)
+	} else if topShouldBeInt(last) && op == vm.Oadd {
+		return p.writeMulti(vm.Ineg, vm.Ineg, vm.Oadd, vm.Gdup, vm.Gpop)
+	} else {
+		return p.w.Write(op)
+	}
 }
 
 func (p *Prettifier) writeWithDecorationS(op vm.Op, last vm.Op) error {
@@ -73,4 +79,13 @@ func (p *Prettifier) writeMulti(ops ...vm.Op) error {
 
 func (p *Prettifier) Mode() lexer.Mode {
 	return p.w.Mode()
+}
+
+func topShouldBeInt(op vm.Op) bool {
+	for _, v := range []vm.Op{vm.Inew, vm.Iinc, vm.Ishl, vm.Iadd, vm.Ineg, vm.Isht} {
+		if op == v {
+			return true
+		}
+	}
+	return false
 }
