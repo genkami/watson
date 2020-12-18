@@ -91,6 +91,8 @@ func ToValue(v interface{}) *vm.Value {
 func reflectValueToValue(v reflect.Value) *vm.Value {
 	if isIntFamily(v) {
 		return reflectIntToValue(v)
+	} else if isUintFamily(v) {
+		return reflectUintToValue(v)
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
 	}
@@ -100,6 +102,10 @@ func reflectValueToValue(v reflect.Value) *vm.Value {
 
 func reflectIntToValue(v reflect.Value) *vm.Value {
 	return vm.NewIntValue(v.Int())
+}
+
+func reflectUintToValue(v reflect.Value) *vm.Value {
+	return vm.NewUintValue(v.Uint())
 }
 
 func reflectMapToValue(v reflect.Value) *vm.Value {
@@ -116,6 +122,15 @@ func reflectMapToValue(v reflect.Value) *vm.Value {
 func isIntFamily(v reflect.Value) bool {
 	switch v.Type().Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	default:
+		return false
+	}
+}
+
+func isUintFamily(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
 		return true
 	default:
 		return false
