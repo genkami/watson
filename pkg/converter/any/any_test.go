@@ -87,3 +87,19 @@ func TestToValueConvertsNil(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestToValueConvertsTrue(t *testing.T) {
+	want := vm.NewBoolValue(true)
+	got := ToValue(true)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsFalse(t *testing.T) {
+	want := vm.NewBoolValue(false)
+	got := ToValue(false)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
