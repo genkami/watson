@@ -1,5 +1,5 @@
-// Package util provides utility functions for converting vm.Value into various formats.
-package util
+// Package any provides between `vm.Value`s and built-in types.
+package any
 
 import (
 	"fmt"
@@ -7,14 +7,14 @@ import (
 	"github.com/genkami/watson/pkg/vm"
 )
 
-// ToObject converts vm.Value into one of the following type:
+// FromValue converts vm.Value into one of the following type:
 // * int64
 // * uint64
 // * string
 // * bool
 // * (interface{})(nil)
 // * map[string]interface{} (the value of which is also one or many of these types)
-func ToObject(val *vm.Value) interface{} {
+func FromValue(val *vm.Value) interface{} {
 	switch val.Kind {
 	case vm.KInt:
 		return val.Int
@@ -27,13 +27,13 @@ func ToObject(val *vm.Value) interface{} {
 	case vm.KObject:
 		obj := map[string]interface{}{}
 		for k, v := range val.Object {
-			obj[k] = ToObject(v)
+			obj[k] = FromValue(v)
 		}
 		return obj
 	case vm.KArray:
 		arr := make([]interface{}, 0, len(val.Array))
 		for _, v := range val.Array {
-			arr = append(arr, ToObject(v))
+			arr = append(arr, FromValue(v))
 		}
 		return arr
 	case vm.KBool:
