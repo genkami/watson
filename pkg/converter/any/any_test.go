@@ -1,6 +1,7 @@
 package any
 
 import (
+	"math"
 	"testing"
 
 	"github.com/genkami/watson/pkg/vm"
@@ -195,6 +196,25 @@ func TestToValueConvertsByteSlice(t *testing.T) {
 func TestToValueConvertsString(t *testing.T) {
 	want := vm.NewStringValue([]byte("hogefuga"))
 	got := ToValue("hogefuga")
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsFloat32(t *testing.T) {
+	want := vm.NewFloatValue(1.2345e-6)
+	got := ToValue(float32(1.2345e-6))
+	if got.Kind != vm.KFloat {
+		t.Fatalf("expected Float but got %#v", got)
+	}
+	if math.Abs(want.Float-got.Float)/math.Abs(want.Float) > 1e-3 {
+		t.Fatalf("expected %#v but got %#v", want, got)
+	}
+}
+
+func TestToValueConvertsFloat64(t *testing.T) {
+	want := vm.NewFloatValue(1.2345e-6)
+	got := ToValue(float64(1.2345e-6))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}

@@ -78,6 +78,10 @@ func ToValue(v interface{}) *vm.Value {
 		return vm.NewStringValue(w)
 	case string:
 		return vm.NewStringValue([]byte(v))
+	case float32:
+		return vm.NewFloatValue(float64(v))
+	case float64:
+		return vm.NewFloatValue(v)
 	}
 	panic(fmt.Errorf("can't convert %#v (%T) to *vm.Value", v, v))
 }
