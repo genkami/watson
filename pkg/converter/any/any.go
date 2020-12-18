@@ -44,3 +44,10 @@ func FromValue(val *vm.Value) interface{} {
 		panic(fmt.Errorf("invalid kind: %d", val.Kind))
 	}
 }
+
+func ToValue(v interface{}) *vm.Value {
+	if v == nil {
+		return vm.NewNilValue()
+	}
+	panic(fmt.Errorf("can't convert %#v (%T) to *vm.Value", v, v))
+}

@@ -79,3 +79,11 @@ func TestFromValueConvertsNil(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
+
+func TestToValueConvertsNil(t *testing.T) {
+	want := vm.NewNilValue()
+	got := ToValue(nil)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
