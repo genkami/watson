@@ -54,6 +54,8 @@ func (p *Prettifier) writeWithDecorationS(op vm.Op, last vm.Op) error {
 		return p.writeMulti(vm.Ineg, vm.Ineg, vm.Iadd)
 	} else if last == vm.Isht && op == vm.Iadd { // ShaArrk
 		return p.writeMulti(vm.Ineg, vm.Ineg, vm.Iadd)
+	} else if op == vm.Onew { // Samee+
+		return p.writeMulti(vm.Inew, vm.Ishl, vm.Finf, vm.Gpop, vm.Gpop, vm.Onew)
 	} else {
 		return p.w.Write(op)
 	}
