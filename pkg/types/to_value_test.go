@@ -21,6 +21,15 @@ type nestedInner struct {
 	value int
 }
 
+type embedded struct {
+	field int
+	embeddedInner
+}
+
+type embeddedInner struct {
+	anotherField int
+}
+
 func TestToValueConvertsNilInterface(t *testing.T) {
 	want := NewNilValue()
 	got := ToValue(nil)
@@ -320,6 +329,23 @@ func TestToValueConvertsNestedStruct(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsEmbeddedStruct(t *testing.T) {
+	want := NewObjectValue(map[string]*Value{
+		"field": NewIntValue(123),
+		"embeddedinner": NewObjectValue(map[string]*Value{
+			"anotherfield": NewIntValue(456),
+		}),
+	})
+	value := &embedded{
+		field: 123,
+	}
+	value.anotherField = 456
+	got := ToValue(value)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := NewNilValue()
@@ -606,6 +632,23 @@ func TestToValueByReflectionConvertsNestedStruct(t *testing.T) {
 			value: 123,
 		},
 	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionConvertsEmbeddedStruct(t *testing.T) {
+	want := NewObjectValue(map[string]*Value{
+		"field": NewIntValue(123),
+		"embeddedinner": NewObjectValue(map[string]*Value{
+			"anotherfield": NewIntValue(456),
+		}),
+	})
+	value := &embedded{
+		field: 123,
+	}
+	value.anotherField = 456
+	got := ToValueByReflection(reflect.ValueOf(value))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
