@@ -60,6 +60,17 @@ type inlineInner struct {
 	NestedField int
 }
 
+type customMarshaler struct {
+	SomeField int
+}
+
+func (m *customMarshaler) MarshalWatson() *types.Value {
+	return types.NewObjectValue(map[string]*types.Value{
+		"custom":          types.NewBoolValue(true),
+		"customFieldName": types.NewIntValue(int64(m.SomeField)),
+	})
+}
+
 func TestToValueConvertsNilInterface(t *testing.T) {
 	want := types.NewNilValue()
 	got := types.ToValue(nil)
@@ -444,6 +455,17 @@ func TestToValuesEnbedsFieldTaggedWithInline(t *testing.T) {
 	}
 }
 
+func TestToValuesUsesMarshalWatsonWhenArgImplementsMarshaler(t *testing.T) {
+	m := &customMarshaler{
+		SomeField: 123,
+	}
+	want := m.MarshalWatson()
+	got := types.ToValue(m)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := types.NewNilValue()
@@ -815,6 +837,17 @@ func TestToValueByReflectionsEnbedsFieldTaggedWithInline(t *testing.T) {
 			NestedField: 456,
 		},
 	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionsUsesMarshalWatsonWhenArgImplementsMarshaler(t *testing.T) {
+	m := &customMarshaler{
+		SomeField: 123,
+	}
+	want := m.MarshalWatson()
+	got := types.ToValueByReflection(reflect.ValueOf(m))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}

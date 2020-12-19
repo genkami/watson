@@ -162,3 +162,7 @@ func (k Kind) GoString() string {
 }
 
 var _ fmt.GoStringer = Kind(0)
+
+type Marshaler interface {
+	MarshalWatson() *Value
+}

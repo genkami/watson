@@ -39,6 +39,9 @@ func ToValue(v interface{}) *Value {
 	case float64:
 		return NewFloatValue(v)
 	}
+	if marshaler, ok := v.(Marshaler); ok {
+		return marshaler.MarshalWatson()
+	}
 	vv := reflect.ValueOf(v)
 	return ToValueByReflection(vv)
 }
@@ -56,6 +59,8 @@ func ToValueByReflection(v reflect.Value) *Value {
 		return reflectStringToValue(v)
 	} else if isArray(v) {
 		return reflectSliceOrArrayToValue(v)
+	} else if isMarshaler(v) {
+		return reflectMarshalerToValue(v)
 	} else if isStruct(v) {
 		return reflectStructToValue(v)
 	} else if isNil(v) {
@@ -161,6 +166,12 @@ func addFields(obj map[string]*Value, v reflect.Value) {
 	}
 }
 
+func reflectMarshalerToValue(v reflect.Value) *Value {
+	marshal := v.MethodByName("MarshalWatson")
+	ret := marshal.Call([]reflect.Value{})
+	return ret[0].Interface().(*Value)
+}
+
 func isIntFamily(v reflect.Value) bool {
 	switch v.Type().Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -224,4 +235,9 @@ func isPtr(v reflect.Value) bool {
 
 func isStruct(v reflect.Value) bool {
 	return v.Type().Kind() == reflect.Struct
+}
+
+func isMarshaler(v reflect.Value) bool {
+	var marshaler Marshaler
+	return v.Type().Implements(reflect.TypeOf(&marshaler).Elem())
 }
