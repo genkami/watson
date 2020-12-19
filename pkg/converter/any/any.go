@@ -95,6 +95,8 @@ func reflectValueToValue(v reflect.Value) *vm.Value {
 		return reflectUintToValue(v)
 	} else if isFloatFamily(v) {
 		return reflectFloatToValue(v)
+	} else if isBool(v) {
+		return reflectBoolToValue(v)
 	} else if v.IsNil() {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
 		return vm.NewNilValue()
@@ -116,6 +118,10 @@ func reflectUintToValue(v reflect.Value) *vm.Value {
 
 func reflectFloatToValue(v reflect.Value) *vm.Value {
 	return vm.NewFloatValue(v.Float())
+}
+
+func reflectBoolToValue(v reflect.Value) *vm.Value {
+	return vm.NewBoolValue(v.Bool())
 }
 
 func reflectMapToValue(v reflect.Value) *vm.Value {
@@ -154,6 +160,10 @@ func isFloatFamily(v reflect.Value) bool {
 	default:
 		return false
 	}
+}
+
+func isBool(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Bool
 }
 
 func isMapConvertibleToValue(v reflect.Value) bool {
