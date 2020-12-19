@@ -95,6 +95,10 @@ func reflectValueToValue(v reflect.Value) *vm.Value {
 		return reflectUintToValue(v)
 	} else if isFloatFamily(v) {
 		return reflectFloatToValue(v)
+	} else if v.IsNil() {
+		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
+		return vm.NewNilValue()
+		// Maps, slices, and structs should be placed after nil so as to convert nil into Nil correctly.
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
 	}

@@ -374,6 +374,56 @@ func TestToValueConvertsFloat64Map(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsNilInterfaceMap(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewNilValue(),
+	})
+	got := ToValue(map[string]interface{}{
+		"value": nil,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+type testStruct struct{}
+
+func TestToValueConvertsNilStructMap(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewNilValue(),
+	})
+	got := ToValue(map[string]*testStruct{
+		"value": nil,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsNilMapMap(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewNilValue(),
+	})
+	got := ToValue(map[string]map[string]interface{}{
+		"value": nil,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsNilSliceMap(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewNilValue(),
+	})
+	got := ToValue(map[string][]int{
+		"value": nil,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func closeEnough(x, y float64) bool {
 	return math.Abs(x-y)/math.Abs(x) < 1e-3
 }
