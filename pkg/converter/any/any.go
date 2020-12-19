@@ -73,10 +73,6 @@ func ToValue(v interface{}) *vm.Value {
 		return vm.NewUintValue(uint64(v))
 	case uint64:
 		return vm.NewUintValue(uint64(v))
-	case []byte:
-		w := make([]byte, len(v))
-		copy(w, v)
-		return vm.NewStringValue(w)
 	case string:
 		return vm.NewStringValue([]byte(v))
 	case float32:
@@ -103,10 +99,10 @@ func reflectValueToValue(v reflect.Value) *vm.Value {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
 		return vm.NewNilValue()
 		// Maps, slices, and structs should be placed after nil so as to convert nil into Nil correctly.
-	} else if isBytes(v) {
-		return reflectBytesToValue(v)
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
+	} else if isSlice(v) {
+		return reflectSliceToValue(v)
 	}
 
 	panic(fmt.Errorf("can't convert %s to *vm.Value", v.Type().String()))
@@ -132,13 +128,6 @@ func reflectStringToValue(v reflect.Value) *vm.Value {
 	return vm.NewStringValue([]byte(v.String()))
 }
 
-func reflectBytesToValue(v reflect.Value) *vm.Value {
-	bytes := v.Bytes()
-	clone := make([]byte, len(bytes))
-	copy(clone, bytes)
-	return vm.NewStringValue(clone)
-}
-
 func reflectMapToValue(v reflect.Value) *vm.Value {
 	obj := map[string]*vm.Value{}
 	iter := v.MapRange()
@@ -152,6 +141,20 @@ func reflectMapToValue(v reflect.Value) *vm.Value {
 		}
 	}
 	return vm.NewObjectValue(obj)
+}
+
+func reflectSliceToValue(v reflect.Value) *vm.Value {
+	arr := []*vm.Value{}
+	size := v.Len()
+	for i := 0; i < size; i++ {
+		elem := v.Index(i)
+		if elem.CanInterface() {
+			arr = append(arr, ToValue(elem.Interface()))
+		} else {
+			arr = append(arr, reflectValueToValue(elem))
+		}
+	}
+	return vm.NewArrayValue(arr)
 }
 
 func isIntFamily(v reflect.Value) bool {
@@ -189,11 +192,11 @@ func isString(v reflect.Value) bool {
 	return v.Type().Kind() == reflect.String
 }
 
-func isBytes(v reflect.Value) bool {
-	return v.Type().Kind() == reflect.Slice && v.Type().Elem() == reflect.TypeOf(byte(0))
-}
-
 func isMapConvertibleToValue(v reflect.Value) bool {
 	t := v.Type()
 	return t.Kind() == reflect.Map && t.Key().Kind() == reflect.String
+}
+
+func isSlice(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Slice
 }

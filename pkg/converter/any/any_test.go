@@ -185,14 +185,6 @@ func TestToValueConvertsUint64(t *testing.T) {
 	}
 }
 
-func TestToValueConvertsByteSlice(t *testing.T) {
-	want := vm.NewStringValue([]byte("hogefuga"))
-	got := ToValue([]byte("hogefuga"))
-	if diff := cmp.Diff(want, got); diff != "" {
-		t.Errorf("mismatch (-want +got):\n%s", diff)
-	}
-}
-
 func TestToValueConvertsString(t *testing.T) {
 	want := vm.NewStringValue([]byte("hogefuga"))
 	got := ToValue("hogefuga")
@@ -448,18 +440,6 @@ func TestToValueConvertsStringMap(t *testing.T) {
 	}
 }
 
-func TestToValueConvertsBytesMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewStringValue([]byte("hoge")),
-	})
-	got := ToValue(map[string][]byte{
-		"value": []byte("hoge"),
-	})
-	if diff := cmp.Diff(want, got); diff != "" {
-		t.Errorf("mismatch (-want +got):\n%s", diff)
-	}
-}
-
 func TestToValueConvertsMapOfMap(t *testing.T) {
 	want := vm.NewObjectValue(map[string]*vm.Value{
 		"nested": vm.NewObjectValue(map[string]*vm.Value{
@@ -471,6 +451,137 @@ func TestToValueConvertsMapOfMap(t *testing.T) {
 			"value": 123,
 		},
 	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsIntArray(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewIntValue(123),
+	})
+	got := ToValue([]int{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsInt8Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewIntValue(123),
+	})
+	got := ToValue([]int8{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsInt16Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewIntValue(123),
+	})
+	got := ToValue([]int16{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsInt32Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewIntValue(123),
+	})
+	got := ToValue([]int32{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsInt64Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewIntValue(123),
+	})
+	got := ToValue([]int64{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUintSlice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewUintValue(123),
+	})
+	got := ToValue([]uint{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUint8Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewUintValue(123),
+	})
+	got := ToValue([]uint8{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUint16Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewUintValue(123),
+	})
+	got := ToValue([]uint16{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUint32Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewUintValue(123),
+	})
+	got := ToValue([]uint32{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsUint64Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewUintValue(123),
+	})
+	got := ToValue([]uint64{123})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsFloat32Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewFloatValue(1.23e4),
+	})
+	got := ToValue([]float32{1.23e4})
+	if got.Kind != vm.KArray {
+		t.Fatalf("expected Array but got %#v", got)
+	}
+
+	if len(got.Array) != 1 {
+		t.Fatalf("length mismatch: %#v", got)
+	}
+	gotValue := got.Array[0]
+	if gotValue.Kind != vm.KFloat {
+		t.Fatalf("expected float but got: %#v", gotValue)
+	}
+	if !closeEnough(want.Array[0].Float, gotValue.Float) {
+		t.Fatalf("expected %#v but got %#v", want, got)
+	}
+}
+
+func TestToValueConvertsFloat64Slice(t *testing.T) {
+	want := vm.NewArrayValue([]*vm.Value{
+		vm.NewFloatValue(1.23e45),
+	})
+	got := ToValue([]float64{1.23e45})
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
