@@ -8,6 +8,19 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+type untagged struct {
+	Name     string
+	LongName string
+}
+
+type nested struct {
+	value *nestedInner
+}
+
+type nestedInner struct {
+	value int
+}
+
 func TestToValueConvertsNilInterface(t *testing.T) {
 	want := NewNilValue()
 	got := ToValue(nil)
@@ -277,6 +290,36 @@ func TestToValueConvertsPtr(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsUntaggedStruct(t *testing.T) {
+	want := NewObjectValue(map[string]*Value{
+		"name":     NewStringValue([]byte("hoge")),
+		"longname": NewStringValue([]byte("longhoge")),
+	})
+	got := ToValue(&untagged{
+		Name:     "hoge",
+		LongName: "longhoge",
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsNestedStruct(t *testing.T) {
+	want := NewObjectValue(map[string]*Value{
+		"value": NewObjectValue(map[string]*Value{
+			"value": NewIntValue(123),
+		}),
+	})
+	got := ToValue(&nested{
+		value: &nestedInner{
+			value: 123,
+		},
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := NewNilValue()
@@ -533,6 +576,36 @@ func TestToValueByReflectionConvertsPtr(t *testing.T) {
 	var i int = 123
 	want := NewIntValue(123)
 	got := ToValueByReflection(reflect.ValueOf(&i))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionConvertsUntaggedStruct(t *testing.T) {
+	want := NewObjectValue(map[string]*Value{
+		"name":     NewStringValue([]byte("hoge")),
+		"longname": NewStringValue([]byte("longhoge")),
+	})
+	got := ToValueByReflection(reflect.ValueOf(&untagged{
+		Name:     "hoge",
+		LongName: "longhoge",
+	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionConvertsNestedStruct(t *testing.T) {
+	want := NewObjectValue(map[string]*Value{
+		"value": NewObjectValue(map[string]*Value{
+			"value": NewIntValue(123),
+		}),
+	})
+	got := ToValueByReflection(reflect.ValueOf(&nested{
+		value: &nestedInner{
+			value: 123,
+		},
+	}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}

@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 func ToValue(v interface{}) *Value {
@@ -56,6 +57,8 @@ func ToValueByReflection(v reflect.Value) *Value {
 		return reflectStringToValue(v)
 	} else if isArray(v) {
 		return reflectSliceOrArrayToValue(v)
+	} else if isStruct(v) {
+		return reflectStructToValue(v)
 	} else if isNil(v) {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
 		return NewNilValue()
@@ -129,6 +132,27 @@ func reflectPtrToValue(v reflect.Value) *Value {
 	}
 }
 
+func reflectStructToValue(v reflect.Value) *Value {
+	obj := map[string]*Value{}
+	size := v.NumField()
+	t := v.Type()
+	for i := 0; i < size; i++ {
+		f := t.Field(i)
+		name := keyNameOf(&f)
+		elem := v.Field(i)
+		if elem.CanInterface() {
+			obj[name] = ToValue(elem.Interface())
+		} else {
+			obj[name] = ToValueByReflection(elem)
+		}
+	}
+	return NewObjectValue(obj)
+}
+
+func keyNameOf(f *reflect.StructField) string {
+	return strings.ToLower(f.Name)
+}
+
 func isIntFamily(v reflect.Value) bool {
 	switch v.Type().Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -188,4 +212,8 @@ func isArray(v reflect.Value) bool {
 
 func isPtr(v reflect.Value) bool {
 	return v.Type().Kind() == reflect.Ptr
+}
+
+func isStruct(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Struct
 }
