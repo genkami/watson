@@ -460,6 +460,22 @@ func TestToValueConvertsBytesMap(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsMapOfMap(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"nested": vm.NewObjectValue(map[string]*vm.Value{
+			"value": vm.NewIntValue(123),
+		}),
+	})
+	got := ToValue(map[string]map[string]int{
+		"nested": map[string]int{
+			"value": 123,
+		},
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func closeEnough(x, y float64) bool {
 	return math.Abs(x-y)/math.Abs(x) < 1e-3
 }
