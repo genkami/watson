@@ -436,6 +436,30 @@ func TestToValueConvertsBoolMap(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsStringMap(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewStringValue([]byte("hoge")),
+	})
+	got := ToValue(map[string]string{
+		"value": "hoge",
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsBytesMap(t *testing.T) {
+	want := vm.NewObjectValue(map[string]*vm.Value{
+		"value": vm.NewStringValue([]byte("hoge")),
+	})
+	got := ToValue(map[string][]byte{
+		"value": []byte("hoge"),
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func closeEnough(x, y float64) bool {
 	return math.Abs(x-y)/math.Abs(x) < 1e-3
 }

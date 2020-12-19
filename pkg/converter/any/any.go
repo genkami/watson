@@ -97,10 +97,14 @@ func reflectValueToValue(v reflect.Value) *vm.Value {
 		return reflectFloatToValue(v)
 	} else if isBool(v) {
 		return reflectBoolToValue(v)
+	} else if isString(v) {
+		return reflectStringToValue(v)
 	} else if v.IsNil() {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
 		return vm.NewNilValue()
 		// Maps, slices, and structs should be placed after nil so as to convert nil into Nil correctly.
+	} else if isBytes(v) {
+		return reflectBytesToValue(v)
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
 	}
@@ -122,6 +126,17 @@ func reflectFloatToValue(v reflect.Value) *vm.Value {
 
 func reflectBoolToValue(v reflect.Value) *vm.Value {
 	return vm.NewBoolValue(v.Bool())
+}
+
+func reflectStringToValue(v reflect.Value) *vm.Value {
+	return vm.NewStringValue([]byte(v.String()))
+}
+
+func reflectBytesToValue(v reflect.Value) *vm.Value {
+	bytes := v.Bytes()
+	clone := make([]byte, len(bytes))
+	copy(clone, bytes)
+	return vm.NewStringValue(clone)
 }
 
 func reflectMapToValue(v reflect.Value) *vm.Value {
@@ -164,6 +179,14 @@ func isFloatFamily(v reflect.Value) bool {
 
 func isBool(v reflect.Value) bool {
 	return v.Type().Kind() == reflect.Bool
+}
+
+func isString(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.String
+}
+
+func isBytes(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Slice && v.Type().Elem() == reflect.TypeOf(byte(0))
 }
 
 func isMapConvertibleToValue(v reflect.Value) bool {
