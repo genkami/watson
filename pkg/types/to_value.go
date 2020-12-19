@@ -40,10 +40,10 @@ func ToValue(v interface{}) *Value {
 		return NewFloatValue(v)
 	}
 	vv := reflect.ValueOf(v)
-	return reflectValueToValue(vv)
+	return ToValueByReflection(vv)
 }
 
-func reflectValueToValue(v reflect.Value) *Value {
+func ToValueByReflection(v reflect.Value) *Value {
 	if isIntFamily(v) {
 		return reflectIntToValue(v)
 	} else if isUintFamily(v) {
@@ -96,7 +96,7 @@ func reflectMapToValue(v reflect.Value) *Value {
 		if v.CanInterface() {
 			obj[k] = ToValue(v.Interface())
 		} else {
-			obj[k] = reflectValueToValue(v)
+			obj[k] = ToValueByReflection(v)
 		}
 	}
 	return NewObjectValue(obj)
@@ -110,7 +110,7 @@ func reflectSliceToValue(v reflect.Value) *Value {
 		if elem.CanInterface() {
 			arr = append(arr, ToValue(elem.Interface()))
 		} else {
-			arr = append(arr, reflectValueToValue(elem))
+			arr = append(arr, ToValueByReflection(elem))
 		}
 	}
 	return NewArrayValue(arr)
