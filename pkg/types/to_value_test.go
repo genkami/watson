@@ -30,6 +30,10 @@ type embeddedInner struct {
 	anotherField int
 }
 
+type tagged struct {
+	Field int `watson:"customName"`
+}
+
 func TestToValueConvertsNilInterface(t *testing.T) {
 	want := NewNilValue()
 	got := ToValue(nil)
@@ -346,6 +350,18 @@ func TestToValueConvertsEmbeddedStruct(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsTaggedStruct(t *testing.T) {
+	want := NewObjectValue(map[string]*Value{
+		"customName": NewIntValue(123),
+	})
+	got := ToValue(&tagged{
+		Field: 123,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := NewNilValue()
@@ -649,6 +665,18 @@ func TestToValueByReflectionConvertsEmbeddedStruct(t *testing.T) {
 	}
 	value.anotherField = 456
 	got := ToValueByReflection(reflect.ValueOf(value))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionConvertsTaggedStruct(t *testing.T) {
+	want := NewObjectValue(map[string]*Value{
+		"customName": NewIntValue(123),
+	})
+	got := ToValueByReflection(reflect.ValueOf(&tagged{
+		Field: 123,
+	}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}

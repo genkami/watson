@@ -3,7 +3,6 @@ package types
 import (
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 func ToValue(v interface{}) *Value {
@@ -137,8 +136,9 @@ func reflectStructToValue(v reflect.Value) *Value {
 	size := v.NumField()
 	t := v.Type()
 	for i := 0; i < size; i++ {
-		f := t.Field(i)
-		name := keyNameOf(&f)
+		field := t.Field(i)
+		tag := parseTag(&field)
+		name := tag.key()
 		elem := v.Field(i)
 		if elem.CanInterface() {
 			obj[name] = ToValue(elem.Interface())
@@ -147,10 +147,6 @@ func reflectStructToValue(v reflect.Value) *Value {
 		}
 	}
 	return NewObjectValue(obj)
-}
-
-func keyNameOf(f *reflect.StructField) string {
-	return strings.ToLower(f.Name)
 }
 
 func isIntFamily(v reflect.Value) bool {
