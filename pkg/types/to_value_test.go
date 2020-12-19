@@ -16,24 +16,29 @@ type untagged struct {
 }
 
 type nested struct {
-	value *nestedInner
+	Value *nestedInner
 }
 
 type nestedInner struct {
-	value int
+	Value int
 }
 
 type embedded struct {
-	field int
-	embeddedInner
+	Field int
+	EmbeddedInner
 }
 
-type embeddedInner struct {
-	anotherField int
+type EmbeddedInner struct {
+	AnotherField int
 }
 
 type tagged struct {
 	Field int `watson:"customName"`
+}
+
+type private struct {
+	PublicField  int
+	privateField int
 }
 
 func TestToValueConvertsNilInterface(t *testing.T) {
@@ -326,8 +331,8 @@ func TestToValueConvertsNestedStruct(t *testing.T) {
 		}),
 	})
 	got := types.ToValue(&nested{
-		value: &nestedInner{
-			value: 123,
+		Value: &nestedInner{
+			Value: 123,
 		},
 	})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -343,9 +348,9 @@ func TestToValueConvertsEmbeddedStruct(t *testing.T) {
 		}),
 	})
 	value := &embedded{
-		field: 123,
+		Field: 123,
 	}
-	value.anotherField = 456
+	value.AnotherField = 456
 	got := types.ToValue(value)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -358,6 +363,19 @@ func TestToValueConvertsTaggedStruct(t *testing.T) {
 	})
 	got := types.ToValue(&tagged{
 		Field: 123,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueOmitsPrivateField(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"publicfield": types.NewIntValue(123),
+	})
+	got := types.ToValue(&private{
+		PublicField:  123,
+		privateField: 456,
 	})
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -646,8 +664,8 @@ func TestToValueByReflectionConvertsNestedStruct(t *testing.T) {
 		}),
 	})
 	got := types.ToValueByReflection(reflect.ValueOf(&nested{
-		value: &nestedInner{
-			value: 123,
+		Value: &nestedInner{
+			Value: 123,
 		},
 	}))
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -663,9 +681,9 @@ func TestToValueByReflectionConvertsEmbeddedStruct(t *testing.T) {
 		}),
 	})
 	value := &embedded{
-		field: 123,
+		Field: 123,
 	}
-	value.anotherField = 456
+	value.AnotherField = 456
 	got := types.ToValueByReflection(reflect.ValueOf(value))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -678,6 +696,19 @@ func TestToValueByReflectionConvertsTaggedStruct(t *testing.T) {
 	})
 	got := types.ToValueByReflection(reflect.ValueOf(&tagged{
 		Field: 123,
+	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionOmitsPrivateField(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"publicfield": types.NewIntValue(123),
+	})
+	got := types.ToValueByReflection(reflect.ValueOf(&private{
+		PublicField:  123,
+		privateField: 456,
 	}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)

@@ -138,6 +138,9 @@ func reflectStructToValue(v reflect.Value) *Value {
 	for i := 0; i < size; i++ {
 		field := t.Field(i)
 		tag := parseTag(&field)
+		if tag.shouldAlwaysOmit() {
+			continue
+		}
 		name := tag.key()
 		elem := v.Field(i)
 		if elem.CanInterface() {
