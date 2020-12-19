@@ -46,6 +46,11 @@ type omitempty struct {
 	Field2 *int `watson:"field2,omitempty"`
 }
 
+type alwaysomit struct {
+	ShouldBeIncluded int `watson:"shouldBeIncluded"`
+	ShouldBeOmitted  int `watson:"-"`
+}
+
 func TestToValueConvertsNilInterface(t *testing.T) {
 	want := types.NewNilValue()
 	got := types.ToValue(nil)
@@ -401,6 +406,19 @@ func TestToValueOmitsEmptyFieldTaggedWithOmitempty(t *testing.T) {
 	}
 }
 
+func TestToValueOmitsFieldTaggedWithHyphen(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"shouldBeIncluded": types.NewIntValue(123),
+	})
+	got := types.ToValue(&alwaysomit{
+		ShouldBeIncluded: 123,
+		ShouldBeOmitted:  456,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := types.NewNilValue()
@@ -742,6 +760,19 @@ func TestToValueByReflectionOmitsEmptyFieldTaggedWithOmitempty(t *testing.T) {
 	got := types.ToValueByReflection(reflect.ValueOf(&omitempty{
 		Field1: &f1,
 		Field2: nil,
+	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionOmitsFieldTaggedWithHyphen(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"shouldBeIncluded": types.NewIntValue(123),
+	})
+	got := types.ToValueByReflection(reflect.ValueOf(&alwaysomit{
+		ShouldBeIncluded: 123,
+		ShouldBeOmitted:  456,
 	}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)

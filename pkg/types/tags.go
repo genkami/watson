@@ -8,14 +8,16 @@ import (
 )
 
 const (
-	tagId         = "watson"
-	attrOmitEmpty = "omitempty"
+	tagId          = "watson"
+	attrAlwaysOmit = "-"
+	attrOmitEmpty  = "omitempty"
 )
 
 type tag struct {
-	name      string
-	f         *reflect.StructField
-	omitempty bool
+	name       string
+	f          *reflect.StructField
+	omitempty  bool
+	alwaysomit bool
 }
 
 func parseTag(f *reflect.StructField) *tag {
@@ -28,7 +30,11 @@ func parseTag(f *reflect.StructField) *tag {
 	first := true
 	for _, attr := range attrs {
 		if first {
-			tag.name = attr
+			if attr == attrAlwaysOmit {
+				tag.alwaysomit = true
+			} else {
+				tag.name = attr
+			}
 			first = false
 			continue
 		}
@@ -48,6 +54,9 @@ func (t *tag) Key() string {
 }
 
 func (t *tag) ShouldAlwaysOmit() bool {
+	if t.alwaysomit {
+		return true
+	}
 	r, _ := utf8.DecodeRuneInString(t.f.Name)
 	return unicode.IsLower(r)
 }
