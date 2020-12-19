@@ -11,6 +11,7 @@ const (
 	tagId          = "watson"
 	attrAlwaysOmit = "-"
 	attrOmitEmpty  = "omitempty"
+	attrInline     = "inline"
 )
 
 type tag struct {
@@ -18,6 +19,7 @@ type tag struct {
 	f          *reflect.StructField
 	omitempty  bool
 	alwaysomit bool
+	inline     bool
 }
 
 func parseTag(f *reflect.StructField) *tag {
@@ -41,6 +43,8 @@ func parseTag(f *reflect.StructField) *tag {
 		switch attr {
 		case attrOmitEmpty:
 			tag.omitempty = true
+		case attrInline:
+			tag.inline = true
 		}
 	}
 	return tag
@@ -63,4 +67,8 @@ func (t *tag) ShouldAlwaysOmit() bool {
 
 func (t *tag) OmitEmpty() bool {
 	return t.omitempty
+}
+
+func (t *tag) Inline() bool {
+	return t.inline
 }

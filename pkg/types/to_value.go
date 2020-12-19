@@ -133,6 +133,11 @@ func reflectPtrToValue(v reflect.Value) *Value {
 
 func reflectStructToValue(v reflect.Value) *Value {
 	obj := map[string]*Value{}
+	addFields(obj, v)
+	return NewObjectValue(obj)
+}
+
+func addFields(obj map[string]*Value, v reflect.Value) {
 	size := v.NumField()
 	t := v.Type()
 	for i := 0; i < size; i++ {
@@ -146,13 +151,14 @@ func reflectStructToValue(v reflect.Value) *Value {
 		if tag.OmitEmpty() && elem.IsZero() {
 			continue
 		}
-		if elem.CanInterface() {
+		if tag.Inline() {
+			addFields(obj, elem)
+		} else if elem.CanInterface() {
 			obj[name] = ToValue(elem.Interface())
 		} else {
 			obj[name] = ToValueByReflection(elem)
 		}
 	}
-	return NewObjectValue(obj)
 }
 
 func isIntFamily(v reflect.Value) bool {

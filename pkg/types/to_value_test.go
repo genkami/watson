@@ -51,6 +51,15 @@ type alwaysomit struct {
 	ShouldBeOmitted  int `watson:"-"`
 }
 
+type inline struct {
+	Field int
+	Inner inlineInner `watson:",inline"`
+}
+
+type inlineInner struct {
+	NestedField int
+}
+
 func TestToValueConvertsNilInterface(t *testing.T) {
 	want := types.NewNilValue()
 	got := types.ToValue(nil)
@@ -419,6 +428,22 @@ func TestToValueOmitsFieldTaggedWithHyphen(t *testing.T) {
 	}
 }
 
+func TestToValuesEnbedsFieldTaggedWithInline(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"field":       types.NewIntValue(123),
+		"nestedfield": types.NewIntValue(456),
+	})
+	got := types.ToValue(&inline{
+		Field: 123,
+		Inner: inlineInner{
+			NestedField: 456,
+		},
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := types.NewNilValue()
@@ -773,6 +798,22 @@ func TestToValueByReflectionOmitsFieldTaggedWithHyphen(t *testing.T) {
 	got := types.ToValueByReflection(reflect.ValueOf(&alwaysomit{
 		ShouldBeIncluded: 123,
 		ShouldBeOmitted:  456,
+	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionsEnbedsFieldTaggedWithInline(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"field":       types.NewIntValue(123),
+		"nestedfield": types.NewIntValue(456),
+	})
+	got := types.ToValueByReflection(reflect.ValueOf(&inline{
+		Field: 123,
+		Inner: inlineInner{
+			NestedField: 456,
+		},
 	}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
