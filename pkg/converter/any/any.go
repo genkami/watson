@@ -5,86 +5,86 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/genkami/watson/pkg/vm"
+	"github.com/genkami/watson/pkg/types"
 )
 
-// FromValue converts vm.Value into one of the following type:
+// FromValue converts types.Value into one of the following type:
 // * int64
 // * uint64
 // * string
 // * bool
 // * (interface{})(nil)
 // * map[string]interface{} (the value of which is also one or many of these types)
-func FromValue(val *vm.Value) interface{} {
+func FromValue(val *types.Value) interface{} {
 	switch val.Kind {
-	case vm.KInt:
+	case types.Int:
 		return val.Int
-	case vm.KUint:
+	case types.Uint:
 		return val.Uint
-	case vm.KFloat:
+	case types.Float:
 		return val.Float
-	case vm.KString:
+	case types.String:
 		return string(val.String)
-	case vm.KObject:
+	case types.Object:
 		obj := map[string]interface{}{}
 		for k, v := range val.Object {
 			obj[k] = FromValue(v)
 		}
 		return obj
-	case vm.KArray:
+	case types.Array:
 		arr := make([]interface{}, 0, len(val.Array))
 		for _, v := range val.Array {
 			arr = append(arr, FromValue(v))
 		}
 		return arr
-	case vm.KBool:
+	case types.Bool:
 		return val.Bool
-	case vm.KNil:
+	case types.Nil:
 		return nil
 	default:
 		panic(fmt.Errorf("invalid kind: %d", val.Kind))
 	}
 }
 
-func ToValue(v interface{}) *vm.Value {
+func ToValue(v interface{}) *types.Value {
 	if v == nil {
-		return vm.NewNilValue()
+		return types.NewNilValue()
 	}
 	switch v := v.(type) {
 	case bool:
-		return vm.NewBoolValue(v)
+		return types.NewBoolValue(v)
 	case int:
-		return vm.NewIntValue(int64(v))
+		return types.NewIntValue(int64(v))
 	case int8:
-		return vm.NewIntValue(int64(v))
+		return types.NewIntValue(int64(v))
 	case int16:
-		return vm.NewIntValue(int64(v))
+		return types.NewIntValue(int64(v))
 	case int32:
-		return vm.NewIntValue(int64(v))
+		return types.NewIntValue(int64(v))
 	case int64:
-		return vm.NewIntValue(v)
+		return types.NewIntValue(v)
 	case uint:
-		return vm.NewUintValue(uint64(v))
+		return types.NewUintValue(uint64(v))
 	case uint8:
-		return vm.NewUintValue(uint64(v))
+		return types.NewUintValue(uint64(v))
 	case uint16:
-		return vm.NewUintValue(uint64(v))
+		return types.NewUintValue(uint64(v))
 	case uint32:
-		return vm.NewUintValue(uint64(v))
+		return types.NewUintValue(uint64(v))
 	case uint64:
-		return vm.NewUintValue(uint64(v))
+		return types.NewUintValue(uint64(v))
 	case string:
-		return vm.NewStringValue([]byte(v))
+		return types.NewStringValue([]byte(v))
 	case float32:
-		return vm.NewFloatValue(float64(v))
+		return types.NewFloatValue(float64(v))
 	case float64:
-		return vm.NewFloatValue(v)
+		return types.NewFloatValue(v)
 	}
 	vv := reflect.ValueOf(v)
 	return reflectValueToValue(vv)
 }
 
-func reflectValueToValue(v reflect.Value) *vm.Value {
+func reflectValueToValue(v reflect.Value) *types.Value {
 	if isIntFamily(v) {
 		return reflectIntToValue(v)
 	} else if isUintFamily(v) {
@@ -97,7 +97,7 @@ func reflectValueToValue(v reflect.Value) *vm.Value {
 		return reflectStringToValue(v)
 	} else if v.IsNil() {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
-		return vm.NewNilValue()
+		return types.NewNilValue()
 		// Maps, slices, and structs should be placed after nil so as to convert nil into Nil correctly.
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
@@ -105,31 +105,31 @@ func reflectValueToValue(v reflect.Value) *vm.Value {
 		return reflectSliceToValue(v)
 	}
 
-	panic(fmt.Errorf("can't convert %s to *vm.Value", v.Type().String()))
+	panic(fmt.Errorf("can't convert %s to *types.Value", v.Type().String()))
 }
 
-func reflectIntToValue(v reflect.Value) *vm.Value {
-	return vm.NewIntValue(v.Int())
+func reflectIntToValue(v reflect.Value) *types.Value {
+	return types.NewIntValue(v.Int())
 }
 
-func reflectUintToValue(v reflect.Value) *vm.Value {
-	return vm.NewUintValue(v.Uint())
+func reflectUintToValue(v reflect.Value) *types.Value {
+	return types.NewUintValue(v.Uint())
 }
 
-func reflectFloatToValue(v reflect.Value) *vm.Value {
-	return vm.NewFloatValue(v.Float())
+func reflectFloatToValue(v reflect.Value) *types.Value {
+	return types.NewFloatValue(v.Float())
 }
 
-func reflectBoolToValue(v reflect.Value) *vm.Value {
-	return vm.NewBoolValue(v.Bool())
+func reflectBoolToValue(v reflect.Value) *types.Value {
+	return types.NewBoolValue(v.Bool())
 }
 
-func reflectStringToValue(v reflect.Value) *vm.Value {
-	return vm.NewStringValue([]byte(v.String()))
+func reflectStringToValue(v reflect.Value) *types.Value {
+	return types.NewStringValue([]byte(v.String()))
 }
 
-func reflectMapToValue(v reflect.Value) *vm.Value {
-	obj := map[string]*vm.Value{}
+func reflectMapToValue(v reflect.Value) *types.Value {
+	obj := map[string]*types.Value{}
 	iter := v.MapRange()
 	for iter.Next() {
 		k := iter.Key().String()
@@ -140,11 +140,11 @@ func reflectMapToValue(v reflect.Value) *vm.Value {
 			obj[k] = reflectValueToValue(v)
 		}
 	}
-	return vm.NewObjectValue(obj)
+	return types.NewObjectValue(obj)
 }
 
-func reflectSliceToValue(v reflect.Value) *vm.Value {
-	arr := []*vm.Value{}
+func reflectSliceToValue(v reflect.Value) *types.Value {
+	arr := []*types.Value{}
 	size := v.Len()
 	for i := 0; i < size; i++ {
 		elem := v.Index(i)
@@ -154,7 +154,7 @@ func reflectSliceToValue(v reflect.Value) *vm.Value {
 			arr = append(arr, reflectValueToValue(elem))
 		}
 	}
-	return vm.NewArrayValue(arr)
+	return types.NewArrayValue(arr)
 }
 
 func isIntFamily(v reflect.Value) bool {

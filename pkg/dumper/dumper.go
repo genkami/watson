@@ -1,4 +1,4 @@
-// Package dumper converts `vm.Value`s into `vm.Op`s.
+// Package dumper converts `types.Value`s into `types.Op`s.
 package dumper
 
 import (
@@ -6,10 +6,11 @@ import (
 	"math"
 
 	"github.com/genkami/watson/pkg/lexer"
+	"github.com/genkami/watson/pkg/types"
 	"github.com/genkami/watson/pkg/vm"
 )
 
-// Dumper dumps `vm.Value` as a sequence of `vm.Op`s.
+// Dumper dumps `types.Value` as a sequence of `types.Op`s.
 type Dumper struct {
 	w lexer.OpWriter
 }
@@ -19,24 +20,24 @@ func NewDumper(w lexer.OpWriter) *Dumper {
 	return &Dumper{w: w}
 }
 
-// Dump converts v into a sequence of `vm.Op`s and writes it to the underlying writer `lexer.OpWriter`.
-func (d *Dumper) Dump(v *vm.Value) error {
+// Dump converts v into a sequence of `types.Op`s and writes it to the underlying writer `lexer.OpWriter`.
+func (d *Dumper) Dump(v *types.Value) error {
 	switch v.Kind {
-	case vm.KInt:
+	case types.Int:
 		return d.dumpInt(uint64(v.Int))
-	case vm.KUint:
+	case types.Uint:
 		return d.dumpUint(v.Uint)
-	case vm.KFloat:
+	case types.Float:
 		return d.dumpFloat(v.Float)
-	case vm.KString:
+	case types.String:
 		return d.dumpString(v.String)
-	case vm.KObject:
+	case types.Object:
 		return d.dumpObject(v.Object)
-	case vm.KArray:
+	case types.Array:
 		return d.dumpArray(v.Array)
-	case vm.KBool:
+	case types.Bool:
 		return d.dumpBool(v.Bool)
-	case vm.KNil:
+	case types.Nil:
 		return d.dumpNil()
 	default:
 		panic(fmt.Errorf("unknown kind: %d", v.Kind))
@@ -136,7 +137,7 @@ func (d *Dumper) dumpString(s []byte) error {
 	return nil
 }
 
-func (d *Dumper) dumpObject(obj map[string]*vm.Value) error {
+func (d *Dumper) dumpObject(obj map[string]*types.Value) error {
 	var err error
 	err = d.w.Write(vm.Onew)
 	if err != nil {
@@ -159,7 +160,7 @@ func (d *Dumper) dumpObject(obj map[string]*vm.Value) error {
 	return nil
 }
 
-func (d *Dumper) dumpArray(arr []*vm.Value) error {
+func (d *Dumper) dumpArray(arr []*types.Value) error {
 	var err error
 	err = d.w.Write(vm.Anew)
 	if err != nil {

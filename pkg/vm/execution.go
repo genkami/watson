@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"math"
+
+	"github.com/genkami/watson/pkg/types"
 )
 
 var (
@@ -14,7 +16,7 @@ var (
 
 // Top returns a value in the top of the stack.
 // This returns ErrStackEmpty if the stack is empty.
-func (vm *VM) Top() (*Value, error) {
+func (vm *VM) Top() (*types.Value, error) {
 	if vm.sp < 0 {
 		return nil, ErrStackEmpty
 	}
@@ -193,7 +195,7 @@ func (vm *VM) feedSadd() error {
 }
 
 func (vm *VM) feedOnew() error {
-	return vm.pushObject(map[string]*Value{})
+	return vm.pushObject(map[string]*types.Value{})
 }
 
 func (vm *VM) feedOadd() error {
@@ -214,7 +216,7 @@ func (vm *VM) feedOadd() error {
 }
 
 func (vm *VM) feedAnew() error {
-	return vm.pushArray([]*Value{})
+	return vm.pushArray([]*types.Value{})
 }
 
 func (vm *VM) feedAadd() error {
@@ -283,7 +285,7 @@ func (vm *VM) feedGswp() error {
 // Miscellaneous functions
 //
 
-func (vm *VM) push(v *Value) error {
+func (vm *VM) push(v *types.Value) error {
 	if len(vm.stack)-1 <= vm.sp {
 		return ErrMaximumStackSizeExceeded
 	}
@@ -293,38 +295,38 @@ func (vm *VM) push(v *Value) error {
 }
 
 func (vm *VM) pushInt(val int64) error {
-	return vm.push(NewIntValue(val))
+	return vm.push(types.NewIntValue(val))
 }
 
 func (vm *VM) pushUint(val uint64) error {
-	return vm.push(NewUintValue(val))
+	return vm.push(types.NewUintValue(val))
 }
 
 func (vm *VM) pushFloat(val float64) error {
-	return vm.push(NewFloatValue(val))
+	return vm.push(types.NewFloatValue(val))
 }
 
 func (vm *VM) pushString(val []byte) error {
-	return vm.push(NewStringValue(val))
+	return vm.push(types.NewStringValue(val))
 }
 
-func (vm *VM) pushObject(val map[string]*Value) error {
-	return vm.push(NewObjectValue(val))
+func (vm *VM) pushObject(val map[string]*types.Value) error {
+	return vm.push(types.NewObjectValue(val))
 }
 
-func (vm *VM) pushArray(val []*Value) error {
-	return vm.push(NewArrayValue(val))
+func (vm *VM) pushArray(val []*types.Value) error {
+	return vm.push(types.NewArrayValue(val))
 }
 
 func (vm *VM) pushBool(val bool) error {
-	return vm.push(NewBoolValue(val))
+	return vm.push(types.NewBoolValue(val))
 }
 
 func (vm *VM) pushNil() error {
-	return vm.push(NewNilValue())
+	return vm.push(types.NewNilValue())
 }
 
-func (vm *VM) pop() (*Value, error) {
+func (vm *VM) pop() (*types.Value, error) {
 	if vm.sp < 0 {
 		return nil, ErrStackEmpty
 	}
@@ -339,7 +341,7 @@ func (vm *VM) popInt() (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	if v.Kind != KInt {
+	if v.Kind != types.Int {
 		return 0, ErrTypeMismatch
 	}
 	return v.Int, nil
@@ -350,7 +352,7 @@ func (vm *VM) popFloat() (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	if v.Kind != KFloat {
+	if v.Kind != types.Float {
 		return 0, ErrTypeMismatch
 	}
 	return v.Float, nil
@@ -361,29 +363,29 @@ func (vm *VM) popString() ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if v.Kind != KString {
+	if v.Kind != types.String {
 		return nil, ErrTypeMismatch
 	}
 	return v.String, nil
 }
 
-func (vm *VM) popObject() (map[string]*Value, error) {
+func (vm *VM) popObject() (map[string]*types.Value, error) {
 	v, err := vm.pop()
 	if err != nil {
 		return nil, err
 	}
-	if v.Kind != KObject {
+	if v.Kind != types.Object {
 		return nil, ErrTypeMismatch
 	}
 	return v.Object, nil
 }
 
-func (vm *VM) popArray() ([]*Value, error) {
+func (vm *VM) popArray() ([]*types.Value, error) {
 	v, err := vm.pop()
 	if err != nil {
 		return nil, err
 	}
-	if v.Kind != KArray {
+	if v.Kind != types.Array {
 		return nil, ErrTypeMismatch
 	}
 	return v.Array, nil
@@ -394,7 +396,7 @@ func (vm *VM) popBool() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if v.Kind != KBool {
+	if v.Kind != types.Bool {
 		return false, ErrTypeMismatch
 	}
 	return v.Bool, nil

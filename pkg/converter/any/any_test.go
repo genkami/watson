@@ -4,13 +4,13 @@ import (
 	"math"
 	"testing"
 
-	"github.com/genkami/watson/pkg/vm"
+	"github.com/genkami/watson/pkg/types"
 
 	"github.com/google/go-cmp/cmp"
 )
 
 func TestFromValueConvertsInt(t *testing.T) {
-	val := vm.NewIntValue(123)
+	val := types.NewIntValue(123)
 	var want interface{} = int64(123)
 	got := FromValue(val)
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -19,7 +19,7 @@ func TestFromValueConvertsInt(t *testing.T) {
 }
 
 func TestFromValueConvertsFloat(t *testing.T) {
-	val := vm.NewFloatValue(1.23)
+	val := types.NewFloatValue(1.23)
 	var want interface{} = float64(1.23)
 	got := FromValue(val)
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -28,7 +28,7 @@ func TestFromValueConvertsFloat(t *testing.T) {
 }
 
 func TestFromValueConvertsString(t *testing.T) {
-	val := vm.NewStringValue([]byte("hey"))
+	val := types.NewStringValue([]byte("hey"))
 	var want interface{} = "hey"
 	got := FromValue(val)
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -37,9 +37,9 @@ func TestFromValueConvertsString(t *testing.T) {
 }
 
 func TestFromValueConvertsObject(t *testing.T) {
-	val := vm.NewObjectValue(map[string]*vm.Value{
-		"name": vm.NewStringValue([]byte("Taro")),
-		"age":  vm.NewIntValue(25),
+	val := types.NewObjectValue(map[string]*types.Value{
+		"name": types.NewStringValue([]byte("Taro")),
+		"age":  types.NewIntValue(25),
 	})
 	var want interface{} = map[string]interface{}{
 		"name": "Taro",
@@ -52,9 +52,9 @@ func TestFromValueConvertsObject(t *testing.T) {
 }
 
 func TestFromValueConvertsArray(t *testing.T) {
-	val := vm.NewArrayValue([]*vm.Value{
-		vm.NewStringValue([]byte("Yo")),
-		vm.NewIntValue(123),
+	val := types.NewArrayValue([]*types.Value{
+		types.NewStringValue([]byte("Yo")),
+		types.NewIntValue(123),
 	})
 	var want interface{} = []interface{}{"Yo", int64(123)}
 	got := FromValue(val)
@@ -64,7 +64,7 @@ func TestFromValueConvertsArray(t *testing.T) {
 }
 
 func TestFromValueConvertsBool(t *testing.T) {
-	val := vm.NewBoolValue(true)
+	val := types.NewBoolValue(true)
 	var want interface{} = true
 	got := FromValue(val)
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -73,7 +73,7 @@ func TestFromValueConvertsBool(t *testing.T) {
 }
 
 func TestFromValueConvertsNil(t *testing.T) {
-	val := vm.NewNilValue()
+	val := types.NewNilValue()
 	var want interface{} = nil
 	got := FromValue(val)
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -82,7 +82,7 @@ func TestFromValueConvertsNil(t *testing.T) {
 }
 
 func TestToValueConvertsNil(t *testing.T) {
-	want := vm.NewNilValue()
+	want := types.NewNilValue()
 	got := ToValue(nil)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -90,7 +90,7 @@ func TestToValueConvertsNil(t *testing.T) {
 }
 
 func TestToValueConvertsTrue(t *testing.T) {
-	want := vm.NewBoolValue(true)
+	want := types.NewBoolValue(true)
 	got := ToValue(true)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -98,7 +98,7 @@ func TestToValueConvertsTrue(t *testing.T) {
 }
 
 func TestToValueConvertsFalse(t *testing.T) {
-	want := vm.NewBoolValue(false)
+	want := types.NewBoolValue(false)
 	got := ToValue(false)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -106,7 +106,7 @@ func TestToValueConvertsFalse(t *testing.T) {
 }
 
 func TestToValueConvertsInt(t *testing.T) {
-	want := vm.NewIntValue(-12345678)
+	want := types.NewIntValue(-12345678)
 	got := ToValue(int(-12345678))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -114,7 +114,7 @@ func TestToValueConvertsInt(t *testing.T) {
 }
 
 func TestToValueConvertsInt8(t *testing.T) {
-	want := vm.NewIntValue(64)
+	want := types.NewIntValue(64)
 	got := ToValue(int8(64))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -122,7 +122,7 @@ func TestToValueConvertsInt8(t *testing.T) {
 }
 
 func TestToValueConvertsInt16(t *testing.T) {
-	want := vm.NewIntValue(256)
+	want := types.NewIntValue(256)
 	got := ToValue(int16(256))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -130,7 +130,7 @@ func TestToValueConvertsInt16(t *testing.T) {
 }
 
 func TestToValueConvertsInt32(t *testing.T) {
-	want := vm.NewIntValue(65536)
+	want := types.NewIntValue(65536)
 	got := ToValue(int32(65536))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -138,7 +138,7 @@ func TestToValueConvertsInt32(t *testing.T) {
 }
 
 func TestToValueConvertsInt64(t *testing.T) {
-	want := vm.NewIntValue(1234567)
+	want := types.NewIntValue(1234567)
 	got := ToValue(int64(1234567))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -146,7 +146,7 @@ func TestToValueConvertsInt64(t *testing.T) {
 }
 
 func TestToValueConvertsUint(t *testing.T) {
-	want := vm.NewUintValue(12345)
+	want := types.NewUintValue(12345)
 	got := ToValue(uint(12345))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -154,7 +154,7 @@ func TestToValueConvertsUint(t *testing.T) {
 }
 
 func TestToValueConvertsUint8(t *testing.T) {
-	want := vm.NewUintValue(255)
+	want := types.NewUintValue(255)
 	got := ToValue(uint8(255))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -162,7 +162,7 @@ func TestToValueConvertsUint8(t *testing.T) {
 }
 
 func TestToValueConvertsUint16(t *testing.T) {
-	want := vm.NewUintValue(12345)
+	want := types.NewUintValue(12345)
 	got := ToValue(uint16(12345))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -170,7 +170,7 @@ func TestToValueConvertsUint16(t *testing.T) {
 }
 
 func TestToValueConvertsUint32(t *testing.T) {
-	want := vm.NewUintValue(12345)
+	want := types.NewUintValue(12345)
 	got := ToValue(uint32(12345))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -178,7 +178,7 @@ func TestToValueConvertsUint32(t *testing.T) {
 }
 
 func TestToValueConvertsUint64(t *testing.T) {
-	want := vm.NewUintValue(12345)
+	want := types.NewUintValue(12345)
 	got := ToValue(uint64(12345))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -186,7 +186,7 @@ func TestToValueConvertsUint64(t *testing.T) {
 }
 
 func TestToValueConvertsString(t *testing.T) {
-	want := vm.NewStringValue([]byte("hogefuga"))
+	want := types.NewStringValue([]byte("hogefuga"))
 	got := ToValue("hogefuga")
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -194,9 +194,9 @@ func TestToValueConvertsString(t *testing.T) {
 }
 
 func TestToValueConvertsFloat32(t *testing.T) {
-	want := vm.NewFloatValue(1.2345e-6)
+	want := types.NewFloatValue(1.2345e-6)
 	got := ToValue(float32(1.2345e-6))
-	if got.Kind != vm.KFloat {
+	if got.Kind != types.Float {
 		t.Fatalf("expected Float but got %#v", got)
 	}
 	if !closeEnough(want.Float, got.Float) {
@@ -205,7 +205,7 @@ func TestToValueConvertsFloat32(t *testing.T) {
 }
 
 func TestToValueConvertsFloat64(t *testing.T) {
-	want := vm.NewFloatValue(1.2345e-6)
+	want := types.NewFloatValue(1.2345e-6)
 	got := ToValue(float64(1.2345e-6))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
@@ -213,8 +213,8 @@ func TestToValueConvertsFloat64(t *testing.T) {
 }
 
 func TestToValueConvertsIntMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewIntValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewIntValue(1),
 	})
 	got := ToValue(map[string]int{
 		"value": 1,
@@ -225,8 +225,8 @@ func TestToValueConvertsIntMap(t *testing.T) {
 }
 
 func TestToValueConvertsInt8Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewIntValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewIntValue(1),
 	})
 	got := ToValue(map[string]int8{
 		"value": 1,
@@ -237,8 +237,8 @@ func TestToValueConvertsInt8Map(t *testing.T) {
 }
 
 func TestToValueConvertsInt16Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewIntValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewIntValue(1),
 	})
 	got := ToValue(map[string]int16{
 		"value": 1,
@@ -249,8 +249,8 @@ func TestToValueConvertsInt16Map(t *testing.T) {
 }
 
 func TestToValueConvertsInt32Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewIntValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewIntValue(1),
 	})
 	got := ToValue(map[string]int32{
 		"value": 1,
@@ -261,8 +261,8 @@ func TestToValueConvertsInt32Map(t *testing.T) {
 }
 
 func TestToValueConvertsInt64Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewIntValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewIntValue(1),
 	})
 	got := ToValue(map[string]int64{
 		"value": 1,
@@ -273,8 +273,8 @@ func TestToValueConvertsInt64Map(t *testing.T) {
 }
 
 func TestToValueConvertsUintMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewUintValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewUintValue(1),
 	})
 	got := ToValue(map[string]uint{
 		"value": 1,
@@ -285,8 +285,8 @@ func TestToValueConvertsUintMap(t *testing.T) {
 }
 
 func TestToValueConvertsUint8Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewUintValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewUintValue(1),
 	})
 	got := ToValue(map[string]uint8{
 		"value": 1,
@@ -297,8 +297,8 @@ func TestToValueConvertsUint8Map(t *testing.T) {
 }
 
 func TestToValueConvertsUint16Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewUintValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewUintValue(1),
 	})
 	got := ToValue(map[string]uint16{
 		"value": 1,
@@ -309,8 +309,8 @@ func TestToValueConvertsUint16Map(t *testing.T) {
 }
 
 func TestToValueConvertsUint32Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewUintValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewUintValue(1),
 	})
 	got := ToValue(map[string]uint32{
 		"value": 1,
@@ -321,8 +321,8 @@ func TestToValueConvertsUint32Map(t *testing.T) {
 }
 
 func TestToValueConvertsUint64Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewUintValue(1),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewUintValue(1),
 	})
 	got := ToValue(map[string]uint64{
 		"value": 1,
@@ -333,20 +333,20 @@ func TestToValueConvertsUint64Map(t *testing.T) {
 }
 
 func TestToValueConvertsFloat32Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewFloatValue(1.23e-4),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewFloatValue(1.23e-4),
 	})
 	got := ToValue(map[string]float32{
 		"value": 1.23e-4,
 	})
-	if got.Kind != vm.KObject {
+	if got.Kind != types.Object {
 		t.Fatalf("expected Object but got %#v", got)
 	}
 	gotValue, ok := got.Object["value"]
 	if !ok {
 		t.Fatalf("missing key: %#v", got)
 	}
-	if gotValue.Kind != vm.KFloat {
+	if gotValue.Kind != types.Float {
 		t.Fatalf("expected float but got: %#v", gotValue)
 	}
 	if !closeEnough(want.Object["value"].Float, gotValue.Float) {
@@ -355,8 +355,8 @@ func TestToValueConvertsFloat32Map(t *testing.T) {
 }
 
 func TestToValueConvertsFloat64Map(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewFloatValue(1.23e-4),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewFloatValue(1.23e-4),
 	})
 	got := ToValue(map[string]float64{
 		"value": 1.23e-4,
@@ -367,8 +367,8 @@ func TestToValueConvertsFloat64Map(t *testing.T) {
 }
 
 func TestToValueConvertsNilInterfaceMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewNilValue(),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewNilValue(),
 	})
 	got := ToValue(map[string]interface{}{
 		"value": nil,
@@ -381,8 +381,8 @@ func TestToValueConvertsNilInterfaceMap(t *testing.T) {
 type testStruct struct{}
 
 func TestToValueConvertsNilStructMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewNilValue(),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewNilValue(),
 	})
 	got := ToValue(map[string]*testStruct{
 		"value": nil,
@@ -393,8 +393,8 @@ func TestToValueConvertsNilStructMap(t *testing.T) {
 }
 
 func TestToValueConvertsNilMapMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewNilValue(),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewNilValue(),
 	})
 	got := ToValue(map[string]map[string]interface{}{
 		"value": nil,
@@ -405,8 +405,8 @@ func TestToValueConvertsNilMapMap(t *testing.T) {
 }
 
 func TestToValueConvertsNilSliceMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewNilValue(),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewNilValue(),
 	})
 	got := ToValue(map[string][]int{
 		"value": nil,
@@ -417,8 +417,8 @@ func TestToValueConvertsNilSliceMap(t *testing.T) {
 }
 
 func TestToValueConvertsBoolMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewBoolValue(true),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewBoolValue(true),
 	})
 	got := ToValue(map[string]bool{
 		"value": true,
@@ -429,8 +429,8 @@ func TestToValueConvertsBoolMap(t *testing.T) {
 }
 
 func TestToValueConvertsStringMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"value": vm.NewStringValue([]byte("hoge")),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewStringValue([]byte("hoge")),
 	})
 	got := ToValue(map[string]string{
 		"value": "hoge",
@@ -441,9 +441,9 @@ func TestToValueConvertsStringMap(t *testing.T) {
 }
 
 func TestToValueConvertsMapOfMap(t *testing.T) {
-	want := vm.NewObjectValue(map[string]*vm.Value{
-		"nested": vm.NewObjectValue(map[string]*vm.Value{
-			"value": vm.NewIntValue(123),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"nested": types.NewObjectValue(map[string]*types.Value{
+			"value": types.NewIntValue(123),
 		}),
 	})
 	got := ToValue(map[string]map[string]int{
@@ -457,8 +457,8 @@ func TestToValueConvertsMapOfMap(t *testing.T) {
 }
 
 func TestToValueConvertsIntArray(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewIntValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
 	})
 	got := ToValue([]int{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -467,8 +467,8 @@ func TestToValueConvertsIntArray(t *testing.T) {
 }
 
 func TestToValueConvertsInt8Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewIntValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
 	})
 	got := ToValue([]int8{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -477,8 +477,8 @@ func TestToValueConvertsInt8Slice(t *testing.T) {
 }
 
 func TestToValueConvertsInt16Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewIntValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
 	})
 	got := ToValue([]int16{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -487,8 +487,8 @@ func TestToValueConvertsInt16Slice(t *testing.T) {
 }
 
 func TestToValueConvertsInt32Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewIntValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
 	})
 	got := ToValue([]int32{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -497,8 +497,8 @@ func TestToValueConvertsInt32Slice(t *testing.T) {
 }
 
 func TestToValueConvertsInt64Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewIntValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
 	})
 	got := ToValue([]int64{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -507,8 +507,8 @@ func TestToValueConvertsInt64Slice(t *testing.T) {
 }
 
 func TestToValueConvertsUintSlice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewUintValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewUintValue(123),
 	})
 	got := ToValue([]uint{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -517,8 +517,8 @@ func TestToValueConvertsUintSlice(t *testing.T) {
 }
 
 func TestToValueConvertsUint8Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewUintValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewUintValue(123),
 	})
 	got := ToValue([]uint8{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -527,8 +527,8 @@ func TestToValueConvertsUint8Slice(t *testing.T) {
 }
 
 func TestToValueConvertsUint16Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewUintValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewUintValue(123),
 	})
 	got := ToValue([]uint16{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -537,8 +537,8 @@ func TestToValueConvertsUint16Slice(t *testing.T) {
 }
 
 func TestToValueConvertsUint32Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewUintValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewUintValue(123),
 	})
 	got := ToValue([]uint32{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -547,8 +547,8 @@ func TestToValueConvertsUint32Slice(t *testing.T) {
 }
 
 func TestToValueConvertsUint64Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewUintValue(123),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewUintValue(123),
 	})
 	got := ToValue([]uint64{123})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -557,11 +557,11 @@ func TestToValueConvertsUint64Slice(t *testing.T) {
 }
 
 func TestToValueConvertsFloat32Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewFloatValue(1.23e4),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewFloatValue(1.23e4),
 	})
 	got := ToValue([]float32{1.23e4})
-	if got.Kind != vm.KArray {
+	if got.Kind != types.Array {
 		t.Fatalf("expected Array but got %#v", got)
 	}
 
@@ -569,7 +569,7 @@ func TestToValueConvertsFloat32Slice(t *testing.T) {
 		t.Fatalf("length mismatch: %#v", got)
 	}
 	gotValue := got.Array[0]
-	if gotValue.Kind != vm.KFloat {
+	if gotValue.Kind != types.Float {
 		t.Fatalf("expected float but got: %#v", gotValue)
 	}
 	if !closeEnough(want.Array[0].Float, gotValue.Float) {
@@ -578,8 +578,8 @@ func TestToValueConvertsFloat32Slice(t *testing.T) {
 }
 
 func TestToValueConvertsFloat64Slice(t *testing.T) {
-	want := vm.NewArrayValue([]*vm.Value{
-		vm.NewFloatValue(1.23e45),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewFloatValue(1.23e45),
 	})
 	got := ToValue([]float64{1.23e45})
 	if diff := cmp.Diff(want, got); diff != "" {

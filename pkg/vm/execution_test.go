@@ -5,6 +5,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/genkami/watson/pkg/types"
 )
 
 func TestFeedInewPushesZero(t *testing.T) {
@@ -19,7 +21,7 @@ func TestFeedInewPushesZero(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewIntValue(0)
+	want := types.NewIntValue(0)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -46,7 +48,7 @@ func TestFeedIincIncrementsTheValue(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewIntValue(1)
+	want := types.NewIntValue(1)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -98,7 +100,7 @@ func TestFeedIshlShiftsTheTopBy1(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewIntValue(before * 2)
+	want := types.NewIntValue(before * 2)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -154,7 +156,7 @@ func TestFeedIaddAddsTwoIntegers(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewIntValue(3)
+	want := types.NewIntValue(3)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -240,7 +242,7 @@ func TestFeedInegNegatesTheTop(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewIntValue(-1)
+	want := types.NewIntValue(-1)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -296,7 +298,7 @@ func TestFeedIshtShiftsArg2ToLeftByArg1WhenArg1IsPositive(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewIntValue(0xabcd00)
+	want := types.NewIntValue(0xabcd00)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -328,7 +330,7 @@ func TestFeedIshtShiftsArg2ToRightByArg1WhenArg1IsNegative(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewIntValue(0xabcd)
+	want := types.NewIntValue(0xabcd)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -415,7 +417,7 @@ func TestFeedItofConvertsArg1ToFloat(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewFloatValue(1.234e-56)
+	want := types.NewFloatValue(1.234e-56)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -467,7 +469,7 @@ func TestFeedItouConvertsArg1ToUint(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewUintValue(0xffffffffffffffff)
+	want := types.NewUintValue(0xffffffffffffffff)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -515,7 +517,7 @@ func TestFeedFinfPushesPositiveInf(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewFloatValue(math.Inf(1))
+	want := types.NewFloatValue(math.Inf(1))
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -566,7 +568,7 @@ func TestFeedFnegNegatesArg1(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewFloatValue(-9.87456e78)
+	want := types.NewFloatValue(-9.87456e78)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -594,7 +596,7 @@ func TestFeedFnegCanNegateInf(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewFloatValue(math.Inf(-1))
+	want := types.NewFloatValue(math.Inf(-1))
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -641,7 +643,7 @@ func TestFeedSnewPushesEmptyString(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewStringValue([]byte{})
+	want := types.NewStringValue([]byte{})
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -673,7 +675,7 @@ func TestFeedSaddAddsACharToString(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewStringValue([]byte("hello!"))
+	want := types.NewStringValue([]byte("hello!"))
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -754,7 +756,7 @@ func TestFeedOnewPushesEmptyObject(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewObjectValue(map[string]*Value{})
+	want := types.NewObjectValue(map[string]*types.Value{})
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -769,8 +771,8 @@ func TestFeedOaddAddsAKeyValuePairToAnObject(t *testing.T) {
 	var err error
 	vm := NewVM()
 
-	err = vm.pushObject(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
+	err = vm.pushObject(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -792,9 +794,9 @@ func TestFeedOaddAddsAKeyValuePairToAnObject(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewObjectValue(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
-		"year":  NewIntValue(2021),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
+		"year":  types.NewIntValue(2021),
 	})
 	got, err := vm.Top()
 	if err != nil {
@@ -810,8 +812,8 @@ func TestFeedOaddAddsACopyOfAValue(t *testing.T) {
 	var err error
 	vm := NewVM()
 
-	err = vm.pushObject(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
+	err = vm.pushObject(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -820,9 +822,9 @@ func TestFeedOaddAddsACopyOfAValue(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	addedVal := map[string]*Value{
-		"name": NewStringValue([]byte("taro")),
-		"age":  NewIntValue(20),
+	addedVal := map[string]*types.Value{
+		"name": types.NewStringValue([]byte("taro")),
+		"age":  types.NewIntValue(20),
 	}
 	err = vm.pushObject(addedVal)
 	if err != nil {
@@ -837,11 +839,11 @@ func TestFeedOaddAddsACopyOfAValue(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewObjectValue(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
-		"user": NewObjectValue(map[string]*Value{
-			"name": NewStringValue([]byte("taro")),
-			"age":  NewIntValue(20),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
+		"user": types.NewObjectValue(map[string]*types.Value{
+			"name": types.NewStringValue([]byte("taro")),
+			"age":  types.NewIntValue(20),
 		}),
 	})
 	got, err := vm.Top()
@@ -853,7 +855,7 @@ func TestFeedOaddAddsACopyOfAValue(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 
-	got.Object["user"].Object["name"] = NewStringValue([]byte("jiro"))
+	got.Object["user"].Object["name"] = types.NewStringValue([]byte("jiro"))
 	if diff := cmp.Diff(addedVal, got.Object["user"].Object); diff == "" {
 		t.Errorf("the added value does not seem to be a clone of the value on the stack")
 	}
@@ -904,8 +906,8 @@ func TestFeedOaddFailsWhenArg2IsNotString(t *testing.T) {
 	var err error
 	vm := NewVM()
 
-	err = vm.pushObject(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
+	err = vm.pushObject(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -958,7 +960,7 @@ func TestFeedAnewPushesEmptyArray(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewArrayValue([]*Value{})
+	want := types.NewArrayValue([]*types.Value{})
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -973,7 +975,7 @@ func TestFeedAaddAppendsArg1ToArg2(t *testing.T) {
 	var err error
 	vm := NewVM()
 
-	err = vm.pushArray([]*Value{NewIntValue(123)})
+	err = vm.pushArray([]*types.Value{types.NewIntValue(123)})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -990,9 +992,9 @@ func TestFeedAaddAppendsArg1ToArg2(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewArrayValue([]*Value{
-		NewIntValue(123),
-		NewFloatValue(4.56),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewFloatValue(4.56),
 	})
 	got, err := vm.Top()
 	if err != nil {
@@ -1008,13 +1010,13 @@ func TestFeedAaddAppendsACopyOfAValue(t *testing.T) {
 	var err error
 	vm := NewVM()
 
-	err = vm.pushArray([]*Value{NewStringValue([]byte("hello"))})
+	err = vm.pushArray([]*types.Value{types.NewStringValue([]byte("hello"))})
 	if err != nil {
 		t.Fatal(err)
 	}
-	addedVal := map[string]*Value{
-		"name": NewStringValue([]byte("taro")),
-		"age":  NewIntValue(20),
+	addedVal := map[string]*types.Value{
+		"name": types.NewStringValue([]byte("taro")),
+		"age":  types.NewIntValue(20),
 	}
 	err = vm.pushObject(addedVal)
 	if err != nil {
@@ -1029,11 +1031,11 @@ func TestFeedAaddAppendsACopyOfAValue(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewArrayValue([]*Value{
-		NewStringValue([]byte("hello")),
-		NewObjectValue(map[string]*Value{
-			"name": NewStringValue([]byte("taro")),
-			"age":  NewIntValue(20),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewStringValue([]byte("hello")),
+		types.NewObjectValue(map[string]*types.Value{
+			"name": types.NewStringValue([]byte("taro")),
+			"age":  types.NewIntValue(20),
 		}),
 	})
 	got, err := vm.Top()
@@ -1045,7 +1047,7 @@ func TestFeedAaddAppendsACopyOfAValue(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 
-	got.Array[1].Object["name"] = NewStringValue([]byte("jiro"))
+	got.Array[1].Object["name"] = types.NewStringValue([]byte("jiro"))
 	if diff := cmp.Diff(addedVal, got.Array[1].Object); diff == "" {
 		t.Errorf("the added value does not seem to be a clone of the value on the stack")
 	}
@@ -1105,7 +1107,7 @@ func TestFeedBnewPushesFalse(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewBoolValue(false)
+	want := types.NewBoolValue(false)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -1133,7 +1135,7 @@ func TestFeedBnegNegatesTheTop(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewBoolValue(false)
+	want := types.NewBoolValue(false)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -1180,7 +1182,7 @@ func TestFeedNnewPushesNil(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewNilValue()
+	want := types.NewNilValue()
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -1208,7 +1210,7 @@ func TestGdupDuplicatesArg1(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewIntValue(123)
+	want := types.NewIntValue(123)
 	clone, err := vm.pop()
 	if err != nil {
 		t.Fatal(err)
@@ -1229,8 +1231,8 @@ func TestGdupPushesACopy(t *testing.T) {
 	var err error
 	vm := NewVM()
 
-	err = vm.pushObject(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
+	err = vm.pushObject(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -1244,8 +1246,8 @@ func TestGdupPushesACopy(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewObjectValue(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
 	})
 	clone, err := vm.pop()
 	if err != nil {
@@ -1262,7 +1264,7 @@ func TestGdupPushesACopy(t *testing.T) {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 
-	clone.Object["ebi"] = NewStringValue([]byte("shrimp"))
+	clone.Object["ebi"] = types.NewStringValue([]byte("shrimp"))
 	if diff := cmp.Diff(clone, orig); diff == "" {
 		t.Errorf("Gdup does not seem to copy arg1")
 	}
@@ -1299,7 +1301,7 @@ func TestFeedGpopPopsOnce(t *testing.T) {
 		t.Fatalf("stack pointer mismatch: expected %d, got %d", 0, vm.sp)
 	}
 
-	want := NewStringValue([]byte("first"))
+	want := types.NewStringValue([]byte("first"))
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)
@@ -1323,8 +1325,8 @@ func TestFeedGpopFailsWhenStackIsEmpty(t *testing.T) {
 func TestGswpSwapsArgs(t *testing.T) {
 	var err error
 	vm := NewVM()
-	a := NewIntValue(1)
-	b := NewStringValue([]byte("2"))
+	a := types.NewIntValue(1)
+	b := types.NewStringValue([]byte("2"))
 
 	err = vm.push(b)
 	if err != nil {
@@ -1404,7 +1406,7 @@ func TestFeedMultiExecutesOpsSequentially(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	want := NewIntValue(3)
+	want := types.NewIntValue(3)
 	got, err := vm.Top()
 	if err != nil {
 		t.Fatal(err)

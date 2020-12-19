@@ -8,6 +8,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/genkami/watson/pkg/lexer"
+	"github.com/genkami/watson/pkg/types"
 	"github.com/genkami/watson/pkg/vm"
 )
 
@@ -78,7 +79,7 @@ func prettify(orig []vm.Op) ([]vm.Op, error) {
 	return sw.Ops(), nil
 }
 
-func execute(ops []vm.Op) (*vm.Value, error) {
+func execute(ops []vm.Op) (*types.Value, error) {
 	v := vm.NewVM()
 	for _, op := range ops {
 		err := v.Feed(op)

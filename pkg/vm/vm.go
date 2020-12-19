@@ -3,7 +3,8 @@ package vm
 
 import (
 	"fmt"
-	"math"
+
+	"github.com/genkami/watson/pkg/types"
 )
 
 const (
@@ -12,7 +13,7 @@ const (
 
 // VM is a virtual machine that consists of a stack of values and a pointer to the top of the stack.
 type VM struct {
-	stack []*Value
+	stack []*types.Value
 	sp    int
 }
 
@@ -32,7 +33,7 @@ func (opt vmOption) apply(vm *VM) {
 func WithStackSize(size int) VMOption {
 	return vmOption(func(v *VM) {
 		if size > 0 {
-			v.stack = make([]*Value, size)
+			v.stack = make([]*types.Value, size)
 		}
 	})
 }
@@ -45,7 +46,7 @@ func NewVM(opts ...VMOption) *VM {
 		opt.apply(vm)
 	}
 	if len(vm.stack) == 0 {
-		vm.stack = make([]*Value, DefaultStackSize)
+		vm.stack = make([]*types.Value, DefaultStackSize)
 	}
 	return vm
 }
@@ -160,163 +161,3 @@ func (op Op) GoString() string {
 }
 
 var _ fmt.GoStringer = Op(0)
-
-// Kind is a type of Value.
-type Kind int
-
-const (
-	KInt    Kind = iota // 64-bit signed integer
-	KUint               // 64-bit unsigned integer
-	KFloat              // IEEE-754 64-bit floating-point number
-	KString             // string (represented as a byte array)
-	KObject             // object (set of key-value pairs)
-	KArray              // array
-	KBool               // bool
-	KNil                // nil
-
-	// This can only be used to iterate over all defined Kinds.
-	numKinds
-)
-
-func (k Kind) GoString() string {
-	switch k {
-	case KInt:
-		return "Int"
-	case KUint:
-		return "Uint"
-	case KFloat:
-		return "Float"
-	case KString:
-		return "String"
-	case KObject:
-		return "Object"
-	case KArray:
-		return "Array"
-	case KBool:
-		return "Bool"
-	case KNil:
-		return "Nil"
-	default:
-		panic(fmt.Errorf("invalid kind: %d", k))
-	}
-}
-
-var _ fmt.GoStringer = Kind(0)
-
-// Value is an element of the stack.
-type Value struct {
-	Kind   Kind
-	Int    int64
-	Uint   uint64
-	Float  float64
-	String []byte
-	Object map[string]*Value
-	Array  []*Value
-	Bool   bool
-}
-
-// NewIntValue creates a new Value that contains an integer.
-func NewIntValue(val int64) *Value {
-	return &Value{Kind: KInt, Int: val}
-}
-
-// NewUintValue creates a new Value that contains an unsigned integer.
-func NewUintValue(val uint64) *Value {
-	return &Value{Kind: KUint, Uint: val}
-}
-
-// NewFloatValue creates a new Value that contains a floating point number.
-func NewFloatValue(val float64) *Value {
-	return &Value{Kind: KFloat, Float: val}
-}
-
-// NewStringValue creates a new Value that contains a string.
-func NewStringValue(val []byte) *Value {
-	return &Value{Kind: KString, String: val}
-}
-
-// NewObjectValue creates a new Value that contains an object.
-func NewObjectValue(val map[string]*Value) *Value {
-	return &Value{Kind: KObject, Object: val}
-}
-
-// NewArrayValue creates a new value that contains an array.
-func NewArrayValue(val []*Value) *Value {
-	return &Value{Kind: KArray, Array: val}
-}
-
-// NewBoolValue creates a new Value that contains a bool.
-func NewBoolValue(val bool) *Value {
-	return &Value{Kind: KBool, Bool: val}
-}
-
-// NewNilValue creates a new Value that contains nil.
-func NewNilValue() *Value {
-	return &Value{Kind: KNil}
-}
-
-// IsNaN returns true if v is a NaN; otherwise it returns false.
-func (v *Value) IsNaN() bool {
-	return v.Kind == KFloat && math.IsNaN(v.Float)
-}
-
-func (v *Value) DeepCopy() *Value {
-	clone := &Value{Kind: v.Kind}
-	switch v.Kind {
-	case KInt:
-		clone.Int = v.Int
-	case KUint:
-		clone.Uint = v.Uint
-	case KFloat:
-		clone.Float = v.Float
-	case KString:
-		clone.String = make([]byte, len(v.String))
-		copy(clone.String, v.String)
-	case KObject:
-		clone.Object = map[string]*Value{}
-		for k, v := range v.Object {
-			clone.Object[k] = v.DeepCopy()
-		}
-	case KArray:
-		clone.Array = make([]*Value, 0, len(v.Array))
-		for _, v := range v.Array {
-			clone.Array = append(clone.Array, v.DeepCopy())
-		}
-	case KBool:
-		clone.Bool = v.Bool
-	case KNil:
-		// nop
-	default:
-		panic(fmt.Errorf("unknown kind: %d", v.Kind))
-	}
-	return clone
-}
-
-func (v *Value) GoString() string {
-	return fmt.Sprintf("{Kind: %#v, Value: %s}", v.Kind, v.goStringValue())
-}
-
-func (v *Value) goStringValue() string {
-	switch v.Kind {
-	case KInt:
-		return fmt.Sprintf("%d", v.Int)
-	case KUint:
-		return fmt.Sprintf("%d", v.Uint)
-	case KFloat:
-		return fmt.Sprintf("%f", v.Float)
-	case KString:
-		return fmt.Sprintf("%#v", v.String)
-	case KObject:
-		return fmt.Sprintf("%#v", v.Object)
-	case KArray:
-		return fmt.Sprintf("%#v", v.Array)
-	case KBool:
-		return fmt.Sprintf("%t", v.Bool)
-	case KNil:
-		return "nil"
-	default:
-		panic(fmt.Errorf("invalid kind: %d", v.Kind))
-	}
-}
-
-var _ fmt.GoStringer = &Value{}

@@ -8,12 +8,13 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/genkami/watson/pkg/lexer"
+	"github.com/genkami/watson/pkg/types"
 	"github.com/genkami/watson/pkg/vm"
 )
 
 func TestDumpInt(t *testing.T) {
 	test := func(n int64) {
-		orig := vm.NewIntValue(n)
+		orig := types.NewIntValue(n)
 		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
@@ -32,7 +33,7 @@ func TestDumpInt(t *testing.T) {
 
 func TestDumpUint(t *testing.T) {
 	test := func(n uint64) {
-		orig := vm.NewUintValue(n)
+		orig := types.NewUintValue(n)
 		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
@@ -51,7 +52,7 @@ func TestDumpUint(t *testing.T) {
 
 func TestDumpFloat(t *testing.T) {
 	test := func(n float64) {
-		orig := vm.NewFloatValue(n)
+		orig := types.NewFloatValue(n)
 		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
@@ -81,7 +82,7 @@ func TestDumpFloat(t *testing.T) {
 
 func TestDumpString(t *testing.T) {
 	test := func(s string) {
-		orig := vm.NewStringValue([]byte(s))
+		orig := types.NewStringValue([]byte(s))
 		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
@@ -96,8 +97,8 @@ func TestDumpString(t *testing.T) {
 }
 
 func TestDumpObject(t *testing.T) {
-	test := func(v map[string]*vm.Value) {
-		orig := vm.NewObjectValue(v)
+	test := func(v map[string]*types.Value) {
+		orig := types.NewObjectValue(v)
 		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
@@ -106,21 +107,21 @@ func TestDumpObject(t *testing.T) {
 			t.Errorf("mismatch (-want +got):\n%s", diff)
 		}
 	}
-	test(map[string]*vm.Value{})
-	test(map[string]*vm.Value{
-		"hoge": vm.NewStringValue([]byte("fuga")),
+	test(map[string]*types.Value{})
+	test(map[string]*types.Value{
+		"hoge": types.NewStringValue([]byte("fuga")),
 	})
-	test(map[string]*vm.Value{
-		"hoge": vm.NewStringValue([]byte("fuga")),
-		"fuga": vm.NewObjectValue(map[string]*vm.Value{
-			"foo": vm.NewIntValue(0xdeadbeef),
+	test(map[string]*types.Value{
+		"hoge": types.NewStringValue([]byte("fuga")),
+		"fuga": types.NewObjectValue(map[string]*types.Value{
+			"foo": types.NewIntValue(0xdeadbeef),
 		}),
 	})
 }
 
 func TestDumpArray(t *testing.T) {
-	test := func(arr []*vm.Value) {
-		orig := vm.NewArrayValue(arr)
+	test := func(arr []*types.Value) {
+		orig := types.NewArrayValue(arr)
 		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
@@ -129,14 +130,14 @@ func TestDumpArray(t *testing.T) {
 			t.Errorf("mismatch (-want +got):\n%s", diff)
 		}
 	}
-	test([]*vm.Value{})
-	test([]*vm.Value{vm.NewIntValue(1)})
-	test([]*vm.Value{vm.NewIntValue(1), vm.NewStringValue([]byte("hoge"))})
+	test([]*types.Value{})
+	test([]*types.Value{types.NewIntValue(1)})
+	test([]*types.Value{types.NewIntValue(1), types.NewStringValue([]byte("hoge"))})
 }
 
 func TestDumpBool(t *testing.T) {
 	test := func(b bool) {
-		orig := vm.NewBoolValue(b)
+		orig := types.NewBoolValue(b)
 		converted, err := encodeThenExecute(orig)
 		if err != nil {
 			t.Fatal(err)
@@ -150,7 +151,7 @@ func TestDumpBool(t *testing.T) {
 }
 
 func TestDumpNil(t *testing.T) {
-	orig := vm.NewNilValue()
+	orig := types.NewNilValue()
 	converted, err := encodeThenExecute(orig)
 	if err != nil {
 		t.Fatal(err)
@@ -160,7 +161,7 @@ func TestDumpNil(t *testing.T) {
 	}
 }
 
-func encodeThenExecute(val *vm.Value) (*vm.Value, error) {
+func encodeThenExecute(val *types.Value) (*types.Value, error) {
 	w := lexer.NewSliceWriter()
 	d := NewDumper(w)
 	err := d.Dump(val)
