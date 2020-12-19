@@ -1,4 +1,4 @@
-package types
+package types_test
 
 import (
 	"math"
@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+
+	"github.com/genkami/watson/pkg/types"
 )
 
 type untagged struct {
@@ -35,8 +37,8 @@ type tagged struct {
 }
 
 func TestToValueConvertsNilInterface(t *testing.T) {
-	want := NewNilValue()
-	got := ToValue(nil)
+	want := types.NewNilValue()
+	got := types.ToValue(nil)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
@@ -44,8 +46,8 @@ func TestToValueConvertsNilInterface(t *testing.T) {
 
 func TestToValueConvertsNilPointer(t *testing.T) {
 	var p *int = nil
-	want := NewNilValue()
-	got := ToValue(p)
+	want := types.NewNilValue()
+	got := types.ToValue(p)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
@@ -53,8 +55,8 @@ func TestToValueConvertsNilPointer(t *testing.T) {
 
 func TestToValueConvertsNilSlice(t *testing.T) {
 	var p []int = nil
-	want := NewNilValue()
-	got := ToValue(p)
+	want := types.NewNilValue()
+	got := types.ToValue(p)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
@@ -62,121 +64,121 @@ func TestToValueConvertsNilSlice(t *testing.T) {
 
 func TestToValueConvertsNilMap(t *testing.T) {
 	var p map[string]interface{} = nil
-	want := NewNilValue()
-	got := ToValue(p)
+	want := types.NewNilValue()
+	got := types.ToValue(p)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsTrue(t *testing.T) {
-	want := NewBoolValue(true)
-	got := ToValue(true)
+	want := types.NewBoolValue(true)
+	got := types.ToValue(true)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsFalse(t *testing.T) {
-	want := NewBoolValue(false)
-	got := ToValue(false)
+	want := types.NewBoolValue(false)
+	got := types.ToValue(false)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsInt(t *testing.T) {
-	want := NewIntValue(-12345678)
-	got := ToValue(int(-12345678))
+	want := types.NewIntValue(-12345678)
+	got := types.ToValue(int(-12345678))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsInt8(t *testing.T) {
-	want := NewIntValue(64)
-	got := ToValue(int8(64))
+	want := types.NewIntValue(64)
+	got := types.ToValue(int8(64))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsInt16(t *testing.T) {
-	want := NewIntValue(256)
-	got := ToValue(int16(256))
+	want := types.NewIntValue(256)
+	got := types.ToValue(int16(256))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsInt32(t *testing.T) {
-	want := NewIntValue(65536)
-	got := ToValue(int32(65536))
+	want := types.NewIntValue(65536)
+	got := types.ToValue(int32(65536))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsInt64(t *testing.T) {
-	want := NewIntValue(1234567)
-	got := ToValue(int64(1234567))
+	want := types.NewIntValue(1234567)
+	got := types.ToValue(int64(1234567))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsUint(t *testing.T) {
-	want := NewUintValue(12345)
-	got := ToValue(uint(12345))
+	want := types.NewUintValue(12345)
+	got := types.ToValue(uint(12345))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsUint8(t *testing.T) {
-	want := NewUintValue(255)
-	got := ToValue(uint8(255))
+	want := types.NewUintValue(255)
+	got := types.ToValue(uint8(255))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsUint16(t *testing.T) {
-	want := NewUintValue(12345)
-	got := ToValue(uint16(12345))
+	want := types.NewUintValue(12345)
+	got := types.ToValue(uint16(12345))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsUint32(t *testing.T) {
-	want := NewUintValue(12345)
-	got := ToValue(uint32(12345))
+	want := types.NewUintValue(12345)
+	got := types.ToValue(uint32(12345))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsUint64(t *testing.T) {
-	want := NewUintValue(12345)
-	got := ToValue(uint64(12345))
+	want := types.NewUintValue(12345)
+	got := types.ToValue(uint64(12345))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsString(t *testing.T) {
-	want := NewStringValue([]byte("hogefuga"))
-	got := ToValue("hogefuga")
+	want := types.NewStringValue([]byte("hogefuga"))
+	got := types.ToValue("hogefuga")
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsFloat32(t *testing.T) {
-	want := NewFloatValue(1.2345e-6)
-	got := ToValue(float32(1.2345e-6))
-	if got.Kind != Float {
+	want := types.NewFloatValue(1.2345e-6)
+	got := types.ToValue(float32(1.2345e-6))
+	if got.Kind != types.Float {
 		t.Fatalf("expected Float but got %#v", got)
 	}
 	if !closeEnough(want.Float, got.Float) {
@@ -185,35 +187,35 @@ func TestToValueConvertsFloat32(t *testing.T) {
 }
 
 func TestToValueConvertsFloat64(t *testing.T) {
-	want := NewFloatValue(1.2345e-6)
-	got := ToValue(float64(1.2345e-6))
+	want := types.NewFloatValue(1.2345e-6)
+	got := types.ToValue(float64(1.2345e-6))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsMap(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
 	})
-	got := ToValue(map[string]string{"hello": "world"})
+	got := types.ToValue(map[string]string{"hello": "world"})
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsHeteroMap(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"int": NewIntValue(-123),
-		"str": NewStringValue([]byte("hoge")),
-		"object": NewObjectValue(map[string]*Value{
-			"nested": NewBoolValue(true),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"int": types.NewIntValue(-123),
+		"str": types.NewStringValue([]byte("hoge")),
+		"object": types.NewObjectValue(map[string]*types.Value{
+			"nested": types.NewBoolValue(true),
 		}),
-		"array": NewArrayValue([]*Value{
-			NewStringValue([]byte("nested")),
+		"array": types.NewArrayValue([]*types.Value{
+			types.NewStringValue([]byte("nested")),
 		}),
 	})
-	got := ToValue(map[string]interface{}{
+	got := types.ToValue(map[string]interface{}{
 		"int": int(-123),
 		"str": "hoge",
 		"object": map[string]bool{
@@ -227,26 +229,26 @@ func TestToValueConvertsHeteroMap(t *testing.T) {
 }
 
 func TestToValueConvertsSlice(t *testing.T) {
-	want := NewArrayValue([]*Value{
-		NewIntValue(123), NewIntValue(456), NewIntValue(789),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123), types.NewIntValue(456), types.NewIntValue(789),
 	})
-	got := ToValue([]int{123, 456, 789})
+	got := types.ToValue([]int{123, 456, 789})
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsHeteroSlice(t *testing.T) {
-	want := NewArrayValue([]*Value{
-		NewIntValue(123),
-		NewStringValue([]byte("hoge")),
-		NewBoolValue(false),
-		NewObjectValue(map[string]*Value{
-			"fuga": NewStringValue([]byte("foo")),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewStringValue([]byte("hoge")),
+		types.NewBoolValue(false),
+		types.NewObjectValue(map[string]*types.Value{
+			"fuga": types.NewStringValue([]byte("foo")),
 		}),
-		NewArrayValue([]*Value{NewStringValue([]byte("bar"))}),
+		types.NewArrayValue([]*types.Value{types.NewStringValue([]byte("bar"))}),
 	})
-	got := ToValue([]interface{}{
+	got := types.ToValue([]interface{}{
 		int(123),
 		"hoge",
 		false,
@@ -261,26 +263,26 @@ func TestToValueConvertsHeteroSlice(t *testing.T) {
 }
 
 func TestToValueConvertsArray(t *testing.T) {
-	want := NewArrayValue([]*Value{
-		NewIntValue(123), NewIntValue(456), NewIntValue(789),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123), types.NewIntValue(456), types.NewIntValue(789),
 	})
-	got := ToValue([3]int{123, 456, 789})
+	got := types.ToValue([3]int{123, 456, 789})
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsHeteroArray(t *testing.T) {
-	want := NewArrayValue([]*Value{
-		NewIntValue(123),
-		NewStringValue([]byte("hoge")),
-		NewBoolValue(false),
-		NewObjectValue(map[string]*Value{
-			"fuga": NewStringValue([]byte("foo")),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewStringValue([]byte("hoge")),
+		types.NewBoolValue(false),
+		types.NewObjectValue(map[string]*types.Value{
+			"fuga": types.NewStringValue([]byte("foo")),
 		}),
-		NewArrayValue([]*Value{NewStringValue([]byte("bar"))}),
+		types.NewArrayValue([]*types.Value{types.NewStringValue([]byte("bar"))}),
 	})
-	got := ToValue([5]interface{}{
+	got := types.ToValue([5]interface{}{
 		int(123),
 		"hoge",
 		false,
@@ -296,19 +298,19 @@ func TestToValueConvertsHeteroArray(t *testing.T) {
 
 func TestToValueConvertsPtr(t *testing.T) {
 	var i int = 123
-	want := NewIntValue(123)
-	got := ToValue(&i)
+	want := types.NewIntValue(123)
+	got := types.ToValue(&i)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsUntaggedStruct(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"name":     NewStringValue([]byte("hoge")),
-		"longname": NewStringValue([]byte("longhoge")),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"name":     types.NewStringValue([]byte("hoge")),
+		"longname": types.NewStringValue([]byte("longhoge")),
 	})
-	got := ToValue(&untagged{
+	got := types.ToValue(&untagged{
 		Name:     "hoge",
 		LongName: "longhoge",
 	})
@@ -318,12 +320,12 @@ func TestToValueConvertsUntaggedStruct(t *testing.T) {
 }
 
 func TestToValueConvertsNestedStruct(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"value": NewObjectValue(map[string]*Value{
-			"value": NewIntValue(123),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewObjectValue(map[string]*types.Value{
+			"value": types.NewIntValue(123),
 		}),
 	})
-	got := ToValue(&nested{
+	got := types.ToValue(&nested{
 		value: &nestedInner{
 			value: 123,
 		},
@@ -334,27 +336,27 @@ func TestToValueConvertsNestedStruct(t *testing.T) {
 }
 
 func TestToValueConvertsEmbeddedStruct(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"field": NewIntValue(123),
-		"embeddedinner": NewObjectValue(map[string]*Value{
-			"anotherfield": NewIntValue(456),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"field": types.NewIntValue(123),
+		"embeddedinner": types.NewObjectValue(map[string]*types.Value{
+			"anotherfield": types.NewIntValue(456),
 		}),
 	})
 	value := &embedded{
 		field: 123,
 	}
 	value.anotherField = 456
-	got := ToValue(value)
+	got := types.ToValue(value)
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueConvertsTaggedStruct(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"customName": NewIntValue(123),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"customName": types.NewIntValue(123),
 	})
-	got := ToValue(&tagged{
+	got := types.ToValue(&tagged{
 		Field: 123,
 	})
 	if diff := cmp.Diff(want, got); diff != "" {
@@ -364,8 +366,8 @@ func TestToValueConvertsTaggedStruct(t *testing.T) {
 
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
-	want := NewNilValue()
-	got := ToValueByReflection(reflect.ValueOf(p))
+	want := types.NewNilValue()
+	got := types.ToValueByReflection(reflect.ValueOf(p))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
@@ -373,8 +375,8 @@ func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 
 func TestToValueByReflectionConvertsNilSlice(t *testing.T) {
 	var p []int = nil
-	want := NewNilValue()
-	got := ToValueByReflection(reflect.ValueOf(p))
+	want := types.NewNilValue()
+	got := types.ToValueByReflection(reflect.ValueOf(p))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
@@ -382,121 +384,121 @@ func TestToValueByReflectionConvertsNilSlice(t *testing.T) {
 
 func TestToValueByReflectionConvertsNilMap(t *testing.T) {
 	var p map[string]interface{} = nil
-	want := NewNilValue()
-	got := ToValueByReflection(reflect.ValueOf(p))
+	want := types.NewNilValue()
+	got := types.ToValueByReflection(reflect.ValueOf(p))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsTrue(t *testing.T) {
-	want := NewBoolValue(true)
-	got := ToValueByReflection(reflect.ValueOf(true))
+	want := types.NewBoolValue(true)
+	got := types.ToValueByReflection(reflect.ValueOf(true))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsFalse(t *testing.T) {
-	want := NewBoolValue(false)
-	got := ToValueByReflection(reflect.ValueOf(false))
+	want := types.NewBoolValue(false)
+	got := types.ToValueByReflection(reflect.ValueOf(false))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsInt(t *testing.T) {
-	want := NewIntValue(-12345678)
-	got := ToValueByReflection(reflect.ValueOf(int(-12345678)))
+	want := types.NewIntValue(-12345678)
+	got := types.ToValueByReflection(reflect.ValueOf(int(-12345678)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsInt8(t *testing.T) {
-	want := NewIntValue(64)
-	got := ToValueByReflection(reflect.ValueOf(int8(64)))
+	want := types.NewIntValue(64)
+	got := types.ToValueByReflection(reflect.ValueOf(int8(64)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsInt16(t *testing.T) {
-	want := NewIntValue(256)
-	got := ToValueByReflection(reflect.ValueOf(int16(256)))
+	want := types.NewIntValue(256)
+	got := types.ToValueByReflection(reflect.ValueOf(int16(256)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsInt32(t *testing.T) {
-	want := NewIntValue(65536)
-	got := ToValueByReflection(reflect.ValueOf(int32(65536)))
+	want := types.NewIntValue(65536)
+	got := types.ToValueByReflection(reflect.ValueOf(int32(65536)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsInt64(t *testing.T) {
-	want := NewIntValue(1234567)
-	got := ToValueByReflection(reflect.ValueOf(int64(1234567)))
+	want := types.NewIntValue(1234567)
+	got := types.ToValueByReflection(reflect.ValueOf(int64(1234567)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsUint(t *testing.T) {
-	want := NewUintValue(12345)
-	got := ToValueByReflection(reflect.ValueOf(uint(12345)))
+	want := types.NewUintValue(12345)
+	got := types.ToValueByReflection(reflect.ValueOf(uint(12345)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsUint8(t *testing.T) {
-	want := NewUintValue(255)
-	got := ToValueByReflection(reflect.ValueOf(uint8(255)))
+	want := types.NewUintValue(255)
+	got := types.ToValueByReflection(reflect.ValueOf(uint8(255)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsUint16(t *testing.T) {
-	want := NewUintValue(12345)
-	got := ToValueByReflection(reflect.ValueOf(uint16(12345)))
+	want := types.NewUintValue(12345)
+	got := types.ToValueByReflection(reflect.ValueOf(uint16(12345)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsUint32(t *testing.T) {
-	want := NewUintValue(12345)
-	got := ToValueByReflection(reflect.ValueOf(uint32(12345)))
+	want := types.NewUintValue(12345)
+	got := types.ToValueByReflection(reflect.ValueOf(uint32(12345)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsUint64(t *testing.T) {
-	want := NewUintValue(12345)
-	got := ToValueByReflection(reflect.ValueOf(uint64(12345)))
+	want := types.NewUintValue(12345)
+	got := types.ToValueByReflection(reflect.ValueOf(uint64(12345)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsString(t *testing.T) {
-	want := NewStringValue([]byte("hogefuga"))
-	got := ToValueByReflection(reflect.ValueOf("hogefuga"))
+	want := types.NewStringValue([]byte("hogefuga"))
+	got := types.ToValueByReflection(reflect.ValueOf("hogefuga"))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsFloat32(t *testing.T) {
-	want := NewFloatValue(1.2345e-6)
-	got := ToValueByReflection(reflect.ValueOf(float32(1.2345e-6)))
-	if got.Kind != Float {
+	want := types.NewFloatValue(1.2345e-6)
+	got := types.ToValueByReflection(reflect.ValueOf(float32(1.2345e-6)))
+	if got.Kind != types.Float {
 		t.Fatalf("expected Float but got %#v", got)
 	}
 	if !closeEnough(want.Float, got.Float) {
@@ -505,35 +507,35 @@ func TestToValueByReflectionConvertsFloat32(t *testing.T) {
 }
 
 func TestToValueByReflectionConvertsFloat64(t *testing.T) {
-	want := NewFloatValue(1.2345e-6)
-	got := ToValueByReflection(reflect.ValueOf(float64(1.2345e-6)))
+	want := types.NewFloatValue(1.2345e-6)
+	got := types.ToValueByReflection(reflect.ValueOf(float64(1.2345e-6)))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsMap(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"hello": NewStringValue([]byte("world")),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
 	})
-	got := ToValueByReflection(reflect.ValueOf(map[string]string{"hello": "world"}))
+	got := types.ToValueByReflection(reflect.ValueOf(map[string]string{"hello": "world"}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsHeteroMap(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"int": NewIntValue(-123),
-		"str": NewStringValue([]byte("hoge")),
-		"object": NewObjectValue(map[string]*Value{
-			"nested": NewBoolValue(true),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"int": types.NewIntValue(-123),
+		"str": types.NewStringValue([]byte("hoge")),
+		"object": types.NewObjectValue(map[string]*types.Value{
+			"nested": types.NewBoolValue(true),
 		}),
-		"array": NewArrayValue([]*Value{
-			NewStringValue([]byte("nested")),
+		"array": types.NewArrayValue([]*types.Value{
+			types.NewStringValue([]byte("nested")),
 		}),
 	})
-	got := ToValueByReflection(reflect.ValueOf(map[string]interface{}{
+	got := types.ToValueByReflection(reflect.ValueOf(map[string]interface{}{
 		"int": int(-123),
 		"str": "hoge",
 		"object": map[string]bool{
@@ -547,26 +549,26 @@ func TestToValueByReflectionConvertsHeteroMap(t *testing.T) {
 }
 
 func TestToValueByReflectionConvertsSlice(t *testing.T) {
-	want := NewArrayValue([]*Value{
-		NewIntValue(123), NewIntValue(456), NewIntValue(789),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123), types.NewIntValue(456), types.NewIntValue(789),
 	})
-	got := ToValueByReflection(reflect.ValueOf([]int{123, 456, 789}))
+	got := types.ToValueByReflection(reflect.ValueOf([]int{123, 456, 789}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsHeteroSlice(t *testing.T) {
-	want := NewArrayValue([]*Value{
-		NewIntValue(123),
-		NewStringValue([]byte("hoge")),
-		NewBoolValue(false),
-		NewObjectValue(map[string]*Value{
-			"fuga": NewStringValue([]byte("foo")),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewStringValue([]byte("hoge")),
+		types.NewBoolValue(false),
+		types.NewObjectValue(map[string]*types.Value{
+			"fuga": types.NewStringValue([]byte("foo")),
 		}),
-		NewArrayValue([]*Value{NewStringValue([]byte("bar"))}),
+		types.NewArrayValue([]*types.Value{types.NewStringValue([]byte("bar"))}),
 	})
-	got := ToValueByReflection(reflect.ValueOf([]interface{}{
+	got := types.ToValueByReflection(reflect.ValueOf([]interface{}{
 		int(123),
 		"hoge",
 		false,
@@ -581,26 +583,26 @@ func TestToValueByReflectionConvertsHeteroSlice(t *testing.T) {
 }
 
 func TestToValueByReflectionConvertsArray(t *testing.T) {
-	want := NewArrayValue([]*Value{
-		NewIntValue(123), NewIntValue(456), NewIntValue(789),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123), types.NewIntValue(456), types.NewIntValue(789),
 	})
-	got := ToValueByReflection(reflect.ValueOf([3]int{123, 456, 789}))
+	got := types.ToValueByReflection(reflect.ValueOf([3]int{123, 456, 789}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsHeteroArray(t *testing.T) {
-	want := NewArrayValue([]*Value{
-		NewIntValue(123),
-		NewStringValue([]byte("hoge")),
-		NewBoolValue(false),
-		NewObjectValue(map[string]*Value{
-			"fuga": NewStringValue([]byte("foo")),
+	want := types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewStringValue([]byte("hoge")),
+		types.NewBoolValue(false),
+		types.NewObjectValue(map[string]*types.Value{
+			"fuga": types.NewStringValue([]byte("foo")),
 		}),
-		NewArrayValue([]*Value{NewStringValue([]byte("bar"))}),
+		types.NewArrayValue([]*types.Value{types.NewStringValue([]byte("bar"))}),
 	})
-	got := ToValueByReflection(reflect.ValueOf([5]interface{}{
+	got := types.ToValueByReflection(reflect.ValueOf([5]interface{}{
 		int(123),
 		"hoge",
 		false,
@@ -616,19 +618,19 @@ func TestToValueByReflectionConvertsHeteroArray(t *testing.T) {
 
 func TestToValueByReflectionConvertsPtr(t *testing.T) {
 	var i int = 123
-	want := NewIntValue(123)
-	got := ToValueByReflection(reflect.ValueOf(&i))
+	want := types.NewIntValue(123)
+	got := types.ToValueByReflection(reflect.ValueOf(&i))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsUntaggedStruct(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"name":     NewStringValue([]byte("hoge")),
-		"longname": NewStringValue([]byte("longhoge")),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"name":     types.NewStringValue([]byte("hoge")),
+		"longname": types.NewStringValue([]byte("longhoge")),
 	})
-	got := ToValueByReflection(reflect.ValueOf(&untagged{
+	got := types.ToValueByReflection(reflect.ValueOf(&untagged{
 		Name:     "hoge",
 		LongName: "longhoge",
 	}))
@@ -638,12 +640,12 @@ func TestToValueByReflectionConvertsUntaggedStruct(t *testing.T) {
 }
 
 func TestToValueByReflectionConvertsNestedStruct(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"value": NewObjectValue(map[string]*Value{
-			"value": NewIntValue(123),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewObjectValue(map[string]*types.Value{
+			"value": types.NewIntValue(123),
 		}),
 	})
-	got := ToValueByReflection(reflect.ValueOf(&nested{
+	got := types.ToValueByReflection(reflect.ValueOf(&nested{
 		value: &nestedInner{
 			value: 123,
 		},
@@ -654,27 +656,27 @@ func TestToValueByReflectionConvertsNestedStruct(t *testing.T) {
 }
 
 func TestToValueByReflectionConvertsEmbeddedStruct(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"field": NewIntValue(123),
-		"embeddedinner": NewObjectValue(map[string]*Value{
-			"anotherfield": NewIntValue(456),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"field": types.NewIntValue(123),
+		"embeddedinner": types.NewObjectValue(map[string]*types.Value{
+			"anotherfield": types.NewIntValue(456),
 		}),
 	})
 	value := &embedded{
 		field: 123,
 	}
 	value.anotherField = 456
-	got := ToValueByReflection(reflect.ValueOf(value))
+	got := types.ToValueByReflection(reflect.ValueOf(value))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}
 }
 
 func TestToValueByReflectionConvertsTaggedStruct(t *testing.T) {
-	want := NewObjectValue(map[string]*Value{
-		"customName": NewIntValue(123),
+	want := types.NewObjectValue(map[string]*types.Value{
+		"customName": types.NewIntValue(123),
 	})
-	got := ToValueByReflection(reflect.ValueOf(&tagged{
+	got := types.ToValueByReflection(reflect.ValueOf(&tagged{
 		Field: 123,
 	}))
 	if diff := cmp.Diff(want, got); diff != "" {
