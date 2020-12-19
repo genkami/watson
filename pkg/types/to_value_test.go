@@ -234,6 +234,40 @@ func TestToValueConvertsHeteroSlice(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsArray(t *testing.T) {
+	want := NewArrayValue([]*Value{
+		NewIntValue(123), NewIntValue(456), NewIntValue(789),
+	})
+	got := ToValue([3]int{123, 456, 789})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueConvertsHeteroArray(t *testing.T) {
+	want := NewArrayValue([]*Value{
+		NewIntValue(123),
+		NewStringValue([]byte("hoge")),
+		NewBoolValue(false),
+		NewObjectValue(map[string]*Value{
+			"fuga": NewStringValue([]byte("foo")),
+		}),
+		NewArrayValue([]*Value{NewStringValue([]byte("bar"))}),
+	})
+	got := ToValue([5]interface{}{
+		int(123),
+		"hoge",
+		false,
+		map[string]interface{}{
+			"fuga": "foo",
+		},
+		[]string{"bar"},
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := NewNilValue()
@@ -439,6 +473,40 @@ func TestToValueByReflectionConvertsHeteroSlice(t *testing.T) {
 		NewArrayValue([]*Value{NewStringValue([]byte("bar"))}),
 	})
 	got := ToValueByReflection(reflect.ValueOf([]interface{}{
+		int(123),
+		"hoge",
+		false,
+		map[string]interface{}{
+			"fuga": "foo",
+		},
+		[]string{"bar"},
+	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionConvertsArray(t *testing.T) {
+	want := NewArrayValue([]*Value{
+		NewIntValue(123), NewIntValue(456), NewIntValue(789),
+	})
+	got := ToValueByReflection(reflect.ValueOf([3]int{123, 456, 789}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionConvertsHeteroArray(t *testing.T) {
+	want := NewArrayValue([]*Value{
+		NewIntValue(123),
+		NewStringValue([]byte("hoge")),
+		NewBoolValue(false),
+		NewObjectValue(map[string]*Value{
+			"fuga": NewStringValue([]byte("foo")),
+		}),
+		NewArrayValue([]*Value{NewStringValue([]byte("bar"))}),
+	})
+	got := ToValueByReflection(reflect.ValueOf([5]interface{}{
 		int(123),
 		"hoge",
 		false,

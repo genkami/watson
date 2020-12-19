@@ -54,14 +54,16 @@ func ToValueByReflection(v reflect.Value) *Value {
 		return reflectBoolToValue(v)
 	} else if isString(v) {
 		return reflectStringToValue(v)
-	} else if v.IsNil() {
+	} else if isArray(v) {
+		return reflectSliceOrArrayToValue(v)
+	} else if isNil(v) {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
 		return NewNilValue()
 		// Maps, slices, and structs should be placed after nil so as to convert nil into Nil correctly.
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
 	} else if isSlice(v) {
-		return reflectSliceToValue(v)
+		return reflectSliceOrArrayToValue(v)
 	}
 
 	panic(fmt.Errorf("can't convert %s to *Value", v.Type().String()))
@@ -102,7 +104,7 @@ func reflectMapToValue(v reflect.Value) *Value {
 	return NewObjectValue(obj)
 }
 
-func reflectSliceToValue(v reflect.Value) *Value {
+func reflectSliceOrArrayToValue(v reflect.Value) *Value {
 	arr := []*Value{}
 	size := v.Len()
 	for i := 0; i < size; i++ {
@@ -151,6 +153,15 @@ func isString(v reflect.Value) bool {
 	return v.Type().Kind() == reflect.String
 }
 
+func isNil(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
+		return v.IsNil()
+	default:
+		return false
+	}
+}
+
 func isMapConvertibleToValue(v reflect.Value) bool {
 	t := v.Type()
 	return t.Kind() == reflect.Map && t.Key().Kind() == reflect.String
@@ -158,4 +169,8 @@ func isMapConvertibleToValue(v reflect.Value) bool {
 
 func isSlice(v reflect.Value) bool {
 	return v.Type().Kind() == reflect.Slice
+}
+
+func isArray(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Array
 }
