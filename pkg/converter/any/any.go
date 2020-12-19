@@ -145,7 +145,11 @@ func reflectMapToValue(v reflect.Value) *vm.Value {
 	for iter.Next() {
 		k := iter.Key().String()
 		v := iter.Value()
-		obj[k] = reflectValueToValue(v)
+		if v.CanInterface() {
+			obj[k] = ToValue(v.Interface())
+		} else {
+			obj[k] = reflectValueToValue(v)
+		}
 	}
 	return vm.NewObjectValue(obj)
 }
