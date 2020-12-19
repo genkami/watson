@@ -268,6 +268,15 @@ func TestToValueConvertsHeteroArray(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsPtr(t *testing.T) {
+	var i int = 123
+	want := NewIntValue(123)
+	got := ToValue(&i)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := NewNilValue()
@@ -515,6 +524,15 @@ func TestToValueByReflectionConvertsHeteroArray(t *testing.T) {
 		},
 		[]string{"bar"},
 	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionConvertsPtr(t *testing.T) {
+	var i int = 123
+	want := NewIntValue(123)
+	got := ToValueByReflection(reflect.ValueOf(&i))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
 	}

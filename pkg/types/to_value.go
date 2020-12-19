@@ -59,7 +59,9 @@ func ToValueByReflection(v reflect.Value) *Value {
 	} else if isNil(v) {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
 		return NewNilValue()
-		// Maps, slices, and structs should be placed after nil so as to convert nil into Nil correctly.
+		// Maps, slices, and pointers should be placed after nil so as to convert nil into Nil correctly.
+	} else if isPtr(v) {
+		return reflectPtrToValue(v)
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
 	} else if isSlice(v) {
@@ -118,6 +120,15 @@ func reflectSliceOrArrayToValue(v reflect.Value) *Value {
 	return NewArrayValue(arr)
 }
 
+func reflectPtrToValue(v reflect.Value) *Value {
+	elem := v.Elem()
+	if elem.CanInterface() {
+		return ToValue(elem.Interface())
+	} else {
+		return ToValueByReflection(elem)
+	}
+}
+
 func isIntFamily(v reflect.Value) bool {
 	switch v.Type().Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
@@ -173,4 +184,8 @@ func isSlice(v reflect.Value) bool {
 
 func isArray(v reflect.Value) bool {
 	return v.Type().Kind() == reflect.Array
+}
+
+func isPtr(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Ptr
 }
