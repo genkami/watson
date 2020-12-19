@@ -41,6 +41,11 @@ type private struct {
 	privateField int
 }
 
+type omitempty struct {
+	Field1 *int `watson:",omitempty"`
+	Field2 *int `watson:"field2,omitempty"`
+}
+
 func TestToValueConvertsNilInterface(t *testing.T) {
 	want := types.NewNilValue()
 	got := types.ToValue(nil)
@@ -382,6 +387,20 @@ func TestToValueOmitsPrivateField(t *testing.T) {
 	}
 }
 
+func TestToValueOmitsEmptyFieldTaggedWithOmitempty(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"field1": types.NewIntValue(123),
+	})
+	f1 := 123
+	got := types.ToValue(&omitempty{
+		Field1: &f1,
+		Field2: nil,
+	})
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := types.NewNilValue()
@@ -709,6 +728,20 @@ func TestToValueByReflectionOmitsPrivateField(t *testing.T) {
 	got := types.ToValueByReflection(reflect.ValueOf(&private{
 		PublicField:  123,
 		privateField: 456,
+	}))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionOmitsEmptyFieldTaggedWithOmitempty(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"field1": types.NewIntValue(123),
+	})
+	f1 := 123
+	got := types.ToValueByReflection(reflect.ValueOf(&omitempty{
+		Field1: &f1,
+		Field2: nil,
 	}))
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
