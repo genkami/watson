@@ -31,6 +31,8 @@ func (v *Value) Bind(to interface{}) error {
 		return bindFloat32(v, to)
 	case *float64:
 		return bindFloat64(v, to)
+	case *string:
+		return bindString(v, to)
 	}
 	return v.BindByReflection(reflect.ValueOf(to))
 }
@@ -131,6 +133,14 @@ func bindFloat64(v *Value, to *float64) error {
 	return nil
 }
 
+func bindString(v *Value, to *string) error {
+	if v.Kind != String {
+		return typeMismatch(v, String)
+	}
+	*to = string(v.String)
+	return nil
+}
+
 func (v *Value) BindByReflection(to reflect.Value) error {
 	if isPtr(to) {
 		return bindPtrByReflection(v, to)
@@ -146,6 +156,8 @@ func bindPtrByReflection(v *Value, to reflect.Value) error {
 		to.Elem().SetUint(v.Uint)
 	case reflect.Float32, reflect.Float64:
 		to.Elem().SetFloat(v.Float)
+	case reflect.String:
+		to.Elem().SetString(string(v.String))
 	default:
 		return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
 	}

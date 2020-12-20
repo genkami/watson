@@ -180,6 +180,20 @@ func TestBindConvertsFloat64(t *testing.T) {
 	}
 }
 
+func TestBindConvertsString(t *testing.T) {
+	var err error
+	var got string
+	var val = types.NewStringValue([]byte("hoge"))
+	var want string = "hoge"
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -342,6 +356,20 @@ func TestBindByReflectionConvertsFloat64(t *testing.T) {
 	var got float64
 	var val = types.NewFloatValue(1.23e45)
 	var want float64 = 1.23e45
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsString(t *testing.T) {
+	var err error
+	var got string
+	var val = types.NewStringValue([]byte("hoge"))
+	var want string = "hoge"
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {
 		t.Fatal(err)
