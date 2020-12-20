@@ -170,6 +170,8 @@ func bindPtrByReflection(v *Value, to reflect.Value) error {
 		to.Elem().SetString(string(v.String))
 	case reflect.Bool:
 		to.Elem().SetBool(v.Bool)
+	case reflect.Ptr, reflect.Interface, reflect.Slice, reflect.Map:
+		to.Elem().Set(reflect.Zero(to.Type().Elem()))
 	default:
 		return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
 	}

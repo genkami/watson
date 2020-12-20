@@ -208,6 +208,62 @@ func TestBindConvertsBool(t *testing.T) {
 	}
 }
 
+func TestBindConvertsNilInterface(t *testing.T) {
+	var err error
+	var got interface{}
+	var val = types.NewNilValue()
+	var want interface{} = nil
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsNilPtr(t *testing.T) {
+	var err error
+	var got *int
+	var val = types.NewNilValue()
+	var want *int = nil
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsNilSlice(t *testing.T) {
+	var err error
+	var got []int
+	var val = types.NewNilValue()
+	var want []int = nil
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsNilMap(t *testing.T) {
+	var err error
+	var got map[string]int
+	var val = types.NewNilValue()
+	var want map[string]int = nil
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -398,6 +454,62 @@ func TestBindByReflectionConvertsBool(t *testing.T) {
 	var got bool
 	var val = types.NewBoolValue(true)
 	var want bool = true
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsNilInterface(t *testing.T) {
+	var err error
+	var got interface{}
+	var val = types.NewNilValue()
+	var want interface{} = nil
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsNilPtr(t *testing.T) {
+	var err error
+	var got *int
+	var val = types.NewNilValue()
+	var want *int = nil
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsNilSlice(t *testing.T) {
+	var err error
+	var got []int
+	var val = types.NewNilValue()
+	var want []int = nil
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsNilMap(t *testing.T) {
+	var err error
+	var got map[string]int
+	var val = types.NewNilValue()
+	var want map[string]int = nil
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {
 		t.Fatal(err)
