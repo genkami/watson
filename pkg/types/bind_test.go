@@ -194,6 +194,20 @@ func TestBindConvertsString(t *testing.T) {
 	}
 }
 
+func TestBindConvertsBool(t *testing.T) {
+	var err error
+	var got bool
+	var val = types.NewBoolValue(true)
+	var want bool = true
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -370,6 +384,20 @@ func TestBindByReflectionConvertsString(t *testing.T) {
 	var got string
 	var val = types.NewStringValue([]byte("hoge"))
 	var want string = "hoge"
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsBool(t *testing.T) {
+	var err error
+	var got bool
+	var val = types.NewBoolValue(true)
+	var want bool = true
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {
 		t.Fatal(err)
