@@ -5,6 +5,25 @@ import (
 	"reflect"
 )
 
+// ToValue converts an arbitrary value `v` into `Value` by applying the following rules:
+//   * If v is any of int, int8, int16, int32, or int64, then v is converted to Int.
+//   * If v is any of uint, uint8, uint16, uint32, or uint64, then v is converted to Uint.
+//   * If v is float32 or float64, then v is converted to Float.
+//   * If v is bool, then v is converted to Bool.
+//   * If v is string, then v is converted to String.
+//   * If v is a struct that implements `Marshaler`, then v is converted to Value by calling `v.MarshalWatson()`.
+//   * If v is a struct that does not implement `Marshaler`, then v is converted to Object with its keys correspond to the fields of v.
+//   * If v is a slice or an array, then v is converted to Array with its elements converted by these rules.
+//   * If v is a map, then v is converted to Object with its elements converted by these rules.
+//   * If v is a pointer, then v is converted to `Value` by converting `*v` with these rules.
+//
+// Note that you can configure struct fields by adding "watson" tag to fields.
+// Tag must be like `watson:"name,flag1,flag2,...,flagN"`.
+// If `ToValue` finds a field that has such tag, it uses `name` as a key of output instead of using the name of the field, or omits such field if `name` equals to "-".
+//
+// Currntly these flags are available:
+//   omitempty      If the field is zero value, it will be omitted from the output.
+//   inline         Inline the field. Currently the field must be a struct.
 func ToValue(v interface{}) *Value {
 	if v == nil {
 		return NewNilValue()
@@ -46,6 +65,7 @@ func ToValue(v interface{}) *Value {
 	return ToValueByReflection(vv)
 }
 
+// `ToValueByReflection` does almost the same thing as `ToValue`, but it always uses reflection.
 func ToValueByReflection(v reflect.Value) *Value {
 	if isIntFamily(v) {
 		return reflectIntToValue(v)

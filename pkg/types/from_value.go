@@ -5,12 +5,14 @@ import (
 )
 
 // FromValue converts Value into one of the following type:
-// * int64
-// * uint64
-// * string
-// * bool
-// * (interface{})(nil)
-// * map[string]interface{} (the value of which is also one or many of these types)
+//   * int64
+//   * uint64
+//   * float64
+//   * string
+//   * bool
+//   * (interface{})(nil)
+//   * []interface{} (the element of which is also one or many of these types)
+//   * map[string]interface{} (the value of which is also one or many of these types)
 func FromValue(val *Value) interface{} {
 	switch val.Kind {
 	case Int:
