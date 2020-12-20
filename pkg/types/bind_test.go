@@ -79,6 +79,76 @@ func TestBindConvertsInt64(t *testing.T) {
 	}
 }
 
+func TestBindConvertsUint(t *testing.T) {
+	var err error
+	var got uint
+	var val = types.NewUintValue(123)
+	var want uint = 123
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsUint8(t *testing.T) {
+	var err error
+	var got uint8
+	var val = types.NewUintValue(123)
+	var want uint8 = 123
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsUint16(t *testing.T) {
+	var err error
+	var got uint16
+	var val = types.NewUintValue(123)
+	var want uint16 = 123
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsUint32(t *testing.T) {
+	var err error
+	var got uint32
+	var val = types.NewUintValue(123)
+	var want uint32 = 123
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsUint64(t *testing.T) {
+	var err error
+	var got uint64
+	var val = types.NewUintValue(123)
+	var want uint64 = 123
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -140,6 +210,76 @@ func TestBindByReflectionConvertsInt64(t *testing.T) {
 	var got int64
 	var val = types.NewIntValue(123)
 	var want int64 = 123
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsUint(t *testing.T) {
+	var err error
+	var got uint
+	var val = types.NewUintValue(123)
+	var want uint = 123
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsUint8(t *testing.T) {
+	var err error
+	var got uint8
+	var val = types.NewUintValue(123)
+	var want uint8 = 123
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsUint16(t *testing.T) {
+	var err error
+	var got uint16
+	var val = types.NewUintValue(123)
+	var want uint16 = 123
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsUint32(t *testing.T) {
+	var err error
+	var got uint32
+	var val = types.NewUintValue(123)
+	var want uint32 = 123
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsUint64(t *testing.T) {
+	var err error
+	var got uint64
+	var val = types.NewUintValue(123)
+	var want uint64 = 123
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {
 		t.Fatal(err)

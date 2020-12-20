@@ -17,6 +17,16 @@ func (v *Value) Bind(to interface{}) error {
 		return bindInt32(v, to)
 	case *int64:
 		return bindInt64(v, to)
+	case *uint:
+		return bindUint(v, to)
+	case *uint8:
+		return bindUint8(v, to)
+	case *uint16:
+		return bindUint16(v, to)
+	case *uint32:
+		return bindUint32(v, to)
+	case *uint64:
+		return bindUint64(v, to)
 	}
 	return v.BindByReflection(reflect.ValueOf(to))
 }
@@ -61,6 +71,46 @@ func bindInt64(v *Value, to *int64) error {
 	return nil
 }
 
+func bindUint(v *Value, to *uint) error {
+	if v.Kind != Uint {
+		return typeMismatch(v, Uint)
+	}
+	*to = uint(v.Uint)
+	return nil
+}
+
+func bindUint8(v *Value, to *uint8) error {
+	if v.Kind != Uint {
+		return typeMismatch(v, Uint)
+	}
+	*to = uint8(v.Uint)
+	return nil
+}
+
+func bindUint16(v *Value, to *uint16) error {
+	if v.Kind != Uint {
+		return typeMismatch(v, Uint)
+	}
+	*to = uint16(v.Uint)
+	return nil
+}
+
+func bindUint32(v *Value, to *uint32) error {
+	if v.Kind != Uint {
+		return typeMismatch(v, Uint)
+	}
+	*to = uint32(v.Uint)
+	return nil
+}
+
+func bindUint64(v *Value, to *uint64) error {
+	if v.Kind != Uint {
+		return typeMismatch(v, Uint)
+	}
+	*to = uint64(v.Uint)
+	return nil
+}
+
 func (v *Value) BindByReflection(to reflect.Value) error {
 	if isPtr(to) {
 		return bindPtrByReflection(v, to)
@@ -72,6 +122,8 @@ func bindPtrByReflection(v *Value, to reflect.Value) error {
 	switch to.Type().Elem().Kind() {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		to.Elem().SetInt(v.Int)
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		to.Elem().SetUint(v.Uint)
 	default:
 		return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
 	}
