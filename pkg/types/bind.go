@@ -312,7 +312,31 @@ func (v *Value) castToSlice(t reflect.Type) (reflect.Value, error) {
 	if v.Kind == Nil {
 		return reflect.Zero(t), nil
 	}
+	if v.Kind == Array {
+		arr := reflect.MakeSlice(t, len(v.Array), len(v.Array))
+		err := v.setToArray(arr)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return arr, nil
+	}
 	return reflect.Value{}, typeMismatchByReflection(v, t)
+}
+
+func (v *Value) setToArray(arr reflect.Value) error {
+	t := arr.Type()
+	if v.Kind != Array || !(t.Kind() == reflect.Slice || t.Kind() == reflect.Array) {
+		return typeMismatchByReflection(v, t)
+	}
+	elemType := t.Elem()
+	for i, e := range v.Array {
+		elem, err := e.cast(elemType)
+		if err != nil {
+			return err
+		}
+		arr.Index(i).Set(elem)
+	}
+	return nil
 }
 
 func (v *Value) castToMap(t reflect.Type) (reflect.Value, error) {

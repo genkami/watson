@@ -308,6 +308,40 @@ func TestBindConvertsHeteroMap(t *testing.T) {
 	}
 }
 
+func TestBindConvertsSlice(t *testing.T) {
+	var err error
+	var got []int
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewIntValue(456),
+	})
+	var want []int = []int{123, 456}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsHeteroSlice(t *testing.T) {
+	var err error
+	var got []interface{}
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewStringValue([]byte("456")),
+	})
+	var want []interface{} = []interface{}{int64(123), "456"}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -598,6 +632,40 @@ func TestBindByReflectionConvertsHeteroMap(t *testing.T) {
 			"baz": "quux",
 		},
 	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsSlice(t *testing.T) {
+	var err error
+	var got []int
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewIntValue(456),
+	})
+	var want []int = []int{123, 456}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsHeteroSlice(t *testing.T) {
+	var err error
+	var got []interface{}
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewStringValue([]byte("456")),
+	})
+	var want []interface{} = []interface{}{int64(123), "456"}
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {
 		t.Fatal(err)
