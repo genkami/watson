@@ -282,6 +282,32 @@ func TestBindConvertsMap(t *testing.T) {
 	}
 }
 
+func TestBindConvertsHeteroMap(t *testing.T) {
+	var err error
+	var got map[string]interface{}
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"hoge": types.NewIntValue(123),
+		"fuga": types.NewStringValue([]byte("foo")),
+		"bar": types.NewObjectValue(map[string]*types.Value{
+			"baz": types.NewStringValue([]byte("quux")),
+		}),
+	})
+	var want map[string]interface{} = map[string]interface{}{
+		"hoge": int64(123),
+		"fuga": "foo",
+		"bar": map[string]interface{}{
+			"baz": "quux",
+		},
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -545,6 +571,32 @@ func TestBindByReflectionConvertsMap(t *testing.T) {
 	})
 	var want map[string]int = map[string]int{
 		"hoge": 123,
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsHeteroMap(t *testing.T) {
+	var err error
+	var got map[string]interface{}
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"hoge": types.NewIntValue(123),
+		"fuga": types.NewStringValue([]byte("foo")),
+		"bar": types.NewObjectValue(map[string]*types.Value{
+			"baz": types.NewStringValue([]byte("quux")),
+		}),
+	})
+	var want map[string]interface{} = map[string]interface{}{
+		"hoge": int64(123),
+		"fuga": "foo",
+		"bar": map[string]interface{}{
+			"baz": "quux",
+		},
 	}
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {

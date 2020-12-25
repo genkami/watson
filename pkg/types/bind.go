@@ -359,10 +359,14 @@ func (v *Value) castToPtr(t reflect.Type) (reflect.Value, error) {
 }
 
 func (v *Value) castToInterface(t reflect.Type) (reflect.Value, error) {
-	if v.Kind != Nil {
-		return reflect.Value{}, typeMismatchByReflection(v, t)
+	if v.Kind == Nil {
+		return reflect.Zero(t), nil
 	}
-	return reflect.Zero(t), nil
+	var any interface{}
+	if t == reflect.TypeOf(&any).Elem() {
+		return reflect.ValueOf(FromValue(v)), nil
+	}
+	return reflect.Value{}, typeMismatchByReflection(v, t)
 }
 
 func typeMismatch(v *Value, k Kind) error {
