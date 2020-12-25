@@ -342,6 +342,40 @@ func TestBindConvertsHeteroSlice(t *testing.T) {
 	}
 }
 
+func TestBindConvertsArray(t *testing.T) {
+	var err error
+	var got [2]int
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewIntValue(456),
+	})
+	var want [2]int = [2]int{123, 456}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsHeteroArray(t *testing.T) {
+	var err error
+	var got [2]interface{}
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewStringValue([]byte("456")),
+	})
+	var want [2]interface{} = [2]interface{}{int64(123), "456"}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -666,6 +700,40 @@ func TestBindByReflectionConvertsHeteroSlice(t *testing.T) {
 		types.NewStringValue([]byte("456")),
 	})
 	var want []interface{} = []interface{}{int64(123), "456"}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsArray(t *testing.T) {
+	var err error
+	var got [2]int
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewIntValue(456),
+	})
+	var want [2]int = [2]int{123, 456}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsHeteroArray(t *testing.T) {
+	var err error
+	var got [2]interface{}
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewIntValue(123),
+		types.NewStringValue([]byte("456")),
+	})
+	var want [2]interface{} = [2]interface{}{int64(123), "456"}
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {
 		t.Fatal(err)

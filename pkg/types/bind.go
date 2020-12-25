@@ -203,6 +203,8 @@ func (v *Value) cast(t reflect.Type) (reflect.Value, error) {
 		return v.castToInterface(t)
 	case reflect.Slice:
 		return v.castToSlice(t)
+	case reflect.Array:
+		return v.castToArray(t)
 	case reflect.Map:
 		return v.castToMap(t)
 	default:
@@ -321,6 +323,21 @@ func (v *Value) castToSlice(t reflect.Type) (reflect.Value, error) {
 		return arr, nil
 	}
 	return reflect.Value{}, typeMismatchByReflection(v, t)
+}
+
+func (v *Value) castToArray(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Array {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	if len(v.Array) > t.Len() {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	parr := reflect.New(t)
+	err := v.setToArray(parr.Elem())
+	if err != nil {
+		return reflect.Value{}, err
+	}
+	return parr.Elem(), nil
 }
 
 func (v *Value) setToArray(arr reflect.Value) error {
