@@ -155,92 +155,191 @@ func (v *Value) BindByReflection(to reflect.Value) error {
 	if !isPtr(to) {
 		return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
 	}
-	switch to.Type().Elem().Kind() {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		return v.bindIntByReflection(to)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		return v.bindUintByReflection(to)
-	case reflect.Float32, reflect.Float64:
-		return v.bindFloatByReflection(to)
+	return v.bindByReflection(to.Elem())
+}
+
+func (v *Value) bindByReflection(to reflect.Value) error {
+	casted, err := v.castByReflection(to.Type())
+	if err != nil {
+		return err
+	}
+	to.Set(casted)
+	return nil
+}
+
+func (v *Value) castByReflection(t reflect.Type) (reflect.Value, error) {
+	switch t.Kind() {
+	case reflect.Int:
+		return v.castToInt(t)
+	case reflect.Int8:
+		return v.castToInt8(t)
+	case reflect.Int16:
+		return v.castToInt16(t)
+	case reflect.Int32:
+		return v.castToInt32(t)
+	case reflect.Int64:
+		return v.castToInt64(t)
+	case reflect.Uint:
+		return v.castToUint(t)
+	case reflect.Uint8:
+		return v.castToUint8(t)
+	case reflect.Uint16:
+		return v.castToUint16(t)
+	case reflect.Uint32:
+		return v.castToUint32(t)
+	case reflect.Uint64:
+		return v.castToUint64(t)
+	case reflect.Float32:
+		return v.castToFloat32(t)
+	case reflect.Float64:
+		return v.castToFloat64(t)
 	case reflect.String:
-		return v.bindStringByReflection(to)
+		return v.castToString(t)
 	case reflect.Bool:
-		return v.bindBoolByReflection(to)
-	case reflect.Ptr, reflect.Interface:
-		return v.bindPtrByReflection(to)
+		return v.castToBool(t)
+	case reflect.Ptr:
+		return v.castToPtr(t)
+	case reflect.Interface:
+		return v.castToInterface(t)
 	case reflect.Slice:
-		return v.bindSliceByReflection(to)
+		return v.castToSlice(t)
 	case reflect.Map:
-		return v.bindMapByReflection(to)
+		return v.castToMap(t)
 	default:
-		return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
+		return reflect.Value{}, typeMismatchByReflection(v, t)
 	}
 }
 
-func (v *Value) bindIntByReflection(to reflect.Value) error {
+func (v *Value) castToInt(t reflect.Type) (reflect.Value, error) {
 	if v.Kind != Int {
-		return typeMismatch(v, Int)
+		return reflect.Value{}, typeMismatchByReflection(v, t)
 	}
-	to.Elem().SetInt(v.Int)
-	return nil
+	return reflect.ValueOf(int(v.Int)), nil
 }
 
-func (v *Value) bindUintByReflection(to reflect.Value) error {
+func (v *Value) castToInt8(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Int {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(int8(v.Int)), nil
+}
+
+func (v *Value) castToInt16(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Int {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(int16(v.Int)), nil
+}
+
+func (v *Value) castToInt32(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Int {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(int32(v.Int)), nil
+}
+
+func (v *Value) castToInt64(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Int {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(int64(v.Int)), nil
+}
+
+func (v *Value) castToUint(t reflect.Type) (reflect.Value, error) {
 	if v.Kind != Uint {
-		return typeMismatch(v, Uint)
+		return reflect.Value{}, typeMismatchByReflection(v, t)
 	}
-	to.Elem().SetUint(v.Uint)
-	return nil
+	return reflect.ValueOf(uint(v.Uint)), nil
 }
 
-func (v *Value) bindFloatByReflection(to reflect.Value) error {
+func (v *Value) castToUint8(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Uint {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(uint8(v.Uint)), nil
+}
+
+func (v *Value) castToUint16(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Uint {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(uint16(v.Uint)), nil
+}
+
+func (v *Value) castToUint32(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Uint {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(uint32(v.Uint)), nil
+}
+
+func (v *Value) castToUint64(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Uint {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(uint64(v.Uint)), nil
+}
+
+func (v *Value) castToFloat32(t reflect.Type) (reflect.Value, error) {
 	if v.Kind != Float {
-		return typeMismatch(v, Float)
+		return reflect.Value{}, typeMismatchByReflection(v, t)
 	}
-	to.Elem().SetFloat(v.Float)
-	return nil
+	return reflect.ValueOf(float32(v.Float)), nil
 }
 
-func (v *Value) bindStringByReflection(to reflect.Value) error {
+func (v *Value) castToFloat64(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Float {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.ValueOf(v.Float), nil
+}
+
+func (v *Value) castToString(t reflect.Type) (reflect.Value, error) {
 	if v.Kind != String {
-		return typeMismatch(v, String)
+		return reflect.Value{}, typeMismatchByReflection(v, t)
 	}
-	to.Elem().SetString(string(v.String))
-	return nil
+	return reflect.ValueOf(string(v.String)), nil
 }
 
-func (v *Value) bindBoolByReflection(to reflect.Value) error {
+func (v *Value) castToBool(t reflect.Type) (reflect.Value, error) {
 	if v.Kind != Bool {
-		return typeMismatch(v, Bool)
+		return reflect.Value{}, typeMismatchByReflection(v, t)
 	}
-	to.Elem().SetBool(bool(v.Bool))
-	return nil
+	return reflect.ValueOf(v.Bool), nil
 }
 
-func (v *Value) bindSliceByReflection(to reflect.Value) error {
+func (v *Value) castToSlice(t reflect.Type) (reflect.Value, error) {
 	if v.Kind == Nil {
-		to.Elem().Set(reflect.Zero(to.Type().Elem()))
-		return nil
+		return reflect.Zero(t), nil
 	}
-	return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
+	return reflect.Value{}, typeMismatchByReflection(v, t)
 }
 
-func (v *Value) bindMapByReflection(to reflect.Value) error {
+func (v *Value) castToMap(t reflect.Type) (reflect.Value, error) {
 	if v.Kind == Nil {
-		to.Elem().Set(reflect.Zero(to.Type().Elem()))
-		return nil
+		return reflect.Zero(t), nil
 	}
-	return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
+	return reflect.Value{}, typeMismatchByReflection(v, t)
 }
 
-func (v *Value) bindPtrByReflection(to reflect.Value) error {
-	if v.Kind == Nil {
-		to.Elem().Set(reflect.Zero(to.Type().Elem()))
-		return nil
+func (v *Value) castToPtr(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Nil {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
 	}
-	return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
+	return reflect.Zero(t), nil
+}
+
+func (v *Value) castToInterface(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Nil {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	return reflect.Zero(t), nil
 }
 
 func typeMismatch(v *Value, k Kind) error {
 	return fmt.Errorf("cn't convert %#v to %#v", v.Kind, k)
+}
+
+func typeMismatchByReflection(v *Value, t reflect.Type) error {
+	return fmt.Errorf("can't convert %#v to %s", v.Kind, t.String())
 }
