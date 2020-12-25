@@ -264,6 +264,24 @@ func TestBindConvertsNilMap(t *testing.T) {
 	}
 }
 
+func TestBindConvertsMap(t *testing.T) {
+	var err error
+	var got map[string]int
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"hoge": types.NewIntValue(123),
+	})
+	var want map[string]int = map[string]int{
+		"hoge": 123,
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -510,6 +528,24 @@ func TestBindByReflectionConvertsNilMap(t *testing.T) {
 	var got map[string]int
 	var val = types.NewNilValue()
 	var want map[string]int = nil
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsMap(t *testing.T) {
+	var err error
+	var got map[string]int
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"hoge": types.NewIntValue(123),
+	})
+	var want map[string]int = map[string]int{
+		"hoge": 123,
+	}
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {
 		t.Fatal(err)

@@ -159,7 +159,7 @@ func (v *Value) BindByReflection(to reflect.Value) error {
 }
 
 func (v *Value) bindByReflection(to reflect.Value) error {
-	casted, err := v.castByReflection(to.Type())
+	casted, err := v.cast(to.Type())
 	if err != nil {
 		return err
 	}
@@ -167,7 +167,7 @@ func (v *Value) bindByReflection(to reflect.Value) error {
 	return nil
 }
 
-func (v *Value) castByReflection(t reflect.Type) (reflect.Value, error) {
+func (v *Value) cast(t reflect.Type) (reflect.Value, error) {
 	switch t.Kind() {
 	case reflect.Int:
 		return v.castToInt(t)
@@ -319,7 +319,36 @@ func (v *Value) castToMap(t reflect.Type) (reflect.Value, error) {
 	if v.Kind == Nil {
 		return reflect.Zero(t), nil
 	}
+	if v.Kind == Object {
+		obj := reflect.MakeMap(t)
+		err := v.addToMap(obj)
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		return obj, nil
+	}
 	return reflect.Value{}, typeMismatchByReflection(v, t)
+}
+
+func (v *Value) addToMap(obj reflect.Value) error {
+	t := obj.Type()
+	if v.Kind != Object || t.Kind() != reflect.Map {
+		return typeMismatchByReflection(v, t)
+	}
+	keyType := t.Key()
+	elemType := t.Elem()
+	if keyType.Kind() != reflect.String {
+		return typeMismatchByReflection(v, t)
+	}
+	for k, e := range v.Object {
+		key := reflect.ValueOf(k)
+		elem, err := e.cast(elemType)
+		if err != nil {
+			return err
+		}
+		obj.SetMapIndex(key, elem)
+	}
+	return nil
 }
 
 func (v *Value) castToPtr(t reflect.Type) (reflect.Value, error) {
