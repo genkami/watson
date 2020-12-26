@@ -446,7 +446,7 @@ func TestToValueOmitsFieldTaggedWithHyphen(t *testing.T) {
 	}
 }
 
-func TestToValuesEnbedsFieldTaggedWithInline(t *testing.T) {
+func TestToValueEnbedsFieldTaggedWithInline(t *testing.T) {
 	want := types.NewObjectValue(map[string]*types.Value{
 		"field":       types.NewIntValue(123),
 		"nestedfield": types.NewIntValue(456),
@@ -462,7 +462,7 @@ func TestToValuesEnbedsFieldTaggedWithInline(t *testing.T) {
 	}
 }
 
-func TestToValuesUsesMarshalWatsonWhenArgImplementsMarshaler(t *testing.T) {
+func TestToValueUsesMarshalWatsonWhenArgImplementsMarshaler(t *testing.T) {
 	m := &customMarshaler{
 		SomeField: 123,
 	}
@@ -473,7 +473,7 @@ func TestToValuesUsesMarshalWatsonWhenArgImplementsMarshaler(t *testing.T) {
 	}
 }
 
-func TestToValuesUsesMarshalWatsonWhenArgImplementsMarshalerEvenIfNotStruct(t *testing.T) {
+func TestToValueUsesMarshalWatsonWhenArgImplementsMarshalerEvenIfNotStruct(t *testing.T) {
 	m := primitiveMarshaler(123)
 	want := m.MarshalWatson()
 	got := types.ToValue(m)
@@ -842,7 +842,7 @@ func TestToValueByReflectionOmitsFieldTaggedWithHyphen(t *testing.T) {
 	}
 }
 
-func TestToValueByReflectionsEnbedsFieldTaggedWithInline(t *testing.T) {
+func TestToValueByReflectionEnbedsFieldTaggedWithInline(t *testing.T) {
 	want := types.NewObjectValue(map[string]*types.Value{
 		"field":       types.NewIntValue(123),
 		"nestedfield": types.NewIntValue(456),
@@ -858,7 +858,7 @@ func TestToValueByReflectionsEnbedsFieldTaggedWithInline(t *testing.T) {
 	}
 }
 
-func TestToValueByReflectionsUsesMarshalWatsonWhenArgImplementsMarshaler(t *testing.T) {
+func TestToValueByReflectionUsesMarshalWatsonWhenArgImplementsMarshaler(t *testing.T) {
 	m := &customMarshaler{
 		SomeField: 123,
 	}
