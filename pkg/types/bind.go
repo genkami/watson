@@ -411,7 +411,7 @@ func (v *Value) castToInterface(t reflect.Type) (reflect.Value, error) {
 	}
 	var any interface{}
 	if t == reflect.TypeOf(&any).Elem() {
-		return reflect.ValueOf(FromValue(v)), nil
+		return reflect.ValueOf(v.ToGoObject()), nil
 	}
 	return reflect.Value{}, typeMismatchByReflection(v, t)
 }

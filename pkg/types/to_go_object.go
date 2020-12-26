@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// FromValue converts Value into one of the following type:
+// ToGoObject converts Value into one of the following type:
 //   * int64
 //   * uint64
 //   * float64
@@ -13,7 +13,7 @@ import (
 //   * (interface{})(nil)
 //   * []interface{} (the element of which is also one or many of these types)
 //   * map[string]interface{} (the value of which is also one or many of these types)
-func FromValue(val *Value) interface{} {
+func (val *Value) ToGoObject() interface{} {
 	switch val.Kind {
 	case Int:
 		return val.Int
@@ -26,13 +26,13 @@ func FromValue(val *Value) interface{} {
 	case Object:
 		obj := map[string]interface{}{}
 		for k, v := range val.Object {
-			obj[k] = FromValue(v)
+			obj[k] = v.ToGoObject()
 		}
 		return obj
 	case Array:
 		arr := make([]interface{}, 0, len(val.Array))
 		for _, v := range val.Array {
-			arr = append(arr, FromValue(v))
+			arr = append(arr, v.ToGoObject())
 		}
 		return arr
 	case Bool:

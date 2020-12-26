@@ -9,7 +9,7 @@ import (
 )
 
 func Decode(w io.Writer, val *types.Value) error {
-	obj := types.FromValue(val)
+	obj := val.ToGoObject()
 	enc := yaml.NewEncoder(w)
 	defer enc.Close()
 	return enc.Encode(obj)
