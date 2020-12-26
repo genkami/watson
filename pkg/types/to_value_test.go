@@ -1,6 +1,7 @@
 package types_test
 
 import (
+	"fmt"
 	"math"
 	"reflect"
 	"testing"
@@ -69,6 +70,12 @@ func (m *customMarshaler) MarshalWatson() *types.Value {
 		"custom":          types.NewBoolValue(true),
 		"customFieldName": types.NewIntValue(int64(m.SomeField)),
 	})
+}
+
+type primitiveMarshaler int
+
+func (p primitiveMarshaler) MarshalWatson() *types.Value {
+	return types.NewStringValue([]byte(fmt.Sprintf("value=%d", p)))
 }
 
 func TestToValueConvertsNilInterface(t *testing.T) {
@@ -466,6 +473,15 @@ func TestToValuesUsesMarshalWatsonWhenArgImplementsMarshaler(t *testing.T) {
 	}
 }
 
+func TestToValuesUsesMarshalWatsonWhenArgImplementsMarshalerEvenIfNotStruct(t *testing.T) {
+	m := primitiveMarshaler(123)
+	want := m.MarshalWatson()
+	got := types.ToValue(m)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueByReflectionConvertsNilPointer(t *testing.T) {
 	var p *int = nil
 	want := types.NewNilValue()
@@ -846,6 +862,15 @@ func TestToValueByReflectionsUsesMarshalWatsonWhenArgImplementsMarshaler(t *test
 	m := &customMarshaler{
 		SomeField: 123,
 	}
+	want := m.MarshalWatson()
+	got := types.ToValueByReflection(reflect.ValueOf(m))
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByRelectionUsesMarshalWatsonWhenArgImplementsMarshalerEvenIfNotStruct(t *testing.T) {
+	m := primitiveMarshaler(123)
 	want := m.MarshalWatson()
 	got := types.ToValueByReflection(reflect.ValueOf(m))
 	if diff := cmp.Diff(want, got); diff != "" {

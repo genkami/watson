@@ -67,7 +67,9 @@ func ToValue(v interface{}) *Value {
 
 // `ToValueByReflection` does almost the same thing as `ToValue`, but it always uses reflection.
 func ToValueByReflection(v reflect.Value) *Value {
-	if isIntFamily(v) {
+	if isMarshaler(v) {
+		return marshalerToValueByReflection(v)
+	} else if isIntFamily(v) {
 		return intToValueByReflection(v)
 	} else if isUintFamily(v) {
 		return uintToValueByReflection(v)
@@ -79,8 +81,6 @@ func ToValueByReflection(v reflect.Value) *Value {
 		return stringToValueByReflection(v)
 	} else if isArray(v) {
 		return sliceOrArrayToValueByReflection(v)
-	} else if isMarshaler(v) {
-		return marshalerToValueByReflection(v)
 	} else if isStruct(v) {
 		return structToValueByReflection(v)
 	} else if isNil(v) {
