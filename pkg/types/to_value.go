@@ -68,21 +68,21 @@ func ToValue(v interface{}) *Value {
 // `ToValueByReflection` does almost the same thing as `ToValue`, but it always uses reflection.
 func ToValueByReflection(v reflect.Value) *Value {
 	if isIntFamily(v) {
-		return reflectIntToValue(v)
+		return intToValueByReflection(v)
 	} else if isUintFamily(v) {
-		return reflectUintToValue(v)
+		return uintToValueByReflection(v)
 	} else if isFloatFamily(v) {
-		return reflectFloatToValue(v)
+		return floatToValueByReflection(v)
 	} else if isBool(v) {
-		return reflectBoolToValue(v)
+		return boolToValueByReflection(v)
 	} else if isString(v) {
-		return reflectStringToValue(v)
+		return stringToValueByReflection(v)
 	} else if isArray(v) {
-		return reflectSliceOrArrayToValue(v)
+		return sliceOrArrayToValueByReflection(v)
 	} else if isMarshaler(v) {
-		return reflectMarshalerToValue(v)
+		return marshalerToValueByReflection(v)
 	} else if isStruct(v) {
-		return reflectStructToValue(v)
+		return structToValueByReflection(v)
 	} else if isNil(v) {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
 		return NewNilValue()
@@ -92,29 +92,29 @@ func ToValueByReflection(v reflect.Value) *Value {
 	} else if isMapConvertibleToValue(v) {
 		return reflectMapToValue(v)
 	} else if isSlice(v) {
-		return reflectSliceOrArrayToValue(v)
+		return sliceOrArrayToValueByReflection(v)
 	}
 
 	panic(fmt.Errorf("can't convert %s to *Value", v.Type().String()))
 }
 
-func reflectIntToValue(v reflect.Value) *Value {
+func intToValueByReflection(v reflect.Value) *Value {
 	return NewIntValue(v.Int())
 }
 
-func reflectUintToValue(v reflect.Value) *Value {
+func uintToValueByReflection(v reflect.Value) *Value {
 	return NewUintValue(v.Uint())
 }
 
-func reflectFloatToValue(v reflect.Value) *Value {
+func floatToValueByReflection(v reflect.Value) *Value {
 	return NewFloatValue(v.Float())
 }
 
-func reflectBoolToValue(v reflect.Value) *Value {
+func boolToValueByReflection(v reflect.Value) *Value {
 	return NewBoolValue(v.Bool())
 }
 
-func reflectStringToValue(v reflect.Value) *Value {
+func stringToValueByReflection(v reflect.Value) *Value {
 	return NewStringValue([]byte(v.String()))
 }
 
@@ -133,7 +133,7 @@ func reflectMapToValue(v reflect.Value) *Value {
 	return NewObjectValue(obj)
 }
 
-func reflectSliceOrArrayToValue(v reflect.Value) *Value {
+func sliceOrArrayToValueByReflection(v reflect.Value) *Value {
 	arr := []*Value{}
 	size := v.Len()
 	for i := 0; i < size; i++ {
@@ -156,7 +156,7 @@ func reflectPtrToValue(v reflect.Value) *Value {
 	}
 }
 
-func reflectStructToValue(v reflect.Value) *Value {
+func structToValueByReflection(v reflect.Value) *Value {
 	obj := map[string]*Value{}
 	addFields(obj, v)
 	return NewObjectValue(obj)
@@ -186,7 +186,7 @@ func addFields(obj map[string]*Value, v reflect.Value) {
 	}
 }
 
-func reflectMarshalerToValue(v reflect.Value) *Value {
+func marshalerToValueByReflection(v reflect.Value) *Value {
 	marshal := v.MethodByName("MarshalWatson")
 	ret := marshal.Call([]reflect.Value{})
 	return ret[0].Interface().(*Value)
