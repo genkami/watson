@@ -35,6 +35,20 @@ func findField(key string, obj reflect.Value) (*tag, bool) {
 	return nil, false
 }
 
+func inlineFields(obj reflect.Value) []*tag {
+	t := obj.Type()
+	tags := make([]*tag, 0)
+	size := obj.NumField()
+	for i := 0; i < size; i++ {
+		f := t.Field(i)
+		tag := parseTag(&f)
+		if tag.Inline() {
+			tags = append(tags, tag)
+		}
+	}
+	return tags
+}
+
 func parseTag(f *reflect.StructField) *tag {
 	tag := &tag{f: f}
 	name := f.Tag.Get(tagId)

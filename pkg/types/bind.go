@@ -429,12 +429,22 @@ func (v *Value) castToStruct(t reflect.Type) (reflect.Value, error) {
 		if !ok {
 			continue
 		}
+		if tag.ShouldAlwaysOmit() {
+			continue
+		}
 		field := tag.FieldOf(obj)
 		elem, err := v.cast(field.Type())
 		if err != nil {
 			return reflect.Value{}, err
 		}
 		field.Set(elem)
+	}
+	for _, tag := range inlineFields(obj) {
+		field := tag.FieldOf(obj)
+		err := v.bindByReflection(field)
+		if err != nil {
+			return reflect.Value{}, err
+		}
 	}
 	return obj, nil
 

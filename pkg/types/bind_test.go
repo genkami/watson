@@ -415,6 +415,130 @@ func TestBindConvertsUntaggedStruct(t *testing.T) {
 	}
 }
 
+func TestBindConvertsNestedStruct(t *testing.T) {
+	var err error
+	var got nested
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewObjectValue(map[string]*types.Value{
+			"value": types.NewIntValue(123),
+		}),
+	})
+	var want nested = nested{
+		Value: &nestedInner{
+			Value: 123,
+		},
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsEmbeddedStruct(t *testing.T) {
+	var err error
+	var got embedded
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"field": types.NewIntValue(123),
+		"embeddedinner": types.NewObjectValue(map[string]*types.Value{
+			"anotherfield": types.NewIntValue(456),
+		}),
+	})
+	var want embedded = embedded{
+		Field: 123,
+		EmbeddedInner: EmbeddedInner{
+			AnotherField: 456,
+		},
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsTaggedStruct(t *testing.T) {
+	var err error
+	var got tagged
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"customName": types.NewIntValue(123),
+	})
+	var want tagged = tagged{
+		Field: 123,
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindOmitsPrivateField(t *testing.T) {
+	var err error
+	var got private
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"publicfield":  types.NewIntValue(123),
+		"privatefield": types.NewIntValue(456),
+	})
+	var want private = private{
+		PublicField: 123,
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want.PublicField != got.PublicField || want.privateField != got.privateField {
+		t.Errorf("expected %#v but got %#v", &want, &got)
+	}
+}
+
+func TestBindConvertsFieldTaggedWithHyphen(t *testing.T) {
+	var err error
+	var got alwaysomit
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"shouldBeIncluded": types.NewIntValue(123),
+		"shouldbeomitted":  types.NewIntValue(456),
+	})
+	var want alwaysomit = alwaysomit{
+		ShouldBeIncluded: 123,
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindEmbedsFieldTaggedWithInline(t *testing.T) {
+	var err error
+	var got inline
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"field":       types.NewIntValue(123),
+		"nestedfield": types.NewIntValue(456),
+	})
+	var want inline = inline{
+		Field: 123,
+		Inner: inlineInner{
+			NestedField: 456,
+		},
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -811,6 +935,130 @@ func TestBindByReflectionConvertsUntaggedStruct(t *testing.T) {
 	var want untagged = untagged{
 		Name:     "hoge",
 		LongName: "longhoge",
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsNestedStruct(t *testing.T) {
+	var err error
+	var got nested
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"value": types.NewObjectValue(map[string]*types.Value{
+			"value": types.NewIntValue(123),
+		}),
+	})
+	var want nested = nested{
+		Value: &nestedInner{
+			Value: 123,
+		},
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsEmbeddedStruct(t *testing.T) {
+	var err error
+	var got embedded
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"field": types.NewIntValue(123),
+		"embeddedinner": types.NewObjectValue(map[string]*types.Value{
+			"anotherfield": types.NewIntValue(456),
+		}),
+	})
+	var want embedded = embedded{
+		Field: 123,
+		EmbeddedInner: EmbeddedInner{
+			AnotherField: 456,
+		},
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsTaggedStruct(t *testing.T) {
+	var err error
+	var got tagged
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"customName": types.NewIntValue(123),
+	})
+	var want tagged = tagged{
+		Field: 123,
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionOmitsPrivateField(t *testing.T) {
+	var err error
+	var got private
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"publicfield":  types.NewIntValue(123),
+		"privatefield": types.NewIntValue(456),
+	})
+	var want private = private{
+		PublicField: 123,
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want.PublicField != got.PublicField || want.privateField != got.privateField {
+		t.Errorf("expected %#v but got %#v", &want, &got)
+	}
+}
+
+func TestBindByReflectionConvertsFieldTaggedWithHyphen(t *testing.T) {
+	var err error
+	var got alwaysomit
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"shouldBeIncluded": types.NewIntValue(123),
+		"shouldbeomitted":  types.NewIntValue(456),
+	})
+	var want alwaysomit = alwaysomit{
+		ShouldBeIncluded: 123,
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionEmbedsFieldTaggedWithInline(t *testing.T) {
+	var err error
+	var got inline
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"field":       types.NewIntValue(123),
+		"nestedfield": types.NewIntValue(456),
+	})
+	var want inline = inline{
+		Field: 123,
+		Inner: inlineInner{
+			NestedField: 456,
+		},
 	}
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {
