@@ -22,6 +22,19 @@ type tag struct {
 	inline     bool
 }
 
+func findField(key string, obj reflect.Value) (*tag, bool) {
+	t := obj.Type()
+	size := obj.NumField()
+	for i := 0; i < size; i++ {
+		f := t.Field(i)
+		tag := parseTag(&f)
+		if tag.Key() == key {
+			return tag, true
+		}
+	}
+	return nil, false
+}
+
 func parseTag(f *reflect.StructField) *tag {
 	tag := &tag{f: f}
 	name := f.Tag.Get(tagId)
@@ -71,4 +84,8 @@ func (t *tag) OmitEmpty() bool {
 
 func (t *tag) Inline() bool {
 	return t.inline
+}
+
+func (t *tag) FieldOf(v reflect.Value) reflect.Value {
+	return v.FieldByIndex(t.f.Index)
 }

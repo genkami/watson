@@ -395,6 +395,26 @@ func TestBindConvertsPtr(t *testing.T) {
 	}
 }
 
+func TestBindConvertsUntaggedStruct(t *testing.T) {
+	var err error
+	var got untagged
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"name":     types.NewStringValue([]byte("hoge")),
+		"longname": types.NewStringValue([]byte("longhoge")),
+	})
+	var want untagged = untagged{
+		Name:     "hoge",
+		LongName: "longhoge",
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -771,6 +791,26 @@ func TestBindByReflectionConvertsPtr(t *testing.T) {
 	})
 	var want map[string]*int = map[string]*int{
 		"hoge": &v,
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsUntaggedStruct(t *testing.T) {
+	var err error
+	var got untagged
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"name":     types.NewStringValue([]byte("hoge")),
+		"longname": types.NewStringValue([]byte("longhoge")),
+	})
+	var want untagged = untagged{
+		Name:     "hoge",
+		LongName: "longhoge",
 	}
 	err = val.BindByReflection(reflect.ValueOf(&got))
 	if err != nil {

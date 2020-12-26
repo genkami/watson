@@ -207,6 +207,8 @@ func (v *Value) cast(t reflect.Type) (reflect.Value, error) {
 		return v.castToArray(t)
 	case reflect.Map:
 		return v.castToMap(t)
+	case reflect.Struct:
+		return v.castToStruct(t)
 	default:
 		return reflect.Value{}, typeMismatchByReflection(v, t)
 	}
@@ -414,6 +416,28 @@ func (v *Value) castToInterface(t reflect.Type) (reflect.Value, error) {
 		return reflect.ValueOf(v.ToGoObject()), nil
 	}
 	return reflect.Value{}, typeMismatchByReflection(v, t)
+}
+
+func (v *Value) castToStruct(t reflect.Type) (reflect.Value, error) {
+	if v.Kind != Object {
+		return reflect.Value{}, typeMismatchByReflection(v, t)
+	}
+	pobj := reflect.New(t)
+	obj := pobj.Elem()
+	for k, v := range v.Object {
+		tag, ok := findField(k, obj)
+		if !ok {
+			continue
+		}
+		field := tag.FieldOf(obj)
+		elem, err := v.cast(field.Type())
+		if err != nil {
+			return reflect.Value{}, err
+		}
+		field.Set(elem)
+	}
+	return obj, nil
+
 }
 
 func typeMismatch(v *Value, k Kind) error {
