@@ -393,10 +393,16 @@ func (v *Value) addToMap(obj reflect.Value) error {
 }
 
 func (v *Value) castToPtr(t reflect.Type) (reflect.Value, error) {
-	if v.Kind != Nil {
-		return reflect.Value{}, typeMismatchByReflection(v, t)
+	if v.Kind == Nil {
+		return reflect.Zero(t), nil
 	}
-	return reflect.Zero(t), nil
+	elem, err := v.cast(t.Elem())
+	if err != nil {
+		return reflect.Value{}, err
+	}
+	ptr := reflect.New(t.Elem())
+	ptr.Elem().Set(elem)
+	return ptr, nil
 }
 
 func (v *Value) castToInterface(t reflect.Type) (reflect.Value, error) {
