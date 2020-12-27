@@ -156,10 +156,8 @@ func bindBool(v *Value, to *bool) error {
 
 func (v *Value) BindByReflection(to reflect.Value) error {
 	if isUnmarshaler(to.Type()) {
-		fmt.Printf("kind=unmarshaler ")
 		return v.bindToUnmarshalerByReflection(to)
 	} else if isPtr(to) {
-		fmt.Printf("kind=ptr ")
 		return v.bindToPtrByReflection(to)
 	}
 	return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
@@ -452,9 +450,7 @@ func (v *Value) castToStruct(t reflect.Type) (reflect.Value, error) {
 			continue
 		}
 		field := tag.FieldOf(obj)
-		fmt.Printf("%s: ", tag.Key())
 		err := v.BindByReflection(field.Addr())
-		fmt.Println("")
 		if err != nil {
 			return reflect.Value{}, err
 		}
