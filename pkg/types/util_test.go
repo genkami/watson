@@ -60,18 +60,22 @@ type customMarshaler struct {
 	SomeField int
 }
 
-func (m *customMarshaler) MarshalWatson() *types.Value {
+func (m *customMarshaler) MarshalWatson() (*types.Value, error) {
 	return types.NewObjectValue(map[string]*types.Value{
 		"custom":          types.NewBoolValue(true),
 		"customFieldName": types.NewIntValue(int64(m.SomeField)),
-	})
+	}), nil
 }
+
+var _ types.Marshaler = &customMarshaler{}
 
 type primitiveMarshaler int
 
-func (p primitiveMarshaler) MarshalWatson() *types.Value {
-	return types.NewStringValue([]byte(fmt.Sprintf("value=%d", p)))
+func (p primitiveMarshaler) MarshalWatson() (*types.Value, error) {
+	return types.NewStringValue([]byte(fmt.Sprintf("value=%d", p))), nil
 }
+
+var _ types.Marshaler = primitiveMarshaler(0)
 
 type customUnmarshalerOuter struct {
 	Unmarshaler *customUnmarshaler
@@ -96,6 +100,8 @@ func (u *customUnmarshaler) UnmarshalWatson(v *types.Value) error {
 	return nil
 }
 
+var _ types.Unmarshaler = &customUnmarshaler{}
+
 type primitiveUnmarshaler int
 
 func (p *primitiveUnmarshaler) UnmarshalWatson(v *types.Value) error {
@@ -112,3 +118,6 @@ func (p *primitiveUnmarshaler) UnmarshalWatson(v *types.Value) error {
 	*p = primitiveUnmarshaler(k.Int)
 	return nil
 }
+
+var primitiveUnmarshalerTypeAssertion = primitiveUnmarshaler(0)
+var _ types.Unmarshaler = &primitiveUnmarshalerTypeAssertion

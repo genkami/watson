@@ -25,8 +25,8 @@ type DepartmentName struct {
 	Value string
 }
 
-func (d *DepartmentName) MarshalWatson() *types.Value {
-	return types.NewStringValue([]byte(d.Value))
+func (d *DepartmentName) MarshalWatson() (*types.Value, error) {
+	return types.NewStringValue([]byte(d.Value)), nil
 }
 
 var _ types.Marshaler = &DepartmentName{}

@@ -20,8 +20,10 @@ func NewEncoder(w io.Writer) *Encoder {
 }
 
 func (e *Encoder) Encode(v interface{}) error {
-	// TODO: error handling
-	val := types.ToValue(v)
+	val, err := types.ToValue(v)
+	if err != nil {
+		return err
+	}
 	return e.d.Dump(val)
 }
 

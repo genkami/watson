@@ -24,39 +24,39 @@ import (
 // Currntly these flags are available:
 //   omitempty      If the field is zero value, it will be omitted from the output.
 //   inline         Inline the field. Currently the field must be a struct.
-func ToValue(v interface{}) *Value {
+func ToValue(v interface{}) (*Value, error) {
 	if v == nil {
-		return NewNilValue()
+		return NewNilValue(), nil
 	}
 	switch v := v.(type) {
 	case bool:
-		return NewBoolValue(v)
+		return NewBoolValue(v), nil
 	case int:
-		return NewIntValue(int64(v))
+		return NewIntValue(int64(v)), nil
 	case int8:
-		return NewIntValue(int64(v))
+		return NewIntValue(int64(v)), nil
 	case int16:
-		return NewIntValue(int64(v))
+		return NewIntValue(int64(v)), nil
 	case int32:
-		return NewIntValue(int64(v))
+		return NewIntValue(int64(v)), nil
 	case int64:
-		return NewIntValue(v)
+		return NewIntValue(v), nil
 	case uint:
-		return NewUintValue(uint64(v))
+		return NewUintValue(uint64(v)), nil
 	case uint8:
-		return NewUintValue(uint64(v))
+		return NewUintValue(uint64(v)), nil
 	case uint16:
-		return NewUintValue(uint64(v))
+		return NewUintValue(uint64(v)), nil
 	case uint32:
-		return NewUintValue(uint64(v))
+		return NewUintValue(uint64(v)), nil
 	case uint64:
-		return NewUintValue(uint64(v))
+		return NewUintValue(uint64(v)), nil
 	case string:
-		return NewStringValue([]byte(v))
+		return NewStringValue([]byte(v)), nil
 	case float32:
-		return NewFloatValue(float64(v))
+		return NewFloatValue(float64(v)), nil
 	case float64:
-		return NewFloatValue(v)
+		return NewFloatValue(v), nil
 	}
 	if marshaler, ok := v.(Marshaler); ok {
 		return marshaler.MarshalWatson()
@@ -66,7 +66,7 @@ func ToValue(v interface{}) *Value {
 }
 
 // `ToValueByReflection` does almost the same thing as `ToValue`, but it always uses reflection.
-func ToValueByReflection(v reflect.Value) *Value {
+func ToValueByReflection(v reflect.Value) (*Value, error) {
 	if isMarshaler(v) {
 		return marshalerToValueByReflection(v)
 	} else if isIntFamily(v) {
@@ -85,7 +85,7 @@ func ToValueByReflection(v reflect.Value) *Value {
 		return structToValueByReflection(v)
 	} else if isNil(v) {
 		// Marshalers should be placed before nil so as to handle `MarshalWatson` correctly.
-		return NewNilValue()
+		return NewNilValue(), nil
 		// Maps, slices, and pointers should be placed after nil so as to convert nil into Nil correctly.
 	} else if isPtr(v) {
 		return reflectPtrToValue(v)
@@ -95,59 +95,71 @@ func ToValueByReflection(v reflect.Value) *Value {
 		return sliceOrArrayToValueByReflection(v)
 	}
 
-	panic(fmt.Errorf("can't convert %s to *Value", v.Type().String()))
+	return nil, fmt.Errorf("can't convert %s to *Value", v.Type().String())
 }
 
-func intToValueByReflection(v reflect.Value) *Value {
-	return NewIntValue(v.Int())
+func intToValueByReflection(v reflect.Value) (*Value, error) {
+	return NewIntValue(v.Int()), nil
 }
 
-func uintToValueByReflection(v reflect.Value) *Value {
-	return NewUintValue(v.Uint())
+func uintToValueByReflection(v reflect.Value) (*Value, error) {
+	return NewUintValue(v.Uint()), nil
 }
 
-func floatToValueByReflection(v reflect.Value) *Value {
-	return NewFloatValue(v.Float())
+func floatToValueByReflection(v reflect.Value) (*Value, error) {
+	return NewFloatValue(v.Float()), nil
 }
 
-func boolToValueByReflection(v reflect.Value) *Value {
-	return NewBoolValue(v.Bool())
+func boolToValueByReflection(v reflect.Value) (*Value, error) {
+	return NewBoolValue(v.Bool()), nil
 }
 
-func stringToValueByReflection(v reflect.Value) *Value {
-	return NewStringValue([]byte(v.String()))
+func stringToValueByReflection(v reflect.Value) (*Value, error) {
+	return NewStringValue([]byte(v.String())), nil
 }
 
-func reflectMapToValue(v reflect.Value) *Value {
+func reflectMapToValue(v reflect.Value) (*Value, error) {
+	var err error
 	obj := map[string]*Value{}
 	iter := v.MapRange()
 	for iter.Next() {
 		k := iter.Key().String()
-		v := iter.Value()
-		if v.CanInterface() {
-			obj[k] = ToValue(v.Interface())
+		elem := iter.Value()
+		var elemVal *Value
+		if elem.CanInterface() {
+			elemVal, err = ToValue(elem.Interface())
 		} else {
-			obj[k] = ToValueByReflection(v)
+			elemVal, err = ToValueByReflection(elem)
 		}
+		if err != nil {
+			return nil, err
+		}
+		obj[k] = elemVal
 	}
-	return NewObjectValue(obj)
+	return NewObjectValue(obj), nil
 }
 
-func sliceOrArrayToValueByReflection(v reflect.Value) *Value {
+func sliceOrArrayToValueByReflection(v reflect.Value) (*Value, error) {
+	var err error
 	arr := []*Value{}
 	size := v.Len()
 	for i := 0; i < size; i++ {
 		elem := v.Index(i)
+		var elemVal *Value
 		if elem.CanInterface() {
-			arr = append(arr, ToValue(elem.Interface()))
+			elemVal, err = ToValue(elem.Interface())
 		} else {
-			arr = append(arr, ToValueByReflection(elem))
+			elemVal, err = ToValueByReflection(elem)
 		}
+		if err != nil {
+			return nil, err
+		}
+		arr = append(arr, elemVal)
 	}
-	return NewArrayValue(arr)
+	return NewArrayValue(arr), nil
 }
 
-func reflectPtrToValue(v reflect.Value) *Value {
+func reflectPtrToValue(v reflect.Value) (*Value, error) {
 	elem := v.Elem()
 	if elem.CanInterface() {
 		return ToValue(elem.Interface())
@@ -156,13 +168,16 @@ func reflectPtrToValue(v reflect.Value) *Value {
 	}
 }
 
-func structToValueByReflection(v reflect.Value) *Value {
+func structToValueByReflection(v reflect.Value) (*Value, error) {
 	obj := map[string]*Value{}
-	addFields(obj, v)
-	return NewObjectValue(obj)
+	err := addFields(obj, v)
+	if err != nil {
+		return nil, err
+	}
+	return NewObjectValue(obj), nil
 }
 
-func addFields(obj map[string]*Value, v reflect.Value) {
+func addFields(obj map[string]*Value, v reflect.Value) error {
 	size := v.NumField()
 	t := v.Type()
 	for i := 0; i < size; i++ {
@@ -177,17 +192,33 @@ func addFields(obj map[string]*Value, v reflect.Value) {
 			continue
 		}
 		if tag.Inline() {
-			addFields(obj, elem)
+			err := addFields(obj, elem)
+			if err != nil {
+				return err
+			}
 		} else if elem.CanInterface() {
-			obj[name] = ToValue(elem.Interface())
+			elemVal, err := ToValue(elem.Interface())
+			if err != nil {
+				return err
+			}
+			obj[name] = elemVal
 		} else {
-			obj[name] = ToValueByReflection(elem)
+			elemVal, err := ToValueByReflection(elem)
+			if err != nil {
+				return err
+			}
+			obj[name] = elemVal
 		}
 	}
+	return nil
 }
 
-func marshalerToValueByReflection(v reflect.Value) *Value {
+func marshalerToValueByReflection(v reflect.Value) (*Value, error) {
 	marshal := v.MethodByName("MarshalWatson")
 	ret := marshal.Call([]reflect.Value{})
-	return ret[0].Interface().(*Value)
+	val := ret[0].Interface().(*Value)
+	if err, ok := ret[1].Interface().(error); ok {
+		return val, err
+	}
+	return val, nil
 }
