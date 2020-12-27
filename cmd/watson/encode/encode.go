@@ -8,6 +8,7 @@ import (
 
 	"github.com/genkami/watson/cmd/watson/util"
 	"github.com/genkami/watson/pkg/converter/json"
+	"github.com/genkami/watson/pkg/converter/msgpack"
 	"github.com/genkami/watson/pkg/converter/yaml"
 	"github.com/genkami/watson/pkg/dumper"
 	"github.com/genkami/watson/pkg/lexer"
@@ -54,6 +55,8 @@ func encode(r io.Reader) (*types.Value, error) {
 		return yaml.Encode(r)
 	case util.Json:
 		return json.Encode(r)
+	case util.Msgpack:
+		return msgpack.Encode(r)
 	default:
 		panic("unknown input type")
 	}

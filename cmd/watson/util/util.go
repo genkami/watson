@@ -47,11 +47,13 @@ type Type int
 const (
 	Yaml Type = iota
 	Json
+	Msgpack
 )
 
 const (
-	typeNameYaml = "yaml"
-	typeNameJson = "json"
+	typeNameYaml    = "yaml"
+	typeNameJson    = "json"
+	typeNameMsgpack = "msgpack"
 )
 
 func (t *Type) String() string {
@@ -60,6 +62,8 @@ func (t *Type) String() string {
 		return typeNameYaml
 	case Json:
 		return typeNameJson
+	case Msgpack:
+		return typeNameMsgpack
 	default:
 		panic("unknown type")
 	}
@@ -73,6 +77,8 @@ func (t *Type) Set(s string) error {
 		*t = Yaml
 	case typeNameJson:
 		*t = Json
+	case typeNameMsgpack:
+		*t = Msgpack
 	default:
 		return fmt.Errorf("unknown type: %s", s)
 	}
