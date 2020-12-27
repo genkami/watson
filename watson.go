@@ -1,6 +1,7 @@
 package watson
 
 import (
+	"bytes"
 	"io"
 
 	"github.com/genkami/watson/pkg/dumper"
@@ -8,6 +9,21 @@ import (
 	"github.com/genkami/watson/pkg/types"
 	"github.com/genkami/watson/pkg/vm"
 )
+
+func Marshal(v interface{}) ([]byte, error) {
+	buf := bytes.NewBuffer(nil)
+	enc := NewEncoder(buf)
+	err := enc.Encode(v)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func Unmarshal(buf []byte, v interface{}) error {
+	dec := NewDecoder(bytes.NewReader(buf))
+	return dec.Decode(v)
+}
 
 type Encoder struct {
 	d *dumper.Dumper

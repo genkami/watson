@@ -1,7 +1,6 @@
 package watson_test
 
 import (
-	"bytes"
 	"fmt"
 	"testing"
 
@@ -60,17 +59,9 @@ func TestEncodeAndDecode(t *testing.T) {
 }
 
 func encodeThenDecode(in interface{}, out interface{}) error {
-	var err error
-	buf := bytes.NewBuffer(nil)
-	enc := watson.NewEncoder(buf)
-	err = enc.Encode(in)
+	encoded, err := watson.Marshal(in)
 	if err != nil {
 		return err
 	}
-	dec := watson.NewDecoder(bytes.NewReader(buf.Bytes()))
-	err = dec.Decode(out)
-	if err != nil {
-		return err
-	}
-	return nil
+	return watson.Unmarshal(encoded, out)
 }
