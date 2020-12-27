@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/genkami/watson/cmd/watson/util"
+	"github.com/genkami/watson/pkg/converter/cbor"
 	"github.com/genkami/watson/pkg/converter/json"
 	"github.com/genkami/watson/pkg/converter/msgpack"
 	"github.com/genkami/watson/pkg/converter/yaml"
@@ -87,6 +88,8 @@ func decode(w io.Writer, v *types.Value) error {
 		return json.Decode(w, v)
 	case util.Msgpack:
 		return msgpack.Decode(w, v)
+	case util.Cbor:
+		return cbor.Decode(w, v)
 	default:
 		panic("unknown output type")
 	}

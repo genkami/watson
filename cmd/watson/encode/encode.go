@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/genkami/watson/cmd/watson/util"
+	"github.com/genkami/watson/pkg/converter/cbor"
 	"github.com/genkami/watson/pkg/converter/json"
 	"github.com/genkami/watson/pkg/converter/msgpack"
 	"github.com/genkami/watson/pkg/converter/yaml"
@@ -57,6 +58,8 @@ func encode(r io.Reader) (*types.Value, error) {
 		return json.Encode(r)
 	case util.Msgpack:
 		return msgpack.Encode(r)
+	case util.Cbor:
+		return cbor.Encode(r)
 	default:
 		panic("unknown input type")
 	}
