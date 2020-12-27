@@ -491,8 +491,3 @@ func typeMismatch(v *Value, k Kind) error {
 func typeMismatchByReflection(v *Value, t reflect.Type) error {
 	return fmt.Errorf("can't convert %#v to %s", v.Kind, t.String())
 }
-
-func isUnmarshaler(t reflect.Type) bool {
-	var unmarshaler Unmarshaler
-	return t.Implements(reflect.TypeOf(&unmarshaler).Elem())
-}

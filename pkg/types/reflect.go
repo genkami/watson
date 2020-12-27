@@ -103,3 +103,78 @@ func (t *tag) Inline() bool {
 func (t *tag) FieldOf(v reflect.Value) reflect.Value {
 	return v.FieldByIndex(t.f.Index)
 }
+
+func isIntFamily(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	default:
+		return false
+	}
+}
+
+func isUintFamily(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return true
+	default:
+		return false
+	}
+}
+
+func isFloatFamily(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Float32, reflect.Float64:
+		return true
+	default:
+		return false
+	}
+}
+
+func isBool(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Bool
+}
+
+func isString(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.String
+}
+
+func isNil(v reflect.Value) bool {
+	switch v.Type().Kind() {
+	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map, reflect.Ptr, reflect.Slice:
+		return v.IsNil()
+	default:
+		return false
+	}
+}
+
+func isMapConvertibleToValue(v reflect.Value) bool {
+	t := v.Type()
+	return t.Kind() == reflect.Map && t.Key().Kind() == reflect.String
+}
+
+func isSlice(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Slice
+}
+
+func isArray(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Array
+}
+
+func isPtr(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Ptr
+}
+
+func isStruct(v reflect.Value) bool {
+	return v.Type().Kind() == reflect.Struct
+}
+
+func isMarshaler(v reflect.Value) bool {
+	var marshaler Marshaler
+	return v.Type().Implements(reflect.TypeOf(&marshaler).Elem())
+}
+
+func isUnmarshaler(t reflect.Type) bool {
+	var unmarshaler Unmarshaler
+	return t.Implements(reflect.TypeOf(&unmarshaler).Elem())
+}
