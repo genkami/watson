@@ -5,10 +5,12 @@ import (
 	"os"
 
 	"github.com/genkami/watson/cmd/watson/decode"
+	"github.com/genkami/watson/cmd/watson/encode"
 )
 
 var allCmds = map[string]func([]string){
 	"decode": decode.Main,
+	"encode": encode.Main,
 }
 
 func main() {

@@ -14,3 +14,13 @@ func Decode(w io.Writer, val *types.Value) error {
 	defer enc.Close()
 	return enc.Encode(obj)
 }
+
+func Encode(r io.Reader) (*types.Value, error) {
+	var any interface{}
+	dec := yaml.NewDecoder(r)
+	err := dec.Decode(&any)
+	if err != nil {
+		return nil, err
+	}
+	return types.ToValue(any)
+}
