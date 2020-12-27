@@ -539,6 +539,62 @@ func TestBindEmbedsFieldTaggedWithInline(t *testing.T) {
 	}
 }
 
+func TestBindConvertsUnmarshaler(t *testing.T) {
+	var err error
+	var got customUnmarshaler
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"customKey": types.NewIntValue(123),
+	})
+	var want customUnmarshaler = customUnmarshaler{
+		SomeField: 123,
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsUnmarshalerEvenIfNotStruct(t *testing.T) {
+	var err error
+	var got primitiveUnmarshaler
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"customKey": types.NewIntValue(123),
+	})
+	var want primitiveUnmarshaler = primitiveUnmarshaler(123)
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindConvertsNestedUnmarshaler(t *testing.T) {
+	var err error
+	var got customUnmarshalerOuter
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"unmarshaler": types.NewObjectValue(map[string]*types.Value{
+			"customKey": types.NewIntValue(123),
+		}),
+	})
+	var want customUnmarshalerOuter = customUnmarshalerOuter{
+		Unmarshaler: &customUnmarshaler{
+			SomeField: 123,
+		},
+	}
+	err = val.Bind(&got)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -1058,6 +1114,62 @@ func TestBindByReflectionEmbedsFieldTaggedWithInline(t *testing.T) {
 		Field: 123,
 		Inner: inlineInner{
 			NestedField: 456,
+		},
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsUnmarshaler(t *testing.T) {
+	var err error
+	var got customUnmarshaler
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"customKey": types.NewIntValue(123),
+	})
+	var want customUnmarshaler = customUnmarshaler{
+		SomeField: 123,
+	}
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsUnmarshalerEvenIfNotStruct(t *testing.T) {
+	var err error
+	var got primitiveUnmarshaler
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"customKey": types.NewIntValue(123),
+	})
+	var want primitiveUnmarshaler = primitiveUnmarshaler(123)
+	err = val.BindByReflection(reflect.ValueOf(&got))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionConvertsNestedUnmarshaler(t *testing.T) {
+	var err error
+	var got customUnmarshalerOuter
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"unmarshaler": types.NewObjectValue(map[string]*types.Value{
+			"customKey": types.NewIntValue(123),
+		}),
+	})
+	var want customUnmarshalerOuter = customUnmarshalerOuter{
+		Unmarshaler: &customUnmarshaler{
+			SomeField: 123,
 		},
 	}
 	err = val.BindByReflection(reflect.ValueOf(&got))

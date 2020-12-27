@@ -36,6 +36,9 @@ func (v *Value) Bind(to interface{}) error {
 	case *bool:
 		return bindBool(v, to)
 	}
+	if unmarshaler, ok := to.(Unmarshaler); ok {
+		return unmarshaler.UnmarshalWatson(v)
+	}
 	return v.BindByReflection(reflect.ValueOf(to))
 }
 
@@ -152,22 +155,38 @@ func bindBool(v *Value, to *bool) error {
 }
 
 func (v *Value) BindByReflection(to reflect.Value) error {
-	if !isPtr(to) {
-		return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
+	if isUnmarshaler(to.Type()) {
+		fmt.Printf("kind=unmarshaler ")
+		return v.bindToUnmarshalerByReflection(to)
+	} else if isPtr(to) {
+		fmt.Printf("kind=ptr ")
+		return v.bindToPtrByReflection(to)
 	}
-	return v.bindByReflection(to.Elem())
+	return fmt.Errorf("can't convert %#v to %s", v.Kind, to.Type().String())
 }
 
-func (v *Value) bindByReflection(to reflect.Value) error {
-	casted, err := v.cast(to.Type())
+func (v *Value) bindToUnmarshalerByReflection(to reflect.Value) error {
+	unmarshal := to.MethodByName("UnmarshalWatson")
+	ret := unmarshal.Call([]reflect.Value{reflect.ValueOf(v)})[0].Interface()
+	if err, ok := ret.(error); ok {
+		return err
+	}
+	return nil
+}
+
+func (v *Value) bindToPtrByReflection(to reflect.Value) error {
+	casted, err := v.cast(to.Elem().Type())
 	if err != nil {
 		return err
 	}
-	to.Set(casted)
+	to.Elem().Set(casted)
 	return nil
 }
 
 func (v *Value) cast(t reflect.Type) (reflect.Value, error) {
+	if isUnmarshaler(t) {
+		return v.castToUnmarshaler(t)
+	}
 	switch t.Kind() {
 	case reflect.Int:
 		return v.castToInt(t)
@@ -433,15 +452,16 @@ func (v *Value) castToStruct(t reflect.Type) (reflect.Value, error) {
 			continue
 		}
 		field := tag.FieldOf(obj)
-		elem, err := v.cast(field.Type())
+		fmt.Printf("%s: ", tag.Key())
+		err := v.BindByReflection(field.Addr())
+		fmt.Println("")
 		if err != nil {
 			return reflect.Value{}, err
 		}
-		field.Set(elem)
 	}
 	for _, tag := range inlineFields(obj) {
 		field := tag.FieldOf(obj)
-		err := v.bindByReflection(field)
+		err := v.BindByReflection(field.Addr())
 		if err != nil {
 			return reflect.Value{}, err
 		}
@@ -450,10 +470,29 @@ func (v *Value) castToStruct(t reflect.Type) (reflect.Value, error) {
 
 }
 
+func (v *Value) castToUnmarshaler(t reflect.Type) (reflect.Value, error) {
+	var obj reflect.Value
+	if t.Kind() == reflect.Ptr {
+		obj = reflect.New(t.Elem())
+	} else {
+		obj = reflect.New(t).Elem()
+	}
+	err := v.bindToUnmarshalerByReflection(obj)
+	if err != nil {
+		return reflect.Value{}, err
+	}
+	return obj, nil
+}
+
 func typeMismatch(v *Value, k Kind) error {
 	return fmt.Errorf("cn't convert %#v to %#v", v.Kind, k)
 }
 
 func typeMismatchByReflection(v *Value, t reflect.Type) error {
 	return fmt.Errorf("can't convert %#v to %s", v.Kind, t.String())
+}
+
+func isUnmarshaler(t reflect.Type) bool {
+	var unmarshaler Unmarshaler
+	return t.Implements(reflect.TypeOf(&unmarshaler).Elem())
 }

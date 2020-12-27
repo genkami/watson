@@ -78,6 +78,46 @@ func (p primitiveMarshaler) MarshalWatson() *types.Value {
 	return types.NewStringValue([]byte(fmt.Sprintf("value=%d", p)))
 }
 
+type customUnmarshalerOuter struct {
+	Unmarshaler *customUnmarshaler
+}
+
+type customUnmarshaler struct {
+	SomeField int
+}
+
+func (u *customUnmarshaler) UnmarshalWatson(v *types.Value) error {
+	if v.Kind != types.Object {
+		return fmt.Errorf("value is not an Object")
+	}
+	k, ok := v.Object["customKey"]
+	if !ok {
+		return fmt.Errorf("value does not have customKey")
+	}
+	if k.Kind != types.Int {
+		return fmt.Errorf("custom key is not an int")
+	}
+	u.SomeField = int(k.Int)
+	return nil
+}
+
+type primitiveUnmarshaler int
+
+func (p *primitiveUnmarshaler) UnmarshalWatson(v *types.Value) error {
+	if v.Kind != types.Object {
+		return fmt.Errorf("value is not an Object")
+	}
+	k, ok := v.Object["customKey"]
+	if !ok {
+		return fmt.Errorf("value does not have customKey")
+	}
+	if k.Kind != types.Int {
+		return fmt.Errorf("custom key is not an int")
+	}
+	*p = primitiveUnmarshaler(k.Int)
+	return nil
+}
+
 func TestToValueConvertsNilInterface(t *testing.T) {
 	want := types.NewNilValue()
 	got := types.ToValue(nil)

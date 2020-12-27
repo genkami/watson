@@ -166,3 +166,7 @@ var _ fmt.GoStringer = Kind(0)
 type Marshaler interface {
 	MarshalWatson() *Value
 }
+
+type Unmarshaler interface {
+	UnmarshalWatson(*Value) error
+}
