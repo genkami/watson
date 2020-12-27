@@ -88,9 +88,9 @@ func ToValueByReflection(v reflect.Value) (*Value, error) {
 		return NewNilValue(), nil
 		// Maps, slices, and pointers should be placed after nil so as to convert nil into Nil correctly.
 	} else if isPtr(v) {
-		return reflectPtrToValue(v)
+		return ptrToValueByReflection(v)
 	} else if isMapConvertibleToValue(v) {
-		return reflectMapToValue(v)
+		return mapToValueByReflection(v)
 	} else if isSlice(v) {
 		return sliceOrArrayToValueByReflection(v)
 	}
@@ -118,7 +118,7 @@ func stringToValueByReflection(v reflect.Value) (*Value, error) {
 	return NewStringValue([]byte(v.String())), nil
 }
 
-func reflectMapToValue(v reflect.Value) (*Value, error) {
+func mapToValueByReflection(v reflect.Value) (*Value, error) {
 	var err error
 	obj := map[string]*Value{}
 	iter := v.MapRange()
@@ -159,7 +159,7 @@ func sliceOrArrayToValueByReflection(v reflect.Value) (*Value, error) {
 	return NewArrayValue(arr), nil
 }
 
-func reflectPtrToValue(v reflect.Value) (*Value, error) {
+func ptrToValueByReflection(v reflect.Value) (*Value, error) {
 	elem := v.Elem()
 	if elem.CanInterface() {
 		return ToValue(elem.Interface())
