@@ -148,9 +148,9 @@ func isNil(v reflect.Value) bool {
 	}
 }
 
-func isMapConvertibleToValue(v reflect.Value) bool {
+func isMap(v reflect.Value) bool {
 	t := v.Type()
-	return t.Kind() == reflect.Map && t.Key().Kind() == reflect.String
+	return t.Kind() == reflect.Map
 }
 
 func isSlice(v reflect.Value) bool {

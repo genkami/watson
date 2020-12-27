@@ -265,6 +265,19 @@ func TestToValueConvertsHeteroMap(t *testing.T) {
 	}
 }
 
+func TestToValueConvertsMapWhoseKeyCanBeConvertedToString(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
+	})
+	got, err := types.ToValue(map[interface{}]string{"hello": "world"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
 func TestToValueConvertsSlice(t *testing.T) {
 	want := types.NewArrayValue([]*types.Value{
 		types.NewIntValue(123), types.NewIntValue(456), types.NewIntValue(789),
@@ -764,6 +777,19 @@ func TestToValueByReflectionConvertsHeteroMap(t *testing.T) {
 		},
 		"array": []interface{}{"nested"},
 	}))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestToValueByReflectionConvertsMapWhoseKeyCanBeConvertedToString(t *testing.T) {
+	want := types.NewObjectValue(map[string]*types.Value{
+		"hello": types.NewStringValue([]byte("world")),
+	})
+	got, err := types.ToValueByReflection(reflect.ValueOf(map[interface{}]string{"hello": "world"}))
 	if err != nil {
 		t.Fatal(err)
 	}
