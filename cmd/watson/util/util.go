@@ -34,7 +34,7 @@ func (m *Mode) Set(s string) error {
 	case modeNameS:
 		*m = Mode(lexer.S)
 	default:
-		fmt.Errorf("unknown mode: %s", s)
+		return fmt.Errorf("unknown mode: %s", s)
 	}
 	return nil
 }
