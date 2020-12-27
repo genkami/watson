@@ -17,11 +17,13 @@ import (
 
 var (
 	outType util.Type
+	mode    util.Mode
 )
 
 func buildFlagSet() *flag.FlagSet {
 	fs := flag.NewFlagSet("watson encode", flag.ExitOnError)
 	fs.Var(&outType, "t", "input type")
+	fs.Var(&mode, "initial-mode", "initial mode of the lexer")
 	return fs
 }
 
@@ -36,7 +38,7 @@ func Main(args []string) {
 		os.Exit(1)
 	}
 
-	lexer := lexer.NewLexer(os.Stdin, lexer.WithFileName("<stdin>"))
+	lexer := lexer.NewLexer(os.Stdin, lexer.WithFileName("<stdin>"), lexer.WithInitialLexerMode(lexer.Mode(mode)))
 	v, err := parseWatson(lexer)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "parse error: %s\n", err)

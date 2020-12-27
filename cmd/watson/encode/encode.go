@@ -17,11 +17,13 @@ import (
 
 var (
 	inType util.Type
+	mode   util.Mode
 )
 
 func buildFlagSet() *flag.FlagSet {
 	fs := flag.NewFlagSet("watson encode", flag.ExitOnError)
 	fs.Var(&inType, "t", "input type")
+	fs.Var(&mode, "initial-mode", "initial mode of the unlexer")
 	return fs
 }
 
@@ -58,7 +60,7 @@ func encode(r io.Reader) (*types.Value, error) {
 }
 
 func dump(w io.Writer, v *types.Value) error {
-	unl := prettifier.NewPrettifier(lexer.NewUnlexer(w))
+	unl := prettifier.NewPrettifier(lexer.NewUnlexer(w, lexer.WithInitialUnlexerMode(lexer.Mode(mode))))
 	d := dumper.NewDumper(unl)
 	return d.Dump(v)
 }
