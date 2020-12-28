@@ -2,6 +2,7 @@ package types_test
 
 import (
 	"reflect"
+	"regexp"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
@@ -595,6 +596,54 @@ func TestBindConvertsNestedUnmarshaler(t *testing.T) {
 	}
 }
 
+func TestBindReturnsErrorWhenTypeMismatchInTopLevel(t *testing.T) {
+	var err error
+	var val = types.NewIntValue(123)
+	var bindTo string
+	err = val.Bind(&bindTo)
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+	pat := regexp.MustCompile(`\(at <root>\)`)
+	if !pat.MatchString(err.Error()) {
+		t.Errorf("expected \"%s\" to match /%s/, but it didn't", err.Error(), pat.String())
+	}
+}
+
+func TestBindReturnsErrorWhenTypeMismatchInMapElem(t *testing.T) {
+	var err error
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"validValue": types.NewStringValue([]byte("123")),
+		"value":      types.NewIntValue(456),
+	})
+	var bindTo map[string]string
+	err = val.Bind(&bindTo)
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+	pat := regexp.MustCompile(`\(at <root>.value\)`)
+	if !pat.MatchString(err.Error()) {
+		t.Errorf("expected \"%s\" to match /%s/, but it didn't", err.Error(), pat.String())
+	}
+}
+
+func TestBindReturnsErrorWhenTypeMismatchInArrayElem(t *testing.T) {
+	var err error
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewStringValue([]byte("123")),
+		types.NewIntValue(456),
+	})
+	var bindTo []string
+	err = val.Bind(&bindTo)
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+	pat := regexp.MustCompile(`\(at <root>\[1\]\)`)
+	if !pat.MatchString(err.Error()) {
+		t.Errorf("expected \"%s\" to match /%s/, but it didn't", err.Error(), pat.String())
+	}
+}
+
 func TestBindByReflectionConvertsInt(t *testing.T) {
 	var err error
 	var got int
@@ -1178,5 +1227,53 @@ func TestBindByReflectionConvertsNestedUnmarshaler(t *testing.T) {
 	}
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Errorf("mismatch (-want +got):\n%s", diff)
+	}
+}
+
+func TestBindByReflectionReturnsErrorWhenTypeMismatchInTopLevel(t *testing.T) {
+	var err error
+	var val = types.NewIntValue(123)
+	var bindTo string
+	err = val.BindByReflection(reflect.ValueOf(&bindTo))
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+	pat := regexp.MustCompile(`\(at <root>\)`)
+	if !pat.MatchString(err.Error()) {
+		t.Errorf("expected \"%s\" to match /%s/, but it didn't", err.Error(), pat.String())
+	}
+}
+
+func TestBindByReflectionReturnsErrorWhenTypeMismatchInMapElem(t *testing.T) {
+	var err error
+	var val = types.NewObjectValue(map[string]*types.Value{
+		"validValue": types.NewStringValue([]byte("123")),
+		"value":      types.NewIntValue(456),
+	})
+	var bindTo map[string]string
+	err = val.BindByReflection(reflect.ValueOf(&bindTo))
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+	pat := regexp.MustCompile(`\(at <root>.value\)`)
+	if !pat.MatchString(err.Error()) {
+		t.Errorf("expected \"%s\" to match /%s/, but it didn't", err.Error(), pat.String())
+	}
+}
+
+func TestBindByReflectionReturnsErrorWhenTypeMismatchInArrayElem(t *testing.T) {
+	var err error
+	var val = types.NewArrayValue([]*types.Value{
+		types.NewStringValue([]byte("123")),
+		types.NewIntValue(456),
+	})
+	var bindTo []string
+	err = val.BindByReflection(reflect.ValueOf(&bindTo))
+	if err == nil {
+		t.Fatal("expected an error but got nil")
+	}
+	pat := regexp.MustCompile(`\(at <root>\[1\]\)`)
+	if !pat.MatchString(err.Error()) {
+		t.Errorf("expected \"%s\" to match /%s/, but it didn't", err.Error(), pat.String())
 	}
 }

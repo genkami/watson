@@ -1,6 +1,7 @@
 package types
 
 import (
+	"fmt"
 	"reflect"
 	"strings"
 	"unicode"
@@ -177,4 +178,15 @@ func isMarshaler(v reflect.Value) bool {
 func isUnmarshaler(t reflect.Type) bool {
 	var unmarshaler Unmarshaler
 	return t.Implements(reflect.TypeOf(&unmarshaler).Elem())
+}
+
+type TypeMismatch struct {
+	val  *Value
+	t    reflect.Type
+	path path
+}
+
+func (e *TypeMismatch) Error() string {
+	return fmt.Sprintf("can't convert %#v to %s (at %s)",
+		e.val.Kind, e.t.String(), e.path.string())
 }
