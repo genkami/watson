@@ -44,8 +44,8 @@ func (e *Encoder) Encode(v interface{}) error {
 }
 
 type Decoder struct {
-	l       *lexer.Lexer
-	bufsize int
+	l         *lexer.Lexer
+	stackSize int
 }
 
 func NewDecoder(r io.Reader) *Decoder {
@@ -54,12 +54,12 @@ func NewDecoder(r io.Reader) *Decoder {
 	}
 }
 
-func (d *Decoder) SetBufSize(size int) {
-	d.bufsize = size
+func (d *Decoder) SetStacksize(size int) {
+	d.stackSize = size
 }
 
 func (d *Decoder) Decode(v interface{}) error {
-	m := vm.NewVM(vm.WithStackSize(d.bufsize))
+	m := vm.NewVM(vm.WithStackSize(d.stackSize))
 	for {
 		tok, err := d.l.Next()
 		if err == io.EOF {
