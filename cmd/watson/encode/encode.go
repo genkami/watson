@@ -3,6 +3,7 @@ package encode
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"io"
 	"os"
 
@@ -20,7 +21,7 @@ import (
 type Runner struct {
 	inType util.Type
 	mode   util.Mode
-	files  []string
+	opener util.Opener
 }
 
 func NewRunner() *Runner {
@@ -35,22 +36,40 @@ func (r *Runner) parseArgs(args []string) {
 	if errors.Is(err, flag.ErrHelp) {
 		os.Exit(0)
 	} else if err != nil {
+		fmt.Fprintf(os.Stderr, "%s", err.Error())
 		fs.PrintDefaults()
 		os.Exit(1)
 	}
-	r.files = fs.Args()
+	files := fs.Args()
+	if len(files) == 0 {
+		r.opener = util.NewRWCOpener("<stdin>", os.Stdin)
+	} else if len(files) == 1 {
+		r.opener = util.NewFileOpener(files[0], os.O_RDONLY, 0)
+	} else {
+		fmt.Fprintf(os.Stderr, "too many arguments")
+		fs.PrintDefaults()
+		os.Exit(1)
+	}
 }
 
 func (r *Runner) Run(args []string) {
 	var err error
 	r.parseArgs(args)
-	val, err := r.encode(os.Stdin)
+	file, err := r.opener.Open()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "can't open %s: %s\n", r.opener.Name(), err.Error())
+		os.Exit(1)
+	}
+	defer file.Close()
+	val, err := r.encode(file)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error loading %s: %s\n", r.opener.Name(), err.Error())
+		os.Exit(1)
 	}
 	err = r.dump(os.Stdout, val)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(os.Stderr, "error writing output: %s\n", r.opener.Name(), err.Error())
+		os.Exit(1)
 	}
 }
 

@@ -104,6 +104,7 @@ func (r *Runner) parseAllFiles() error {
 		}
 		lex := r.buildLexer(file, o.Name())
 		err = r.parseWatson(lex)
+		file.Close()
 		if err != nil {
 			return err
 		}
