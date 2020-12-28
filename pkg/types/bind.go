@@ -5,6 +5,9 @@ import (
 	"reflect"
 )
 
+// Bind converts v into any go object and assigns it to `to`.
+//
+// See watson.Marshal for more details.
 func (v *Value) Bind(to interface{}) error {
 	return v.bind(to, newRootPath())
 }
@@ -214,6 +217,7 @@ func bindBool(v *Value, to *bool, path path) error {
 	return nil
 }
 
+// BindByReflection is almost the same as Bind but it always uses reflection.
 func (v *Value) BindByReflection(to reflect.Value) error {
 	return v.bindByReflection(to, newRootPath())
 }

@@ -63,6 +63,7 @@ func (v *Value) IsNaN() bool {
 	return v.Kind == Float && math.IsNaN(v.Float)
 }
 
+// DeepCopy returns a deep copy of v.
 func (v *Value) DeepCopy() *Value {
 	clone := &Value{Kind: v.Kind}
 	switch v.Kind {
@@ -163,10 +164,12 @@ func (k Kind) GoString() string {
 
 var _ fmt.GoStringer = Kind(0)
 
+// By implementing Marshaler you can configure converting go objects into Values.
 type Marshaler interface {
 	MarshalWatson() (*Value, error)
 }
 
+// By implementing Unmarshaler you can configure converting Values into go objects.
 type Unmarshaler interface {
 	UnmarshalWatson(*Value) error
 }

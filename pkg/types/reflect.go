@@ -180,6 +180,7 @@ func isUnmarshaler(t reflect.Type) bool {
 	return t.Implements(reflect.TypeOf(&unmarshaler).Elem())
 }
 
+// TypeMismatch is an error that indicates that a given Value can't be converted into expected type.
 type TypeMismatch struct {
 	val  *Value
 	t    reflect.Type
