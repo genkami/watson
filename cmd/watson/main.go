@@ -8,9 +8,13 @@ import (
 	"github.com/genkami/watson/cmd/watson/encode"
 )
 
-var allCmds = map[string]func([]string){
-	"decode": decode.Main,
-	"encode": encode.Main,
+type Runner interface {
+	Run([]string)
+}
+
+var allCmds = map[string]Runner{
+	"decode": decode.NewRunner(),
+	"encode": encode.NewRunner(),
 }
 
 func main() {
@@ -23,7 +27,7 @@ func main() {
 		usage()
 		os.Exit(1)
 	}
-	cmd(os.Args[2:])
+	cmd.Run(os.Args[2:])
 }
 
 func usage() {

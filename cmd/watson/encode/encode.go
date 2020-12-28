@@ -17,41 +17,45 @@ import (
 	"github.com/genkami/watson/pkg/types"
 )
 
-var (
+type Runner struct {
 	inType util.Type
 	mode   util.Mode
-)
-
-func buildFlagSet() *flag.FlagSet {
-	fs := flag.NewFlagSet("watson encode", flag.ExitOnError)
-	fs.Var(&inType, "t", "input type")
-	fs.Var(&mode, "initial-mode", "initial mode of the unlexer")
-	return fs
+	files  []string
 }
 
-func Main(args []string) {
-	var err error
-	fs := buildFlagSet()
-	err = fs.Parse(args)
+func NewRunner() *Runner {
+	return &Runner{}
+}
+
+func (r *Runner) parseArgs(args []string) {
+	fs := flag.NewFlagSet("watson encode", flag.ExitOnError)
+	fs.Var(&r.inType, "t", "input type")
+	fs.Var(&r.mode, "initial-mode", "initial mode of the unlexer")
+	err := fs.Parse(args)
 	if errors.Is(err, flag.ErrHelp) {
 		os.Exit(0)
 	} else if err != nil {
 		fs.PrintDefaults()
 		os.Exit(1)
 	}
+	r.files = fs.Args()
+}
 
-	val, err := encode(os.Stdin)
+func (r *Runner) Run(args []string) {
+	var err error
+	r.parseArgs(args)
+	val, err := r.encode(os.Stdin)
 	if err != nil {
 		panic(err)
 	}
-	err = dump(os.Stdout, val)
+	err = r.dump(os.Stdout, val)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func encode(r io.Reader) (*types.Value, error) {
-	switch inType {
+func (rn *Runner) encode(r io.Reader) (*types.Value, error) {
+	switch rn.inType {
 	case util.Yaml:
 		return yaml.Encode(r)
 	case util.Json:
@@ -65,8 +69,8 @@ func encode(r io.Reader) (*types.Value, error) {
 	}
 }
 
-func dump(w io.Writer, v *types.Value) error {
-	unl := prettifier.NewPrettifier(lexer.NewUnlexer(w, lexer.WithInitialUnlexerMode(lexer.Mode(mode))))
+func (r *Runner) dump(w io.Writer, v *types.Value) error {
+	unl := prettifier.NewPrettifier(lexer.NewUnlexer(w, lexer.WithInitialUnlexerMode(lexer.Mode(r.mode))))
 	d := dumper.NewDumper(unl)
 	return d.Dump(v)
 }

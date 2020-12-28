@@ -17,40 +17,54 @@ import (
 	"github.com/genkami/watson/pkg/vm"
 )
 
-var (
+type Runner struct {
 	outType util.Type
 	mode    util.Mode
-)
-
-func buildFlagSet() *flag.FlagSet {
-	fs := flag.NewFlagSet("watson encode", flag.ExitOnError)
-	fs.Var(&outType, "t", "input type")
-	fs.Var(&mode, "initial-mode", "initial mode of the lexer")
-	return fs
+	files   []string
+	m       *vm.VM
 }
 
-func Main(args []string) {
-	var err error
-	fs := buildFlagSet()
-	err = fs.Parse(args)
+func NewRunner() *Runner {
+	return &Runner{m: vm.NewVM()}
+}
+
+func (r *Runner) parseArgs(args []string) {
+	fs := flag.NewFlagSet("watson encode", flag.ExitOnError)
+	fs.Var(&r.outType, "t", "input type")
+	fs.Var(&r.mode, "initial-mode", "initial mode of the lexer")
+	err := fs.Parse(args)
 	if errors.Is(err, flag.ErrHelp) {
 		os.Exit(0)
 	} else if err != nil {
 		fs.PrintDefaults()
 		os.Exit(1)
 	}
+	r.files = fs.Args()
+}
 
-	lexer := lexer.NewLexer(os.Stdin, lexer.WithFileName("<stdin>"), lexer.WithInitialLexerMode(lexer.Mode(mode)))
-	v, err := parseWatson(lexer)
+func (r *Runner) Run(args []string) {
+	var err error
+	r.parseArgs(args)
+
+	lexer := r.buildLexer(os.Stdin, "<stdin>")
+	v, err := r.parseWatson(lexer)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "parse error: %s\n", err)
 		os.Exit(1)
 	}
-	err = decode(os.Stdout, v)
+	err = r.decode(os.Stdout, v)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "can't write Watson: %s\n", err.Error())
 		os.Exit(1)
 	}
+}
+
+func (rn *Runner) buildLexer(r io.Reader, name string) *lexer.Lexer {
+	return lexer.NewLexer(
+		r,
+		lexer.WithFileName(name),
+		lexer.WithInitialLexerMode(lexer.Mode(rn.mode)),
+	)
 }
 
 type parseError struct {
@@ -63,8 +77,7 @@ func (p *parseError) Error() string {
 		p.err, p.tok.FileName, p.tok.Line+1, p.tok.Column+1)
 }
 
-func parseWatson(lex *lexer.Lexer) (*types.Value, error) {
-	m := vm.NewVM()
+func (r *Runner) parseWatson(lex *lexer.Lexer) (*types.Value, error) {
 	for {
 		tok, err := lex.Next()
 		if err == io.EOF {
@@ -72,16 +85,17 @@ func parseWatson(lex *lexer.Lexer) (*types.Value, error) {
 		} else if err != nil {
 			return nil, &parseError{tok: tok, err: err}
 		}
-		err = m.Feed(tok.Op)
+		err = r.m.Feed(tok.Op)
 		if err != nil {
 			return nil, &parseError{tok: tok, err: err}
 		}
 	}
-	return m.Top()
+	r.mode = util.Mode(lex.Mode())
+	return r.m.Top()
 }
 
-func decode(w io.Writer, v *types.Value) error {
-	switch outType {
+func (r *Runner) decode(w io.Writer, v *types.Value) error {
+	switch r.outType {
 	case util.Yaml:
 		return yaml.Decode(w, v)
 	case util.Json:
