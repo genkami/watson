@@ -68,7 +68,7 @@ func (r *Runner) Run(args []string) {
 	}
 	err = r.dump(os.Stdout, val)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error writing output: %s\n", r.opener.Name(), err.Error())
+		fmt.Fprintf(os.Stderr, "error writing output: %s\n", err.Error())
 		os.Exit(1)
 	}
 }
