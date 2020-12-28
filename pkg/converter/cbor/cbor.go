@@ -1,3 +1,4 @@
+// Package cbor provides a way to convert CBOR into types.Value and vice versa.
 package cbor
 
 import (

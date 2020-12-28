@@ -1,3 +1,4 @@
+// Package msgpack provides a way to convert MessagePack into types.Value and vice versa.
 package msgpack
 
 import (

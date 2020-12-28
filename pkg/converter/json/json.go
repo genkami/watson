@@ -1,3 +1,4 @@
+// Package json provides a way to convert JSON into types.Value and vice versa.
 package json
 
 import (

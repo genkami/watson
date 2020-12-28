@@ -1,3 +1,4 @@
+// Package yaml provides a way to convert YAML into types.Value and vice versa.
 package yaml
 
 import (
