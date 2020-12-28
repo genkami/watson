@@ -46,10 +46,14 @@ func (r *Runner) Run(args []string) {
 	var err error
 	r.parseArgs(args)
 
-	lexer := r.buildLexer(os.Stdin, "<stdin>")
-	v, err := r.parseWatson(lexer)
+	err = r.parseAllFiles()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "parse error: %s\n", err)
+		os.Exit(1)
+	}
+	v, err := r.m.Top()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "result is empty")
 		os.Exit(1)
 	}
 	err = r.decode(os.Stdout, v)
@@ -57,6 +61,20 @@ func (r *Runner) Run(args []string) {
 		fmt.Fprintf(os.Stderr, "can't write Watson: %s\n", err.Error())
 		os.Exit(1)
 	}
+}
+
+func (r *Runner) openers() []util.Opener {
+	if len(r.files) == 0 {
+		return []util.Opener{
+			util.NewRWCOpener("<stdin>", os.Stdin),
+		}
+	}
+	openers := make([]util.Opener, 0, len(r.files))
+	for _, path := range r.files {
+		o := util.NewFileOpener(path, os.O_RDONLY, 0)
+		openers = append(openers, o)
+	}
+	return openers
 }
 
 func (rn *Runner) buildLexer(r io.Reader, name string) *lexer.Lexer {
@@ -77,21 +95,36 @@ func (p *parseError) Error() string {
 		p.err, p.tok.FileName, p.tok.Line+1, p.tok.Column+1)
 }
 
-func (r *Runner) parseWatson(lex *lexer.Lexer) (*types.Value, error) {
+func (r *Runner) parseAllFiles() error {
+	for _, o := range r.openers() {
+		file, err := o.Open()
+		if err != nil {
+			return err
+		}
+		lex := r.buildLexer(file, o.Name())
+		err = r.parseWatson(lex)
+		if err != nil {
+			return err
+		}
+		r.mode = util.Mode(lex.Mode())
+	}
+	return nil
+}
+
+func (r *Runner) parseWatson(lex *lexer.Lexer) error {
 	for {
 		tok, err := lex.Next()
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return nil, &parseError{tok: tok, err: err}
+			return &parseError{tok: tok, err: err}
 		}
 		err = r.m.Feed(tok.Op)
 		if err != nil {
-			return nil, &parseError{tok: tok, err: err}
+			return &parseError{tok: tok, err: err}
 		}
 	}
-	r.mode = util.Mode(lex.Mode())
-	return r.m.Top()
+	return nil
 }
 
 func (r *Runner) decode(w io.Writer, v *types.Value) error {

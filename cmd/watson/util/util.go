@@ -3,6 +3,8 @@ package util
 import (
 	"flag"
 	"fmt"
+	"io"
+	"os"
 
 	"github.com/genkami/watson/pkg/lexer"
 )
@@ -93,3 +95,54 @@ func (t *Type) Set(s string) error {
 
 var assertTypeIsValue = Type(0)
 var _ flag.Value = &assertTypeIsValue
+
+type Opener interface {
+	Name() string
+	Open() (io.ReadWriteCloser, error)
+}
+
+type RWCOpener struct {
+	name string
+	rwc  io.ReadWriteCloser
+}
+
+func NewRWCOpener(name string, rwc io.ReadWriteCloser) *RWCOpener {
+	return &RWCOpener{
+		name: name,
+		rwc:  rwc,
+	}
+}
+
+func (rwc *RWCOpener) Name() string {
+	return rwc.name
+}
+
+func (rwc *RWCOpener) Open() (io.ReadWriteCloser, error) {
+	return rwc.rwc, nil
+}
+
+var _ Opener = &RWCOpener{}
+
+type FileOpener struct {
+	path string
+	flag int
+	perm os.FileMode
+}
+
+func NewFileOpener(path string, flag int, perm os.FileMode) *FileOpener {
+	return &FileOpener{
+		path: path,
+		flag: flag,
+		perm: perm,
+	}
+}
+
+func (o *FileOpener) Name() string {
+	return o.path
+}
+
+func (o *FileOpener) Open() (io.ReadWriteCloser, error) {
+	return os.OpenFile(o.path, o.flag, o.perm)
+}
+
+var _ Opener = &FileOpener{}
