@@ -268,5 +268,62 @@ push(y);
 push(x);
 ```
 
+If there is no sufficient values in the stack or values on the stack is not what the VM expects, the VM stops execution and reports an error.
+
 ## Watson Representation
-WIP
+
+The correspondence between VM's instructions and its ASCII representation varies depending on the lexer's *mode*.
+
+Each lexer has its own mode. The mode of a lexer is either `A` or `S`. The initial mode of a lexer is `A` unless otherwise specified.
+
+The complete conversion table between instructions and their Watson Representations are as follows:
+
++-----------+--------------+--------------+
+|Instruction\mode|A        |S        |
++-----------+--------------+--------------+
+|Inew       |B             |S             |
++-----------+--------------+--------------+
+|Iinc       |u             |h             |
++-----------+--------------+--------------+
+|Ishl       |b             |a             |
++-----------+--------------+--------------+
+|Iadd       |a             |k             |
++-----------+--------------+--------------+
+|Ineg       |A             |r             |
++-----------+--------------+--------------+
+|Isht       |e             |A             |
++-----------+--------------+--------------+
+|Itof       |i             |z             |
++-----------+--------------+--------------+
+|Itou       |'             |i             |
++-----------+--------------+--------------+
+|Finf       |q             |m             |
++-----------+--------------+--------------+
+|Fnan       |t             |b             |
++-----------+--------------+--------------+
+|Fneg       |p             |u             |
++-----------+--------------+--------------+
+|Snew       |?             |$             |
++-----------+--------------+--------------+
+|Sadd       |!             |-             |
++-----------+--------------+--------------+
+|Onew       |~             |+             |
++-----------+--------------+--------------+
+|Oadd       |M             |g             |
++-----------+--------------+--------------+
+|Anew       |@             |v             |
++-----------+--------------+--------------+
+|Aadd       |s             |?             |
++-----------+--------------+--------------+
+|Bnew       |z             |^             |
++-----------+--------------+--------------+
+|Bneg       |o             |!             |
++-----------+--------------+--------------+
+|Nnew       |.             |y             |
++-----------+--------------+--------------+
+|Gdup       |E             |/             |
++-----------+--------------+--------------+
+|Gpop       |#             |e             |
++-----------+--------------+--------------+
+|Gswp       |%             |:             |
++-----------+--------------+--------------+
