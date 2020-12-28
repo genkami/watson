@@ -59,7 +59,7 @@ Every time an empty string is pushed, the conversion table between instructions 
 Pushing an empty string again restores the state of the conversion table.
 
 ```
-$ echo '?SShaarrkShaaaarrkShaaaaarrkShaaaaaarrk-SShkShaaaaarrkShaaaaaarrk-SShkSharrkShaaarrkShaaaaarrkShaaaaaarrk-SShkSharrkShaarrkShaaarrkShaaaaarrkShaaaaaarrk-' | watson decode -t json
+$ echo '?SShaakShaaaakShaaaaakShaaaaaak-SShkShaaaaakShaaaaaak-SShkShakShaaakShaaaaakShaaaaaak-SShkShakShaakShaaakShaaaaakShaaaaaak-' | watson decode -t json
 "tako"
 ```
 
