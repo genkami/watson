@@ -56,6 +56,12 @@ There are two instructions that manipulate String values:
 * `!` : appends a lowest byte of the top of the stack to a string at the second top of the stack
 
 Every time an empty string is pushed, the conversion table between instructions and its ASCII representations changes. Above six instructions `B`, `u`, `b`, `a`, `?`, and `!`, are changed to `S`, `h`, `a`, `k`, `$`, and `-`, respectively.
+Pushing an empty string again restores the state of the conversion table.
+
+```
+$ echo '?SShaarrkShaaaarrkShaaaaarrkShaaaaaarrk-SShkShaaaaarrkShaaaaaarrk-SShkSharrkShaaarrkShaaaaarrkShaaaaaarrk-SShkSharrkShaarrkShaaarrkShaaaaarrkShaaaaaarrk-' | watson decode -t json
+"tako"
+```
 
 ### Object
 Object is a set of key-value pairs.
