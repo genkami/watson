@@ -9,7 +9,7 @@
 Watson makes it hard but fun to write configuration files.
 
 ## Index
-* [Language Specification(WIP)](#)
+* [Language Specification](./doc/spec.md)
 * [CLI Tool(WIP)](#)
 * [pkg.go.dev](https://pkg.go.dev/github.com/genkami/watson)
 
