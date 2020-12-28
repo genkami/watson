@@ -15,7 +15,9 @@ Watson makes it hard but fun to write configuration files.
 
 ## Installation
 
-*executables will be available soon!*
+Download latest binaries from [releases](https://github.com/genkami/watson/releases).
+
+Or you can build binaries from source code.
 
 ```
 $ git clone git@github.com:genkami/watson.git
