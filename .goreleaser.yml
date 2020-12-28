@@ -5,7 +5,7 @@ before:
   hooks:
     - go mod tidy
 builds:
-  - main: cmd/watson
+  - main: ./cmd/watson/main.go
     binary: watson
     ldflags:
       - -s -w
