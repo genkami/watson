@@ -4,7 +4,7 @@ Watson (Wasted but Amazing Turing-incomplete Stack-based Object Notation) is a c
 
 Watson internally has a stack-based virtual machine called Watson VM. Each byte of Watson files are considered as an instruction to the Watson VM.
 
-The correspondence between instructions and its text representation varies depending on the state of Watson's lexer. We call the state *mode* and the correspondence *Watson Representation*.
+The correspondence between instructions and its text representation varies depending on the state of Watson's lexer. We call the state *mode* and an ASCII representation of the instructions *Watson Representation*.
 
 ## Table of Contents
 
@@ -26,7 +26,12 @@ Following eight types are available.
 * **Nil**: a null value
 
 ## Instructions
-WIP
+As described above, Watson internally has a stack-based virtual machine called Watson VM.
+The VM's initial stack is empty. Values represented by Watson files are determined by following steps:
+
+1. Converts contents of a Watson file into a sequence of instructions.
+2. Executes all instructions sequentially.
+3. Value at the top of the VM's stack is the value that is represented by the Watson file.
 
 ## Watson Representation
 WIP
