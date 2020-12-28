@@ -8,15 +8,19 @@ import (
 	"github.com/genkami/watson/pkg/vm"
 )
 
+// Preffifier behaves as a lexer.OpWriter and writes some meaningless Ops to its underlying OpWriter in addition to any Ops that are written.
 type Prettifier struct {
 	w    lexer.OpWriter
 	last *vm.Op
 }
 
+// NewPrettifier returns a new Prettifier.
 func NewPrettifier(w lexer.OpWriter) *Prettifier {
 	return &Prettifier{w: w, last: nil}
 }
 
+// Write writes op to the underlying OpWriter.
+// It sometimes writes one or more extra Ops to decorate output.
 func (p *Prettifier) Write(op vm.Op) error {
 	var err error
 	if p.last == nil {
@@ -77,6 +81,7 @@ func (p *Prettifier) writeMulti(ops ...vm.Op) error {
 	return nil
 }
 
+// Mode returns the Prettifier's current mode.
 func (p *Prettifier) Mode() lexer.Mode {
 	return p.w.Mode()
 }
