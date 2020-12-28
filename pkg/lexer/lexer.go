@@ -96,12 +96,15 @@ func (opt lexerOption) apply(l *Lexer) {
 	opt(l)
 }
 
+// WithInitialLexerMode sets an initial mode of a lexer.
 func WithInitialLexerMode(mode Mode) LexerOption {
 	return lexerOption(func(l *Lexer) {
 		l.mode = mode
 	})
 }
 
+// WithFileName sets a file name of a lexer.
+// File name is only used to generate error messages.
 func WithFileName(name string) LexerOption {
 	return lexerOption(func(l *Lexer) {
 		l.fileName = name
@@ -171,13 +174,13 @@ func (l *Lexer) Next() (*Token, error) {
 	}
 }
 
-// OpWriter is an abstract interface that defined what the Unlexer does.
+// OpWriter is an abstract interface that defines what the Unlexer does.
 type OpWriter interface {
 	Write(vm.Op) error
 	Mode() Mode
 }
 
-// SliceWriter is a simple `lexer.OpWriter` that just holds `vm.Op`s written as a slice of `vm.Op`s.
+// SliceWriter is a simple `lexer.OpWriter` that is intended to test anything that uses Unlexer.
 type SliceWriter struct {
 	ops  []vm.Op
 	mode Mode
@@ -219,6 +222,7 @@ func (opt unlexerOption) apply(u *Unlexer) {
 	opt(u)
 }
 
+// WithInitialUnlexerMode sets an initial mode of an Unlexer.
 func WithInitialUnlexerMode(m Mode) UnlexerOption {
 	return unlexerOption(func(u *Unlexer) {
 		u.mode = m
@@ -231,6 +235,7 @@ type Unlexer struct {
 	mode Mode
 }
 
+// NewUnlexer returns a new Unlexer that writes to w.
 func NewUnlexer(w io.Writer, opts ...UnlexerOption) *Unlexer {
 	u := &Unlexer{
 		w:    w,
@@ -242,6 +247,7 @@ func NewUnlexer(w io.Writer, opts ...UnlexerOption) *Unlexer {
 	return u
 }
 
+// Write writes an Op to the underlying io.Writer.
 func (u *Unlexer) Write(op vm.Op) error {
 	b := make([]byte, 1)
 	b[0] = showOp(u.mode, op)
@@ -250,6 +256,7 @@ func (u *Unlexer) Write(op vm.Op) error {
 	return err
 }
 
+// Mode returns the unlexer's current mode.
 func (u *Unlexer) Mode() Mode {
 	return u.mode
 }
