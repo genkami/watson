@@ -276,6 +276,8 @@ The correspondence between VM's instructions and its ASCII representation varies
 
 Each lexer has its own mode. The mode of a lexer is either `A` or `S`. The initial mode of a lexer is `A` unless otherwise specified.
 
+Every time the lexer processes Snew, it flips its mode.
+
 The complete conversion table between instructions and their Watson Representations are as follows:
 
 
@@ -304,4 +306,34 @@ The complete conversion table between instructions and their Watson Representati
 |Gdup       |E             |/             |
 |Gpop       |#             |e             |
 |Gswp       |%             |:             |
+
+Any character that is not in this table is simply ignored.
+
+### Examples 1
+
+```
+B
+```
+
+is converted into
+
+```
+Inew
+```
+
+since the initial state of the lexer is A and the corresponding instruction of a character `B` is `Inew`.
+
+### Example 2
+
+```
+b?b
+```
+
+is converted into
+
+```
+Ishl Snew Fnan
+```
+
+since the lexer changes its mode to S after processing a character `?` and then converts the last character `b` using the `S` column of the conversion table.
 
