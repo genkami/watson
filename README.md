@@ -4,6 +4,23 @@
 
 (image from [walfie gif](https://walfiegif.wordpress.com/2020/11/05/this-is-true/))
 
+Watson makes it hard but fun to write configuration files.
+
+## Index
+* [Language Specification(WIP)](#)
+* [CLI Tool(WIP)](#)
+* [pkg.go.dev](https://pkg.go.dev/github.com/genkami/watson)
+
+## Installation
+
+*executables will be available soon!*
+
+```
+$ git clone git@github.com:genkami/watson.git
+$ cd watson/cmd/watson
+$ go install
+```
+
 ## Examples
 
 [You can see more examples here.](https://github.com/genkami/watson/tree/main/examples)
@@ -33,7 +50,7 @@ first: true
 hello: world
 ```
 
-### Deploy Nginx Using Kubernetes
+### Deploying Nginx Using Kubernetes
 
 ```
 $ echo '
@@ -142,4 +159,38 @@ SShkSharrkShaaaaaarrk-SShaarrkShaaarrkShaaaaarrkShaaaaaarrk-SShkShaarrkShaaaarrk
 ' | watson decode -t yaml | kubectl apply -f
 deployment.apps/nginx created
 service/nginx created
+```
+
+### Converting a Go Struct into Watson
+
+``` go
+package main
+
+import (
+	"github.com/genkami/watson"
+	"os"
+)
+
+type User struct {
+	FullName string `watson:"fullName"`
+	Nickname string `watson:"nickname,omitempty"`
+}
+
+func main() {
+	user := User{
+		FullName: "Motoaki Tanigo",
+		Nickname: "YAGOO",
+	}
+	enc := watson.NewEncoder(os.Stdout)
+	err := enc.Encode(&user)
+	if err != nil {
+		panic(err)
+	}
+}
+```
+
+output:
+
+```
+~?SShakShaakShaaaaakShaaaaaak-SShkShaakShaaaakShaaaaakShaaaaaak-SShaakShaaakShaaaaakShaaaaaak-SShaakShaaakShaaaaakShaaaaaak-SShakShaakShaaakShaaaaaak-SShkShaaaaakShaaaaaak-SShkShaakShaaakShaaaaakShaaaaaak-SShkShaakShaaaaakShaaaaaak-$BBuaBubbaBubbbaBubbbbbba!BBuaBubaBubbaBubbbaBubbbbbaBubbbbbba!BBubbaBubbbbaBubbbbbaBubbbbbba!BBuaBubaBubbaBubbbaBubbbbbaBubbbbbba!BBuaBubbbbbaBubbbbbba!BBuaBubaBubbbaBubbbbbaBubbbbbba!BBuaBubbbaBubbbbbaBubbbbbba!BBubbbbba!BBubbaBubbbbaBubbbbbba!BBuaBubbbbbaBubbbbbba!BBubaBubbaBubbbaBubbbbbaBubbbbbba!BBuaBubbbaBubbbbbaBubbbbbba!BBuaBubaBubbaBubbbbbaBubbbbbba!BBuaBubaBubbaBubbbaBubbbbbaBubbbbbba!M?SShakShaakShaaakShaaaaakShaaaaaak-SShkShaaakShaaaaakShaaaaaak-SShkShakShaaaaakShaaaaaak-SShkShakShaaakShaaaaakShaaaaaak-SShakShaakShaaakShaaaaakShaaaaaak-SShkShaaaaakShaaaaaak-SShkShaakShaaakShaaaaakShaaaaaak-SShkShaakShaaaaakShaaaaaak-$BBuaBubbbaBubbbbaBubbbbbba!BBuaBubbbbbba!BBuaBubaBubbaBubbbbbba!BBuaBubaBubbaBubbbaBubbbbbba!BBuaBubaBubbaBubbbaBubbbbbba!M
 ```
