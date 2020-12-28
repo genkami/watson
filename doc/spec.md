@@ -86,7 +86,7 @@ push(-x);
 ```
 
 ### Isht
-Isht pops two Ints `x` and `y`, and then pushes `x << y`.
+Isht pops two Ints `y` and `x`, and then pushes `x << y`.
 
 Pseudo code:
 
@@ -154,7 +154,7 @@ push("");
 ```
 
 ### Sadd
-Sadd pops a String `s` and an Int `x`, appends the lowest 8 bits of `x` to `s`, then pushes `s`.
+Sadd pops an Int `x` and a String `s`, appends the lowest 8 bits of `x` to `s`, then pushes `s`.
 
 Pseudo code:
 
@@ -162,7 +162,7 @@ Pseudo code:
 x: Int = pop();
 s: String = pop();
 s += (lowest 8 bits of x);
-push(t);
+push(s);
 ```
 
 ### Onew
@@ -175,7 +175,7 @@ push({});
 ```
 
 ### Oadd
-Oadd pops an Object `o`, a String `k`, and an arbitrary value `v`, then sets `v` to `o[k]`, and then pushes `o`.
+Oadd pops an arbitrary value `v`, a String `k` and an Object `o` , then sets `v` to `o[k]`, and then pushes `o`.
 
 Pseudo code:
 
@@ -197,7 +197,7 @@ push([]);
 ```
 
 ### Aadd
-Aadd pops an Array `a` and an arbitrary value `x`, appends `x` to `a`, and then pushes `a`.
+Aadd pops an arbitrary value `x` and an Array `a`, appends `x` to `a`, and then pushes `a`.
 
 Pseudo code:
 
