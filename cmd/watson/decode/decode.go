@@ -36,6 +36,7 @@ func (r *Runner) parseArgs(args []string) {
 	if errors.Is(err, flag.ErrHelp) {
 		os.Exit(0)
 	} else if err != nil {
+		fmt.Fprintf(os.Stderr, "%s", err.Error())
 		fs.PrintDefaults()
 		os.Exit(1)
 	}
