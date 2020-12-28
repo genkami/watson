@@ -18,20 +18,22 @@ import (
 )
 
 type Runner struct {
-	outType util.Type
-	mode    util.Mode
-	files   []string
-	m       *vm.VM
+	outType   util.Type
+	mode      util.Mode
+	files     []string
+	m         *vm.VM
+	stackSize int
 }
 
 func NewRunner() *Runner {
-	return &Runner{m: vm.NewVM()}
+	return &Runner{}
 }
 
 func (r *Runner) parseArgs(args []string) {
 	fs := flag.NewFlagSet("watson decode", flag.ExitOnError)
 	fs.Var(&r.outType, "t", "input type")
 	fs.Var(&r.mode, "initial-mode", "initial mode of the lexer")
+	fs.IntVar(&r.stackSize, "stack-size", vm.DefaultStackSize, "stack size of the Watson VM")
 	err := fs.Parse(args)
 	if errors.Is(err, flag.ErrHelp) {
 		os.Exit(0)
@@ -40,6 +42,7 @@ func (r *Runner) parseArgs(args []string) {
 		fs.PrintDefaults()
 		os.Exit(1)
 	}
+	r.m = vm.NewVM(vm.WithStackSize(r.stackSize))
 	r.files = fs.Args()
 }
 
