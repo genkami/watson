@@ -8,6 +8,31 @@
 
 [You can see more examples here.](https://github.com/genkami/watson/tree/main/examples)
 
+### Hello World
+
+```
+$ echo '
+~?ShaaaaaarrShaaaaarrkShaaarrk-
+SameeShaaaaaarrShaaaaarrkShaarrkShrrk-
+ShaaaaaarrShaaaaakSameeShaaarrkShaarrk-
+ShaaaaaarrShaaaaarrkShaaarrkShaarrk-
+ShaaaaaarrShaaaaarrkShaaarrkShaarrkSharrkShrrk-$
+BubbbbbbBubbbbbaBubbbbaBubbaBubaBua!
+BubbbbbbBubbbbbaBubbbaBubbaBubaBua!
+BubbbbbbBubbbbbaBubbbbaBuba!
+BubbbbbbBubbbbbaBubbbaBubba!
+BubbbbbbBubbbbbaBubba!M?
+ShaaaaaaShaaaaakShaakShak-
+ShaaaaaaShaaaaakShaaakShk-
+ShaaaaaaShaaaaakShaaaakShak-
+ShaaaaaaShaaaaakShaaaakShakShk-
+ShaaaaaaShaaaaakShaaaakShaak-
+^!!!!!!!!!!!!!g
+' | watson decode -t yaml
+first: true
+hello: world
+```
+
 ### Deploy Nginx Using Kubernetes
 
 ```
