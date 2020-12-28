@@ -4,6 +4,7 @@ package dumper
 import (
 	"fmt"
 	"math"
+	"math/bits"
 
 	"github.com/genkami/watson/pkg/lexer"
 	"github.com/genkami/watson/pkg/types"
@@ -44,37 +45,42 @@ func (d *Dumper) Dump(v *types.Value) error {
 	}
 }
 
+// dumpInt writes out a number from the most-significant to the least-significant bit.
 func (d *Dumper) dumpInt(n uint64) error {
 	var err error
 	err = d.w.Write(vm.Inew)
 	if err != nil {
 		return err
 	}
-	shift := 0
-	for n != 0 {
-		if n%2 == 1 {
-			err = d.w.Write(vm.Inew)
-			if err != nil {
-				return err
-			}
+
+	if n == 0 {
+		return nil
+	}
+
+	msb := 63 - bits.LeadingZeros64(n)
+
+	// This bit is guaranteed to be one 1 and we can write it out directly.
+	err = d.w.Write(vm.Iinc)
+	if err != nil {
+		return err
+	}
+
+	// Now we start checking from the next bit.
+	for i := msb - 1; i >= 0; i-- {
+		err = d.w.Write(vm.Ishl)
+		if err != nil {
+			return err
+		}
+
+		mask := uint64(1) << i
+		if (n & mask) != 0 {
 			err = d.w.Write(vm.Iinc)
 			if err != nil {
 				return err
 			}
-			for i := 0; i < shift; i++ {
-				err = d.w.Write(vm.Ishl)
-				if err != nil {
-					return err
-				}
-			}
-			err = d.w.Write(vm.Iadd)
-			if err != nil {
-				return err
-			}
 		}
-		n = n >> 1
-		shift++
 	}
+
 	return nil
 }
 
