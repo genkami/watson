@@ -29,7 +29,7 @@ func NewRunner() *Runner {
 }
 
 func (r *Runner) parseArgs(args []string) {
-	fs := flag.NewFlagSet("watson encode", flag.ExitOnError)
+	fs := flag.NewFlagSet("watson decode", flag.ExitOnError)
 	fs.Var(&r.outType, "t", "input type")
 	fs.Var(&r.mode, "initial-mode", "initial mode of the lexer")
 	err := fs.Parse(args)
