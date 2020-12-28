@@ -5,8 +5,8 @@ before:
   hooks:
     - go mod tidy
 builds:
-  - main: .
-    binary: git-bump
+  - main: cmd/watson
+    binary: watson
     ldflags:
       - -s -w
       - -X main.Version={{.Version}}
