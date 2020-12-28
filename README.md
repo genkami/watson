@@ -25,6 +25,48 @@ $ cd watson/cmd/watson
 $ go install
 ```
 
+## Overview of Language Specification
+For complete information, please visit [full specification](./doc/spec.md).
+
+Watson internally has a stack-based virtual machine called Watson VM. Each character of Watson files is considered as an instruction to Watson VM.
+
+### Integer
+Integer (Int) is a 64-bit signed integer.
+
+Basic instructions for Int are as follows:
+
+* `B` : pushes a zero to the stack
+* `u` : increments a value at the top of the stack
+* `b` : shifts a value at the top of the stack to the left by one bit
+* `a` : adds two values on the top of the stack
+
+You can create arbitrary integers by using these instructions:
+
+```
+$ echo 'BBuaBubaBubbbaBubbbbaBubbbbbaBubbbbbba' | watson decode -t json
+123
+```
+
+### String
+String is a byte array.
+
+There are two instructions that manipulate String values:
+
+* `?` : pushes an empty string
+* `!` : appends a lowest byte of the top of the stack to a string at the second top of the stack
+
+Every time an empty string is pushed, the conversion table between instructions and its ASCII representations changes. Above six instructions `B`, `u`, `b`, `a`, `?`, and `!`, are changed to `S`, `h`, `a`, `k`, `$`, and `-`, respectively.
+
+### Object
+Object is a set of key-value pairs.
+
+There are two instructions that manipulate Object values:
+
+* `~` : pushes an empty Object
+* `M` : pops three values `v`, `k`, `o` in this order, set `o[k] = v`, and then pushes `o`
+
+Note that once `?` is invoked these are changed to `+` and `g` respectively.
+
 ## Examples
 
 [You can see more examples here.](https://github.com/genkami/watson/tree/main/examples)
