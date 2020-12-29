@@ -55,8 +55,8 @@ There are two instructions that manipulate String values:
 * `?` : pushes an empty string
 * `!` : appends a lowest byte of the top of the stack to a string at the second top of the stack
 
-Every time an empty string is pushed, the conversion table between instructions and its ASCII representations changes. Above six instructions `B`, `u`, `b`, `a`, `?`, and `!`, are changed to `S`, `h`, `a`, `k`, `$`, and `-`, respectively.
-Pushing an empty string again restores the state of the conversion table.
+Every time an empty string is pushed, the ASCII characters used for stack manipulation are updated. The above six instructions `B`, `u`, `b`, `a`, `?`, and `!`, are changed to `S`, `h`, `a`, `k`, `$`, and `-`, respectively.
+Pushing an empty string again resets to the orignal characters.
 
 ```
 $ echo '?SShaakShaaaakShaaaaakShaaaaaak-SShkShaaaaakShaaaaaak-SShkShakShaaakShaaaaakShaaaaaak-SShkShakShaakShaaakShaaaaakShaaaaaak-' | watson decode -t json
