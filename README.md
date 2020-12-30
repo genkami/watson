@@ -275,6 +275,6 @@ output:
 
 ## Related Projects
 
-* [ratson](https://github.com/Herbstein/ratson) - A Rust implementation of Watson
-* [WATSON-as-a-Service](https://watson-as-a-service.vercel.app/) - A web API for Watson ([GitHub](https://github.com/jozsefsallai/watson-as-a-service))
+* [ratson](https://github.com/Herbstein/ratson) - Rust implementation of Watson
+* [WATSON-as-a-Service](https://watson-as-a-service.vercel.app/) - Web API for Watson ([GitHub](https://github.com/jozsefsallai/watson-as-a-service))
 * [guralang](https://github.com/indronna/guralang) - A
