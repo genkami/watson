@@ -279,5 +279,6 @@ output:
 * [sololegends/watson](https://gitlab.sololegends.com/sololegends/watson) - Java implementation of Watson
 * [takase1121/watson.js](https://github.com/takase1121/watson.js) - JavaScript implementation of Watson
 * [matsubara0507/watson.hs](https://github.com/matsubara0507/watson.hs) - Haskell implementation of Watson
+* [Dar9586/watson-c](https://github.com/Dar9586/watson-c) - C implementation of Watson
 * [jozsefsallai/watson-as-a-service](https://github.com/jozsefsallai/watson-as-a-service) - Web API for Watson ([Website](https://watson-as-a-service.vercel.app/))
 * [indronna/guralang](https://github.com/indronna/guralang) - A
