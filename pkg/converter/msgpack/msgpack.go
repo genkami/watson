@@ -4,7 +4,7 @@ package msgpack
 import (
 	"io"
 
-	"github.com/vmihailenco/msgpack"
+	"github.com/vmihailenco/msgpack/v5"
 
 	"github.com/genkami/watson/pkg/types"
 )
