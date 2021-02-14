@@ -1,6 +1,7 @@
 # WATSON: Wasted but Amazing Turing-incomplete Stack-based Object Notation
 
 ![ci status](https://github.com/genkami/watson/workflows/Test/badge.svg)
+[![Go Reference](https://pkg.go.dev/badge/github.com/genkami/watson.svg)](https://pkg.go.dev/github.com/genkami/watson)
 
 ![WATSON](./doc/img/watson.gif)
 
