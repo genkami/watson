@@ -277,6 +277,7 @@ output:
 ## Related Projects
 
 * [Herbstein/ratson](https://github.com/Herbstein/ratson) - Rust implementation of Watson
+* [genkami/watson-rs](https://github.com/genkami/watson-rs) - Another Rust implementation of Watson
 * [sololegends/watson](https://gitlab.sololegends.com/sololegends/watson) - Java implementation of Watson
 * [takase1121/watson.js](https://github.com/takase1121/watson.js) - JavaScript implementation of Watson
 * [matsubara0507/watson.hs](https://github.com/matsubara0507/watson.hs) - Haskell implementation of Watson
